@@ -89,3 +89,24 @@ Your goal in this module is to get students to understand the *'why'* behind Wal
   * "If Walrus is totally public, how could you *ever* use it for sensitive data, like a company's financial records?"
 
   * **Answer:** You (the client) would have to encrypt the file *before* you upload it. The network would store the meaningless, encrypted "blob." This is a key concept: "client-side encryption."
+
+## 8. Diagram Explanation: The "Write Path"
+
+**Goal:** Use the diagram to visually prove why Walrus is cheap and scalable. The key is showing that the **Blockchain (Sui)** and the **Storage (Nodes)** are two separate lanes.
+
+**Walkthrough Script for the Instructor:**
+
+1.  **The Client is the Chef (User -> File):**
+    * "Notice that the first step happens *on the user's device*. The 'Client' is doing the hard work of chopping the file into pieces (slivers) using RedStuff. This isn't happening on a central server."
+
+2.  **The Heavy Lifting (File -> Storage Nodes):**
+    * "Follow the **thick arrow** to the Storage Nodes. This is where the 'Heavy Data' goes. If you have a 1GB video, 1GB of data flows here. These nodes are like dumb lockers—they just hold the stuff."
+
+3.  **The Brain (User -> Sui Blockchain):**
+    * "Now look at the arrow going to Sui. This is 'Light Data' (Metadata). Even for a 1GB video, this might only be a few kilobytes of text describing *where* the slivers are. This is why it's cheap: we aren't clogging the blockchain with the actual video file."
+
+4.  **The Police (Sui <-> Storage Nodes):**
+    * "Finally, the dotted line. Sui acts as the 'Control Plane.' It doesn't hold the data, but it *polices* the nodes. It randomly challenges them: 'Do you still have piece #45?' If they say yes, Sui pays them. If no, they get fined."
+
+**Key Concept to Emphasize:**
+* **Control Plane vs. Storage Plane:** Walrus separates the *management* (Sui) from the *actual storage* (Nodes). This is the secret sauce that allows it to scale.
