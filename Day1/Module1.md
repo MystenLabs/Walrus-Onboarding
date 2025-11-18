@@ -87,6 +87,23 @@ This is how Walrus ensures your data is safe and "durable" (i.e., it doesn't get
 
 4. **Record:** The client then registers the blob's metadata (like a receipt or table of contents) as a smart contract "object" on the Sui blockchain. This object acts as the proof of ownership and the "map" to find the data.
 
+'''mermaid
+graph TD
+    User[User / Client App]
+    File[Large File / Blob]
+    Sui[Sui Blockchain<br/>(Control Plane)]
+    Nodes[Storage Nodes<br/>(Storage Plane)]
+
+    User -- 1. Encodes & Splits (RedStuff) --> File
+    File -- 2. Distributes Slivers (Heavy Data) --> Nodes
+    User -- 3. Registers Metadata (Light Data) --> Sui
+    Sui -. 4. Verifies Availability & Payments .- Nodes
+    
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+    style Sui fill:#bbf,stroke:#333,stroke-width:2px
+    style Nodes fill:#bfb,stroke:#333,stroke-width:2px
+'''
+
 **2. Retrieving (Reading) a File:**
 
 1. **Request:** Your client initiates a request for the file using its unique "blob ID."
