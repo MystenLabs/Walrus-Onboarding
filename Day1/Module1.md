@@ -89,16 +89,16 @@ This is how Walrus ensures your data is safe and "durable" (i.e., it doesn't get
 
 ```mermaid
 graph TD
-    User[User / Client App]
-    File[Large File / Blob]
-    Sui[Sui Blockchain<br/>(Control Plane)]
-    Nodes[Storage Nodes<br/>(Storage Plane)]
+    User["User / Client App"]
+    File["Large File / Blob"]
+    Sui["Sui Blockchain<br/>(Control Plane)"]
+    Nodes["Storage Nodes<br/>(Storage Plane)"]
 
-    User -- 1. Encodes & Splits (RedStuff) --> File
-    File -- 2. Distributes Slivers (Heavy Data) --> Nodes
-    User -- 3. Registers Metadata (Light Data) --> Sui
-    Sui -. 4. Verifies Availability & Payments .- Nodes
-    
+    User -->|"1. Encodes & Splits (RedStuff)"| File
+    File -->|"2. Distributes Slivers (Heavy Data)"| Nodes
+    User -->|"3. Registers Metadata (Light Data)"| Sui
+    Sui -.->|"4. Verifies Availability & Payments"| Nodes
+
     style User fill:#f9f,stroke:#333,stroke-width:2px
     style Sui fill:#bbf,stroke:#333,stroke-width:2px
     style Nodes fill:#bfb,stroke:#333,stroke-width:2px
