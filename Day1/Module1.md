@@ -87,7 +87,7 @@ This is how Walrus ensures your data is safe and "durable" (i.e., it doesn't get
 
 4. **Record:** The client then registers the blob's metadata (like a receipt or table of contents) as a smart contract "object" on the Sui blockchain. This object acts as the proof of ownership and the "map" to find the data.
 
-'''mermaid
+```mermaid
 graph TD
     User[User / Client App]
     File[Large File / Blob]
@@ -102,7 +102,7 @@ graph TD
     style User fill:#f9f,stroke:#333,stroke-width:2px
     style Sui fill:#bbf,stroke:#333,stroke-width:2px
     style Nodes fill:#bfb,stroke:#333,stroke-width:2px
-'''
+```
 
 **2. Retrieving (Reading) a File:**
 
