@@ -73,6 +73,13 @@ Before starting this curriculum, you should have:
 
 For more information on setting up your wallet and obtaining tokens, see the [Setup guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/setup.md#prerequisites).
 
+## For Instructors
+
+If you're teaching this curriculum, see the [Instructor's Guide](./instructor-guide.md) for:
+- Teaching strategies and approaches
+- Section-by-section guidance
+- Assessment suggestions
+
 ## Next Steps
 
 Start with [Install CLI](./install.md) to set up the Walrus CLI tool, then configure it using [Configuration](./configuration.md), and proceed through the workflow sections to learn how to upload and download data, followed by inspection and troubleshooting sections.
