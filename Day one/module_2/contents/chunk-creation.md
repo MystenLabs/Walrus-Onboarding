@@ -4,9 +4,9 @@ Understanding how blobs are encoded is crucial to understanding Walrus's data fl
 
 ## Encoding Process
 
-```admonish info title="Visual Diagram"
-The encoding process diagram is available as an Excalidraw file. Import [`chunk-creation-diagram.excalidraw.json`](https://github.com/MystenLabs/walrus/blob/main/docs/assets/chunk-creation-diagram.excalidraw.json) into [Excalidraw.com](https://excalidraw.com) to view or edit. Export as SVG for use in documentation.
-```
+![Chunk Creation and Encoding Diagram](../images/chunk-creation-diagram.svg)
+
+*[Excalidraw source file](../assets/chunk-creation-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
 
 The diagram illustrates the complete encoding flow:
 - **Blob Input**: Original binary data
@@ -59,7 +59,7 @@ The encoding process:
 5. Returns sliver pairs and verified metadata
 
 The client SDK wraps this encoding. See the client wrapper:
-[`encode_pairs_and_metadata`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L1124-L1154)
+[`encode_pairs_and_metadata`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs)
 
 ## Consistency Checks
 
@@ -69,9 +69,6 @@ Walrus provides multiple consistency check mechanisms:
 - **Strict check**: Re-encodes the blob and verifies the blob ID matches
 - **Storage node checks**: Storage nodes can detect encoding inconsistencies and mark blobs as invalid
 
-```admonish info title="Encoding Details"
-For full details on the encoding scheme, see the [Encoding documentation](https://github.com/MystenLabs/walrus/blob/main/docs/design/encoding.md) and the [Walrus whitepaper](https://github.com/MystenLabs/walrus/blob/main/docs/walrus.pdf). For terminology definitions, refer to the [Glossary](https://github.com/MystenLabs/walrus/blob/main/docs/glossary.md).
-```
 
 ## Related Sections
 

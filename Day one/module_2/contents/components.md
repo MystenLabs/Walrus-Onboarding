@@ -17,9 +17,9 @@ The diagrams below are Excalidraw diagrams that illustrate each component's arch
 
 **Storage Nodes** are the core infrastructure of Walrus - they actually store the encoded blob data.
 
-![Storage Node Architecture](https://github.com/MystenLabs/walrus/blob/main/docs/assets/storage-node-diagram.svg)
+![Storage Node Architecture](../images/storage-node-diagram.svg)
 
-*[Excalidraw source file](https://github.com/MystenLabs/walrus/blob/main/docs/assets/storage-node-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
+*[Excalidraw source file](../assets/storage-node-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
 
 The diagram illustrates:
 - Storage node connected to Sui blockchain for shard assignment
@@ -56,7 +56,7 @@ Storage nodes:
 #### Storing Slivers
 
 When a storage node receives a sliver, it validates and stores it. See the implementation:
-[`store_sliver_unchecked` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/node.rs#L2554-L2603)
+[`store_sliver_unchecked` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/node.rs)
 
 The storage process:
 1. Determines which shard should store this sliver
@@ -65,17 +65,13 @@ The storage process:
 4. Verifies the sliver hash matches the metadata
 5. Stores the sliver in the shard's database
 
-```admonish warning title="Storage Node Requirements"
-Storage nodes must maintain sufficient SUI and WAL balances, operate a Sui blockchain client, and maintain reliable storage infrastructure. For detailed information about operating storage nodes, see the [Storage Node Operator Guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/storage-node.md).
-```
-
 ## Publisher Role
 
 **Publishers** are optional infrastructure components that help end users store blobs using web2 technologies (like HTTP), reducing bandwidth requirements and providing custom logic.
 
-![Publisher Architecture](https://github.com/MystenLabs/walrus/blob/main/docs/assets/publisher-diagram.svg)
+![Publisher Architecture](../images/publisher-diagram.svg)
 
-*[Excalidraw source file](https://github.com/MystenLabs/walrus/blob/main/docs/assets/publisher-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
+*[Excalidraw source file](../assets/publisher-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
 
 The diagram illustrates the upload flow:
 - Client sending blob via HTTP PUT to Publisher
@@ -116,7 +112,7 @@ Publishers expose an HTTP API that accepts blob uploads. They use the Walrus cli
 #### HTTP Endpoint Implementation
 
 The publisher HTTP endpoint receives PUT requests with blob data. See the implementation:
-[`put_blob` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs#L374-L419)
+[`put_blob` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs)
 
 The endpoint:
 1. Validates authentication (if JWT is configured)
@@ -132,9 +128,9 @@ Publishers can be configured to require authentication (JWT tokens) for uploads,
 
 **Aggregators** are optional infrastructure components that reconstruct blobs from slivers and make them available to users over traditional web2 technologies (HTTP).
 
-![Aggregator Architecture](https://github.com/MystenLabs/walrus/blob/main/docs/assets/aggregator-diagram.svg)
+![Aggregator Architecture](../images/aggregator-diagram.svg)
 
-*[Excalidraw source file](https://github.com/MystenLabs/walrus/blob/main/docs/assets/aggregator-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
+*[Excalidraw source file](../assets/aggregator-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
 
 The diagram illustrates the retrieval flow:
 - Client requesting blob via HTTP GET from Aggregator
@@ -174,7 +170,7 @@ Aggregators use the Walrus read client to:
 #### HTTP Endpoint Implementation
 
 The aggregator HTTP endpoint receives GET requests with blob IDs. See the implementation:
-[`get_blob` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs#L136-L169)
+[`get_blob` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs)
 
 The endpoint:
 1. Extracts the blob ID from the URL path

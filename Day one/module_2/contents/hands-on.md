@@ -9,7 +9,7 @@ Before starting, ensure you have:
 - Completed the [System Components](./components.md) section to understand the architecture
 - Reviewed the [Data Flow](./data-flow.md) section to understand how data moves through the system
 - Understood [Chunk Creation and Encoding](./chunk-creation.md) to know how blobs are encoded
-- Walrus CLI installed (see [Getting Started](../usage/started.md))
+- Walrus CLI installed (see [Getting Started](https://github.com/MystenLabs/walrus/blob/main/docs/usage/started.md))
 - Access to a Walrus network (testnet or mainnet)
 - A wallet with sufficient SUI and WAL tokens (for direct uploads)
 - Or access to a publisher endpoint (for HTTP uploads)
@@ -23,7 +23,7 @@ Let's upload a simple text file to Walrus and trace its journey through the syst
 First, create a simple file to upload:
 
 ```bash
-echo "Hello, Walrus! This is my first blob." > my-blob.txt
+echo "Hello, Walrus! " > my-blob.txt
 ```
 
 This creates a small text file that we'll store in Walrus.
@@ -49,7 +49,7 @@ This command:
 Walrus currently supports blobs up to a maximum size of 13.3 GiB. Larger blobs can be split into smaller chunks before storage. Check the maximum blob size using `walrus info`.
 ```
 
-For detailed CLI command reference, see the [Client CLI documentation](../usage/client-cli.md).
+For detailed CLI command reference, see the [Client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/usage/client-cli.md).
 
 #### Option B: Upload via Publisher (Using HTTP)
 
@@ -61,116 +61,96 @@ curl -X PUT http://publisher.example.com:31416/ \
 
 This sends the blob to a publisher, which handles all the encoding and distribution.
 
-For HTTP API details, see the [Web API documentation](../usage/web-api.md).
+For HTTP API details, see the [Web API documentation](https://github.com/MystenLabs/walrus/blob/main/docs/usage/web-api.md).
 
 ### Step 3: Visual Sequence of Upload Flow
 
 Let's trace what happens behind the scenes:
 
+![Upload Flow Diagram](../images/upload-flow-diagram.svg)
+
+*[Excalidraw source file](../assets/upload-flow-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
+
 #### Phase 1: Encoding (Publisher/Client)
 
-```
-┌─────────────────────────────────────────┐
-│  Original Blob: "Hello, Walrus!..."     │
-│  Size: 38 bytes                          │
-└───────────────┬─────────────────────────┘
-                │
-                ▼
-┌─────────────────────────────────────────┐
-│  Encoding Process                        │
-│  ────────────────────────                │
-│  1. Split into symbols (k=334)          │
-│  2. Apply Reed-Solomon encoding          │
-│  3. Create sliver pairs                 │
-│  4. Compute sliver hashes               │
-│  5. Build Merkle tree                   │
-│  6. Compute blob ID                     │
-└───────────────┬─────────────────────────┘
-                │
-                ▼
-┌─────────────────────────────────────────┐
-│  Encoded Result:                         │
-│  • Blob ID: 0xabc123...                  │
-│  • Sliver pairs: ~1000 pairs             │
-│  • Metadata: size, encoding, hashes     │
-│  • Total encoded size: ~190 bytes        │
-└─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Blob[Original Blob: 'Hello, Walrus!...'] --> Encoding
+    
+    subgraph Encoding [Encoding Process]
+        direction TB
+        Split[1. Split into symbols] --> RS[2. Apply Reed-Solomon]
+        RS --> Pairs[3. Create sliver pairs]
+        Pairs --> Hashes[4. Compute hashes]
+        Hashes --> Merkle[5. Build Merkle tree]
+        Merkle --> BlobID[6. Compute blob ID]
+    end
+
+    Encoding --> Result
+    
+    subgraph Result [Encoded Result]
+        direction TB
+        ResID[Blob ID: 0xabc123...]
+        ResPairs[Sliver pairs: ~1000]
+        ResMeta[Metadata: size, encoding]
+        ResSize[Total size: ~190 bytes]
+        ResID --- ResPairs
+        ResPairs --- ResMeta
+        ResMeta --- ResSize
+    end
 ```
 
 #### Phase 2: On-Chain Registration
 
-```
-┌─────────────────────────────────────────┐
-│  Publisher/Client                       │
-└───────────────┬─────────────────────────┘
-                │ Create transaction
-                │ • Register blob object
-                │ • Reserve storage space
-                │ • Post metadata
-                ▼
-┌─────────────────────────────────────────┐
-│  Sui Blockchain                         │
-│  ────────────────────────                │
-│  Transaction:                            │
-│  • Blob Object ID: 0xdef456...          │
-│  • Blob ID: 0xabc123...                  │
-│  • Size: 38 bytes                        │
-│  • Encoding: RS2                        │
-│  • Status: Registering                  │
-└─────────────────────────────────────────┘
+```mermaid
+sequenceDiagram
+    participant PC as Publisher/Client
+    participant Sui as Sui Blockchain
+
+    Note over PC: Create transaction:<br/>• Register blob object<br/>• Reserve storage space<br/>• Post metadata
+
+    PC->>Sui: Transaction
+    Note over Sui: • Blob Object ID: 0xdef456...<br/>• Blob ID: 0xabc123...<br/>• Size: 38 bytes<br/>• Encoding: RS2<br/>• Status: Registering
 ```
 
 #### Phase 3: Sliver Distribution
 
-```
-┌─────────────────────────────────────────┐
-│  Publisher/Client                       │
-│  Has: 1000 sliver pairs                 │
-└───────────────┬─────────────────────────┘
-                │
-                ├─────────────────┬─────────────────┬──────────────┐
-                │                 │                 │              │
-                ▼                 ▼                 ▼              ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│ Storage Node │  │ Storage Node │  │ Storage Node │  │ Storage Node │
-│   Shard 1    │  │   Shard 2    │  │   Shard 3    │  │   Shard N    │
-│              │  │              │  │              │  │              │
-│ Receives:    │  │ Receives:    │  │ Receives:    │  │ Receives:    │
-│ • Sliver 1   │  │ • Sliver 2   │  │ • Sliver 3   │  │ • Sliver N   │
-│ • Metadata   │  │ • Metadata   │  │ • Metadata   │  │ • Metadata   │
-│              │  │              │  │              │  │              │
-│ Validates:   │  │ Validates:   │  │ Validates:   │  │ Validates:   │
-│ ✓ Hash OK    │  │ ✓ Hash OK    │  │ ✓ Hash OK    │  │ ✓ Hash OK    │
-│ ✓ Blob ID OK │  │ ✓ Blob ID OK │  │ ✓ Blob ID OK │  │ ✓ Blob ID OK │
-│              │  │              │  │              │  │              │
-│ Stores:      │  │ Stores:      │  │ Stores:      │  │ Stores:      │
-│ • Sliver 1   │  │ • Sliver 2   │  │ • Sliver 3   │  │ • Sliver N   │
-└──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘
-       │                 │                 │                 │
-       │ Signs certificate                  │                 │
-       │                                   │                 │
-       └─────────────────┬─────────────────┴─────────────────┘
-                        │ Return signatures
-                        ▼
-┌─────────────────────────────────────────┐
-│  Publisher/Client                       │
-│  Collects signatures from storage nodes │
-│  Aggregates into confirmation certificate│
-└───────────────┬─────────────────────────┘
-                │ Post certificate
-                ▼
-┌─────────────────────────────────────────┐
-│  Sui Blockchain                         │
-│  ────────────────────────                │
-│  Certificate Posted:                     │
-│  • Blob ID: 0xabc123...                  │
-│  • Signatures: [sig1, sig2, sig3, ...]   │
-│  • Status: Certified                     │
-│                                          │
-│  Event Emitted:                          │
-│  • Point of Availability                 │
-│  • Blob is now retrievable              │
-└─────────────────────────────────────────┘
+```mermaid
+sequenceDiagram
+    participant PC as Publisher/Client
+    participant SN1 as Storage Node (Shard 1)
+    participant SN2 as Storage Node (Shard 2)
+    participant SN3 as Storage Node (Shard 3)
+    participant SNN as Storage Node (Shard N)
+    participant Sui as Sui Blockchain
+
+    Note over PC: Has: 1000 sliver pairs
+
+    par Parallel Distribution
+        PC->>SN1: Store Sliver 1 + Metadata
+        PC->>SN2: Store Sliver 2 + Metadata
+        PC->>SN3: Store Sliver 3 + Metadata
+        PC->>SNN: Store Sliver N + Metadata
+    end
+
+    par Validation & Storage
+        Note over SN1: Validate: Hash OK, Blob ID OK<br/>Store: Sliver 1
+        Note over SN2: Validate: Hash OK, Blob ID OK<br/>Store: Sliver 2
+        Note over SN3: Validate: Hash OK, Blob ID OK<br/>Store: Sliver 3
+        Note over SNN: Validate: Hash OK, Blob ID OK<br/>Store: Sliver N
+    end
+
+    par Return Signatures
+        SN1-->>PC: Signed Certificate
+        SN2-->>PC: Signed Certificate
+        SN3-->>PC: Signed Certificate
+        SNN-->>PC: Signed Certificate
+    end
+
+    Note over PC: Collect signatures<br/>Aggregate into confirmation certificate
+
+    PC->>Sui: Post Certificate
+    Note over Sui: • Blob ID: 0xabc123...<br/>• Signatures: [sig1, sig2...]<br/>• Status: Certified<br/><br/>Event Emitted:<br/>• Point of Availability
 ```
 
 ### Step 4: Verify Upload Success
@@ -187,7 +167,7 @@ curl http://aggregator.example.com:31415/<blob-id>
 
 You should receive back: `"Hello, Walrus! This is my first blob."`
 
-For more information about reading blobs and consistency checks, see the [Developer Operations guide](../dev-guide/dev-operations.md#read).
+For more information about reading blobs and consistency checks, see the [Developer Operations guide](https://github.com/MystenLabs/walrus/blob/main/docs/dev-guide/dev-operations.md#read).
 
 ### Step 5: Inspect On-Chain State
 
@@ -208,53 +188,30 @@ You'll see:
 
 Now let's see how retrieval works:
 
+![Download/Retrieval Flow Diagram](../images/download-flow-diagram.svg)
+
+*[Excalidraw source file](../assets/download-flow-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
+
 #### Retrieval Sequence
 
-```
-┌─────────────────────────────────────────┐
-│  Client Request: GET /<blob-id>         │
-└───────────────┬─────────────────────────┘
-                │
-                ▼
-┌─────────────────────────────────────────┐
-│  Aggregator                             │
-│  1. Query Sui for blob metadata         │
-│     • Blob ID: 0xabc123...              │
-│     • Size: 38 bytes                    │
-│     • Storage epoch: 42                 │
-│     • Shard assignments                 │
-└───────────────┬─────────────────────────┘
-                │
-                │ 2. Request slivers
-                │    (needs 334 primary)
-                │
-                ├──────┬──────┬──────┬──────┐
-                │      │      │      │      │
-                ▼      ▼      ▼      ▼      ▼
-┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
-│Storage   │ │Storage   │ │Storage   │ │Storage   │
-│Node 1    │ │Node 2    │ │Node 3    │ │Node N    │
-│          │ │          │ │          │ │          │
-│Returns:  │ │Returns:  │ │Returns:  │ │Returns:  │
-│Sliver 1  │ │Sliver 2  │ │Sliver 3  │ │Sliver N  │
-└─────┬────┘ └─────┬────┘ └─────┬────┘ └─────┬────┘
-      │           │           │           │
-      └───────────┴───────────┴───────────┘
-                │
-                ▼
-┌─────────────────────────────────────────┐
-│  Aggregator                             │
-│  3. Decode 334 slivers                  │
-│  4. Consistency check                   │
-│     ✓ Sliver hashes match metadata     │
-│  5. Reconstruct blob                    │
-└───────────────┬─────────────────────────┘
-                │
-                ▼
-┌─────────────────────────────────────────┐
-│  Client Receives:                       │
-│  "Hello, Walrus! This is my first blob."│
-└─────────────────────────────────────────┘
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Agg as Aggregator
+    participant Sui as Sui Blockchain
+    participant SN as Storage Nodes (1..N)
+
+    Client->>Agg: GET /<blob-id>
+    
+    Agg->>Sui: Query Blob Metadata
+    Sui-->>Agg: ID, Size, Epoch, Shard Assignments
+
+    Agg->>SN: Request Slivers (needs 334 primary)
+    SN-->>Agg: Return Slivers
+
+    Note over Agg: Decode 334 slivers<br/>Consistency check (hashes match)<br/>Reconstruct blob
+
+    Agg-->>Client: "Hello, Walrus! This is my first blob."
 ```
 
 ## Key Observations
@@ -320,8 +277,8 @@ Now that you've completed the hands-on walkthrough:
 1. Try uploading larger files
 2. Experiment with different encoding types
 3. Set up your own publisher or aggregator
-4. Explore the [Developer Guide](../dev-guide/dev-guide.md) for more details
-5. Check the [Operator Guide](../operator-guide/operator-guide.md) to run infrastructure
+4. Explore the [Developer Guide](https://github.com/MystenLabs/walrus/blob/main/docs/dev-guide/dev-guide.md) for more details
+5. Check the [Operator Guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/operator-guide.md) to run infrastructure
 
 ## Summary
 
@@ -333,4 +290,3 @@ You've now seen:
 - ✅ The complete end-to-end flow
 
 Congratulations! You now understand the Walrus architecture and data flow.
-

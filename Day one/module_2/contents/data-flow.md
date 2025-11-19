@@ -2,15 +2,21 @@
 
 This section explains how data moves through the Walrus system from upload to permanent storage, and how retrieval works. Understanding the data flow is essential for building applications on Walrus.
 
-```admonish info title="Visual Diagram"
-The data flow diagram is available as an Excalidraw file. Import [`data-flow-diagram.excalidraw.json`](https://github.com/MystenLabs/walrus/blob/main/docs/assets/data-flow-diagram.excalidraw.json) into [Excalidraw.com](https://excalidraw.com) to view or edit. Export as SVG for use in documentation.
-```
+
+
+![Data Flow Diagram](../images/data-flow-diagram.svg)
+
+*[Excalidraw source file](../assets/data-flow-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
 
 The diagram illustrates both flows:
 - **Upload Flow**: Client → Publisher → Encoding → Sui → Storage Nodes → Certificates → Point of Availability
 - **Retrieval Flow**: Client → Aggregator → Sui → Storage Nodes → Aggregator (reconstruct) → Client
 
 ## Upload Flow: Client to Permanent Storage
+
+![Upload Flow Diagram](../images/upload-flow-diagram.svg)
+
+*[Excalidraw source file](../assets/upload-flow-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
 
 The complete upload flow involves multiple steps and components working together. Let's trace a blob from initial upload to permanent storage.
 
@@ -144,41 +150,36 @@ Once the certificate is posted:
 
 ### Complete Upload Flow Diagram
 
-```
-┌─────────┐
-│ Client  │
-└────┬────┘
-     │ HTTP PUT (blob data)
-     ▼
-┌─────────────┐
-│  Publisher  │
-└─────┬───────┘
-     │ 1. Encode blob → slivers + metadata
-     │ 2. Register on Sui
-     │
-     ├─────────────────┐
-     │                 │
-     ▼                 ▼
-┌─────────┐      ┌─────────────┐
-│   Sui   │      │   Storage   │
-│Blockchain│      │    Nodes    │
-└────┬────┘      └──────┬──────┘
-     │                  │
-     │ 3. Distribute    │ 4. Store slivers
-     │    slivers       │    & sign
-     │                  │
-     │ 5. Collect signatures
-     │                  │
-     │ 6. Post certificate
-     │                  │
-     ▼                  ▼
-┌─────────────────────────┐
-│ Point of Availability   │
-│   (Blob is stored)      │
-└─────────────────────────┘
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Publisher
+    participant Sui as Sui Blockchain
+    participant Nodes as Storage Nodes
+
+    Client->>Publisher: HTTP PUT blob data
+    
+    Note over Publisher: 1. Encode blob<br/>(Reed-Solomon + Merkle)
+    
+    Publisher->>Sui: 2. Register Blob
+    Sui-->>Publisher: Blob Object ID
+    
+    Publisher->>Nodes: 3. Distribute Slivers (Parallel)
+    Note over Nodes: 4. Validate & Store
+    Nodes-->>Publisher: Signatures
+    
+    Note over Publisher: 5. Aggregate Signatures
+    
+    Publisher->>Sui: 6. Post Certificate
+    Note right of Sui: Point of Availability<br/>(Blob is retrievable)
 ```
 
 ## Retrieval Flow: How Data is Retrieved
+
+
+![Download/Retrieval Flow Diagram](../images/download-flow-diagram.svg)
+
+*[Excalidraw source file](../assets/download-flow-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
 
 The retrieval process reconstructs the blob from distributed slivers.
 
@@ -264,55 +265,24 @@ The client receives the original blob data, which they can verify is correct.
 
 ### Complete Retrieval Flow Diagram
 
-```
-┌─────────┐
-│ Client  │
-└────┬────┘
-     │ HTTP GET (blob ID)
-     ▼
-┌─────────────┐
-│ Aggregator  │
-└─────┬───────┘
-     │ 1. Query Sui for blob metadata
-     │
-     ▼
-┌─────────┐
-│   Sui   │
-│Blockchain│
-└────┬────┘
-     │ Returns: blob metadata, storage epoch, shard assignments
-     │
-     ▼
-┌─────────────┐
-│ Aggregator  │
-└─────┬───────┘
-     │ 2. Request slivers from storage nodes
-     │
-     ├─────────────────┐
-     │                 │
-     ▼                 ▼
-┌─────────────┐  ┌─────────────┐
-│   Storage   │  │   Storage   │
-│   Node 1    │  │   Node N    │
-└──────┬──────┘  └──────┬──────┘
-       │                │
-       │ Return slivers │
-       │                │
-       └────────┬───────┘
-                │
-                ▼
-        ┌─────────────┐
-        │ Aggregator  │
-        └─────┬───────┘
-              │ 3. Decode 334 slivers → blob
-              │ 4. Consistency check
-              │
-              ▼
-        ┌─────────┐
-        │ Client  │
-        │(receives│
-        │  blob)  │
-        └─────────┘
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Aggregator
+    participant Sui as Sui Blockchain
+    participant Nodes as Storage Nodes
+
+    Client->>Aggregator: HTTP GET /<blob-id>
+    
+    Aggregator->>Sui: 1. Query Blob Metadata
+    Sui-->>Aggregator: ID, Size, Epoch, Shards
+    
+    Aggregator->>Nodes: 2. Request Slivers (Parallel)
+    Nodes-->>Aggregator: Return Slivers
+    
+    Note over Aggregator: 3. Decode 334 slivers<br/>4. Consistency Check
+    
+    Aggregator-->>Client: Return Original Blob
 ```
 
 ## Key Properties of the Data Flow
