@@ -34,55 +34,14 @@ Instructors should:
 - Be familiar with common CLI errors and troubleshooting
 - Have access to the [official Walrus documentation](https://github.com/MystenLabs/walrus/tree/main/docs/book)
 
-
-## Teaching Approach
-
-### Recommended Sequence
-
-1. **Start with Installation** - Get everyone set up first
-2. **Configuration** - Ensure all students can connect
-3. **Upload Workflow** - Core functionality, most engaging
-4. **Download Workflow** - Complete the basic cycle
-5. **Inspect Commands** - Understanding what's stored
-6. **Common Errors** - Prepare for troubleshooting
-7. **Operational Habits** - Best practices
-8. **Hands-On Exercises** - Reinforce learning
-
-### Teaching Strategies
-
-#### 1. Hands-On First
-- Encourage students to follow along with commands
-- Use live demonstrations when possible
-- Have students verify each step before moving on
-
-#### 2. Error-Driven Learning
-- Don't hide errors - use them as teaching moments
-- Walk through error messages together
-- Show how to use debug logging (`RUST_LOG=walrus=debug`)
-
-#### 3. Real-World Context
-- Explain why each feature exists
-- Discuss use cases and scenarios
-- Connect concepts to practical applications
-
-#### 4. Progressive Complexity
-- Start with simple examples
-- Build up to more complex scenarios
-- Use the exercises to tie everything together
-
 ## Section-by-Section Guidance
 
-### 1. Install CLI 
+### 1. Install CLI
 
 **Key Points to Emphasize:**
 - Multiple installation methods available
 - Mainnet vs Testnet distinction
 - Verification is crucial
-
-**Common Issues:**
-- PATH not configured correctly
-- Wrong binary version (mainnet vs testnet)
-- Permission issues on macOS/Linux
 
 **Teaching Tips:**
 - Have students verify installation immediately
@@ -95,19 +54,13 @@ walrus --version
 walrus --help
 ```
 
-### 2. Configuration 
+### 2. Configuration
 
 **Key Points to Emphasize:**
 - Configuration file locations and precedence
 - Multiple contexts for Mainnet/Testnet
 - Wallet configuration options
 - System and staking object IDs are network-specific
-
-**Common Issues:**
-- Config file not found
-- Wrong object IDs for network
-- Wallet path issues
-- RPC URL connectivity
 
 **Teaching Tips:**
 - Walk through downloading default config together
@@ -123,7 +76,7 @@ walrus info --context testnet  # if using contexts
 
 **Important:** Ensure all students can run `walrus info` successfully before proceeding.
 
-### 3. Upload Workflow 
+### 3. Upload Workflow
 
 **Key Points to Emphasize:**
 - Blob ID is deterministic (same content = same ID)
@@ -131,12 +84,6 @@ walrus info --context testnet  # if using contexts
 - Deletable vs permanent blobs
 - Automatic optimizations (deduplication, resource reuse)
 - Blob lifecycle management
-
-**Common Issues:**
-- Insufficient tokens
-- File too large
-- Network connectivity
-- Confusion about blob ID vs object ID
 
 **Teaching Tips:**
 - Start with a small test file
@@ -163,19 +110,13 @@ walrus store file.txt --epochs 10 --dry-run
 - Cost implications of storage duration
 - When to use quilts vs individual blobs
 
-### 4. Download Workflow 
+### 4. Download Workflow
 
 **Key Points to Emphasize:**
 - Consistency checks and their importance
 - Different output options
 - Reading from quilts
 - Verification after download
-
-**Common Issues:**
-- Blob not found (expired or wrong ID)
-- Network errors during download
-- Consistency check failures
-- Confusion about quilt reading
 
 **Teaching Tips:**
 - Always verify downloads match originals
@@ -203,11 +144,6 @@ walrus blob-id downloaded.txt
 - System information for planning
 - Health checks for troubleshooting
 - Blob ID utilities
-
-**Common Issues:**
-- Confusion about status vs list commands
-- Not understanding system info output
-- Health check interpretation
 
 **Teaching Tips:**
 - Show practical workflows (check before upload, verify after)
@@ -239,12 +175,6 @@ walrus health --committee
 - Most errors have clear solutions
 - Prevention is better than cure
 
-**Common Issues:**
-- Students panic when seeing errors
-- Not reading error messages carefully
-- Not using debug logging
-- Not checking prerequisites
-
 **Teaching Tips:**
 - Go through errors systematically
 - Show how to read error messages
@@ -273,24 +203,12 @@ RUST_LOG=info walrus info
 - Monitoring and maintenance
 - Security considerations
 
-**Common Issues:**
-- Students skip this section
-- Not understanding cost implications
-- Forgetting to save blob IDs
-- Security oversights
-
 **Teaching Tips:**
 - Emphasize practical impact (cost savings)
 - Show real examples of good vs bad practices
 - Discuss security implications
 - Create a checklist for students
 
-**Key Practices to Emphasize:**
-- Always save blob IDs
-- Verify before uploading
-- Check status before critical operations
-- Use appropriate blob types
-- Monitor blob expiration
 
 ### 8. Hands-On Exercises
 
@@ -299,12 +217,6 @@ RUST_LOG=info walrus info
 - Error recovery
 - Verification at each step
 - Independent problem-solving
-
-**Common Issues:**
-- Students rush through exercises
-- Not verifying results
-- Skipping error scenarios
-- Not asking for help when stuck
 
 **Teaching Tips:**
 - Walk through Exercise 1 together
