@@ -5,6 +5,7 @@ A comprehensive curriculum for learning how to use the Walrus command-line inter
 ## Overview
 
 This module provides step-by-step guidance for developers who want to learn how to:
+
 - Install and configure the Walrus CLI
 - Upload and download data on Walrus
 - Inspect stored objects and system information
@@ -17,19 +18,19 @@ This module provides step-by-step guidance for developers who want to learn how 
 
 | File | Description |
 |------|-------------|
-| [index.md](./index.md) | Curriculum overview and learning objectives
-| [install.md](./install.md) | CLI installation instructions
-| [configuration.md](./configuration.md) | Configuration setup and options 
-| [upload-workflow.md](./upload-workflow.md) | Uploading data to Walrus
-| [download-workflow.md](./download-workflow.md) | Downloading data from Walrus
-| [inspect-commands.md](./inspect-commands.md) | Inspecting objects and system info
-| [common-errors.md](./common-errors.md) | Troubleshooting guide
-| [operational-habits.md](./operational-habits.md) | Best practices and tips
-| [hands-on.md](./hands-on.md) | Practical exercises
+| [index.md](./contents/index.md) | Curriculum overview and learning objectives |
+| [install.md](./contents/install.md) | CLI installation instructions |
+| [configuration.md](./contents/configuration.md) | Configuration setup and options |
+| [upload-workflow.md](./contents/upload-workflow.md) | Uploading data to Walrus |
+| [download-workflow.md](./contents/download-workflow.md) | Downloading data from Walrus |
+| [inspect-commands.md](./contents/inspect-commands.md) | Inspecting objects and system info |
+| [common-errors.md](./contents/common-errors.md) | Troubleshooting guide |
+| [operational-habits.md](./contents/operational-habits.md) | Best practices and tips |
+| [hands-on.md](./contents/hands-on.md) | Practical exercises |
 
 ### Supporting Materials
 
-- **[instructor-guide.md](./instructor-guide.md)** - Comprehensive guide for instructors teaching this curriculum
+- **[instructor-guide.md](./contents/instructor-guide.md)** - Comprehensive guide for instructors teaching this curriculum
 - **[assets/](./assets/)** - Source files for diagrams (Excalidraw format)
 - **[images/](./images/)** - Rendered diagram images (SVG format)
 
@@ -44,11 +45,10 @@ This module provides step-by-step guidance for developers who want to learn how 
   - `cli-blob-lifecycle.svg` - Blob lifecycle diagram
   - `cli-quilt-structure.svg` - Quilt structure diagram
 
-
 ## For Instructors
 
-If you're teaching this curriculum, see the **[instructor-guide.md](./instructor-guide.md)** for:
+If you're teaching this curriculum, see the **[instructor-guide.md](./contents/instructor-guide.md)** for:
 
 - Teaching strategies and approaches
 - Section-by-section guidance with key points
-- Assessment suggestionss
+- Assessment suggestions

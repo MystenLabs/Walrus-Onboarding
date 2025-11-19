@@ -256,12 +256,12 @@ For more information on storage costs and how to optimize them, see the [costs g
 Quilts allow you to efficiently batch-store multiple small blobs into a single storage unit, significantly reducing overhead and cost. For efficiently storing large numbers of small blobs, Walrus provides the Quilt feature.
 
 ```admonish info title="Visual Diagram"
-The quilt structure diagram illustrates how small blobs are batched into quilts. Import [`cli-quilt-structure.excalidraw.json`](./images_sources/cli-quilt-structure.excalidraw.json) into [Excalidraw.com](https://excalidraw.com) to view or edit.
+The quilt structure diagram illustrates how small blobs are batched into quilts. Import [`cli-quilt-structure.excalidraw.json`](../assets/cli-quilt-structure.excalidraw.json) into [Excalidraw.com](https://excalidraw.com) to view or edit.
 ```
 
-![Quilt Structure Diagram](./images/cli-quilt-structure.svg)
+![Quilt Structure Diagram](../images/cli-quilt-structure.svg)
 
-*[Excalidraw source file](./images_sources/cli-quilt-structure.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
+*[Excalidraw source file](../assets/cli-quilt-structure.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
 
 The diagram shows:
 - **Input**: Multiple small blobs with identifiers and tags
@@ -311,9 +311,9 @@ For more information about quilts, see the [Quilt documentation](https://github.
 
 ## Managing Blob Lifecycle
 
-![Blob Lifecycle State Diagram](./images/cli-blob-lifecycle.svg)
+![Blob Lifecycle State Diagram](../images/cli-blob-lifecycle.svg)
 
-*[Excalidraw source file](./assets/cli-blob-lifecycle.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
+*[Excalidraw source file](../assets/cli-blob-lifecycle.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
 
 The diagram shows:
 - **States**: Uploaded → Available → Expired, plus Shared, Deleted, and Burned states
