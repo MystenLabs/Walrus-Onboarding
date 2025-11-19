@@ -261,14 +261,12 @@ RUST_LOG=info walrus info
 
 2. **Written Reflection**:
    - "Explain when to use deletable vs permanent blobs"
-   - "Describe the blob lifecycle"
    - "List three best practices for CLI usage"
 
 3. **Troubleshooting Scenario**:
    - Present a scenario with an error
    - Have students identify the issue
    - Walk through the solution
-
 
 ## Additional Resources
 
@@ -290,34 +288,3 @@ Before considering the module complete, ensure students can:
 - [ ] Explain deletable vs permanent blobs
 - [ ] Use at least one inspection command
 - [ ] Complete Exercise 1 successfully
-
-## Adapting for Different Audiences
-
-### Beginners
-- Focus on basics: install, configure, upload, download
-- Skip advanced topics (quilts, advanced config)
-- More guided practice
-- Emphasize error recovery
-
-### Intermediate
-- Cover all topics
-- Include quilts and advanced features
-- More independent exercises
-- Discuss optimization strategies
-
-### Advanced
-- Fast-track basics
-- Deep dive into advanced config
-- Focus on optimization and best practices
-- Explore edge cases and troubleshooting
-
-## Conclusion
-
-This module provides comprehensive training on the Walrus CLI. The key to success is:
-
-1. **Hands-on practice** - Students learn by doing
-2. **Error handling** - Don't fear errors, learn from them
-3. **Verification** - Always verify operations
-4. **Best practices** - Build good habits early
-
-Remember: The goal is not just to teach commands, but to help students understand the system and develop confidence in using it.
