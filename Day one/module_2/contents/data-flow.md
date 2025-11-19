@@ -2,8 +2,6 @@
 
 This section explains how data moves through the Walrus system from upload to permanent storage, and how retrieval works. Understanding the data flow is essential for building applications on Walrus.
 
-
-
 ![Data Flow Diagram](../images/data-flow-diagram.svg)
 
 *[Excalidraw source file](../assets/data-flow-diagram.excalidraw.json) - Import into [Excalidraw.com](https://excalidraw.com) to view or edit*
@@ -102,10 +100,10 @@ For each shard:
 #### Code: Distributing Slivers
 
 The client sends slivers to storage nodes using the storage node client. See the implementation:
-[`store_sliver` and `store_sliver_by_type` functions](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-storage-node-client/src/client.rs#L756-L783)
+[`store_sliver` and `store_sliver_by_type` functions](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-storage-node-client/src/client.rs#L669-L696)
 
 The distribution happens in parallel across all storage nodes, with the client coordinating the upload. See the coordination function:
-[`send_blob_data_and_get_certificate` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L1682-L1712)
+[`send_blob_data_and_get_certificate` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L1647-L1772)
 
 This function:
 1. Gets the current committee of storage nodes
@@ -227,7 +225,7 @@ The aggregator fetches slivers from storage nodes. See the implementation:
 [`get_sliver` and `get_sliver_status` functions](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-storage-node-client/src/client.rs#L474-L503)
 
 The client fetches slivers in parallel with concurrency limits. See the parallel fetching logic:
-[Parallel sliver fetching with concurrency limits](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L798-L828)
+[Parallel sliver fetching with concurrency limits](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L803-L835)
 
 ### Step 4: Aggregator Reconstructs Blob
 
@@ -245,7 +243,7 @@ The aggregator:
 #### Code: Blob Reconstruction
 
 The reconstruction happens in the read client's internal method. See the implementation:
-[`read_blob_internal` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L467-L515)
+[`read_blob_internal` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L476-L522)
 
 This method:
 1. Checks the blob ID format
@@ -311,7 +309,7 @@ sequenceDiagram
 - Storage nodes are assigned via Sui smart contracts
 - Anyone can run a publisher or aggregator
 
-For detailed information about Walrus operations (store, read, certify availability), see the [Developer Operations guide](https://github.com/MystenLabs/walrus/blob/main/docs/dev-guide/dev-operations.md). For formal security properties and guarantees, see the [Properties documentation](https://github.com/MystenLabs/walrus/blob/main/docs/design/properties.md).
+For detailed information about Walrus operations (store, read, certify availability), see the [Developer Operations guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/dev-operations.md). For formal security properties and guarantees, see the [Properties documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/design/properties.md).
 
 ## Related Sections
 
@@ -323,3 +321,12 @@ For detailed information about Walrus operations (store, read, certify availabil
 
 Now that you understand the data flow, proceed to the [Hands-On Walkthrough](./hands-on.md) to see this in action with a practical example.
 
+## Key Points
+
+- **Upload Flow**: Client → Publisher (encodes) → Sui (registers) → Storage Nodes (store slivers) → Certificates → Point of Availability
+- **Retrieval Flow**: Client → Aggregator → Sui (queries metadata) → Storage Nodes (fetch slivers) → Aggregator (reconstructs) → Client
+- **Redundancy** - Only 1/3 of slivers needed for reconstruction, tolerates up to 1/3 Byzantine nodes
+- **Verifiability** - Clients can verify publishers and aggregators performed correctly
+- **Parallel Operations** - Slivers are distributed and fetched in parallel for efficiency
+- **Point of Availability** - Blob becomes retrievable once certificate is posted on Sui
+- **No Single Point of Failure** - Decentralized architecture with storage nodes assigned via Sui smart contracts

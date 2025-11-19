@@ -37,3 +37,11 @@ Follow this recommended learning path:
 
 Start with [System Components](./components.md) to understand the building blocks of Walrus, then learn about [Chunk Creation and Encoding](./chunk-creation.md) to understand how data is transformed, and finally proceed to [Data Flow](./data-flow.md) to see how everything works together.
 
+## Key Points
+
+- **Walrus Architecture** consists of core components (Storage Nodes) and optional infrastructure (Publishers, Aggregators)
+- **Storage Nodes** form the decentralized storage infrastructure, managing shards and storing encoded slivers
+- **Publishers** provide HTTP interfaces for blob uploads, handling encoding and distribution
+- **Aggregators** reconstruct blobs from slivers and serve them via HTTP
+- **Data Flow** involves encoding blobs into slivers, distributing to storage nodes, and reconstructing on retrieval
+- **Erasure Coding** enables redundancy - only 1/3 of slivers needed for reconstruction

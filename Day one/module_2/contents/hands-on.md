@@ -9,7 +9,7 @@ Before starting, ensure you have:
 - Completed the [System Components](./components.md) section to understand the architecture
 - Reviewed the [Data Flow](./data-flow.md) section to understand how data moves through the system
 - Understood [Chunk Creation and Encoding](./chunk-creation.md) to know how blobs are encoded
-- Walrus CLI installed (see [Getting Started](https://github.com/MystenLabs/walrus/blob/main/docs/usage/started.md))
+- Walrus CLI installed (see [Getting Started](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/started.md))
 - Access to a Walrus network (testnet or mainnet)
 - A wallet with sufficient SUI and WAL tokens (for direct uploads)
 - Or access to a publisher endpoint (for HTTP uploads)
@@ -61,7 +61,7 @@ curl -X PUT http://publisher.example.com:31416/ \
 
 This sends the blob to a publisher, which handles all the encoding and distribution.
 
-For HTTP API details, see the [Web API documentation](https://github.com/MystenLabs/walrus/blob/main/docs/usage/web-api.md).
+For HTTP API details, see the [Web API documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/web-api.md).
 
 ### Step 3: Visual Sequence of Upload Flow
 
@@ -167,7 +167,7 @@ curl http://aggregator.example.com:31415/<blob-id>
 
 You should receive back: `"Hello, Walrus! This is my first blob."`
 
-For more information about reading blobs and consistency checks, see the [Developer Operations guide](https://github.com/MystenLabs/walrus/blob/main/docs/dev-guide/dev-operations.md#read).
+For more information about reading blobs and consistency checks, see the [Developer Operations guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/dev-operations.md).
 
 ### Step 5: Inspect On-Chain State
 
@@ -270,16 +270,6 @@ Look for:
 - **[Chunk Creation and Encoding](./chunk-creation.md)** - Deep dive into the encoding process you've seen
 - **[Data Flow](./data-flow.md)** - Review the complete flow you've just executed
 
-## Next Steps
-
-Now that you've completed the hands-on walkthrough:
-
-1. Try uploading larger files
-2. Experiment with different encoding types
-3. Set up your own publisher or aggregator
-4. Explore the [Developer Guide](https://github.com/MystenLabs/walrus/blob/main/docs/dev-guide/dev-guide.md) for more details
-5. Check the [Operator Guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/operator-guide.md) to run infrastructure
-
 ## Summary
 
 You've now seen:
@@ -290,3 +280,13 @@ You've now seen:
 - ✅ The complete end-to-end flow
 
 Congratulations! You now understand the Walrus architecture and data flow.
+
+## Key Points
+
+- **Two Upload Methods**: Direct CLI upload (`walrus store`) or HTTP upload via Publisher (`curl PUT`)
+- **Encoding Overhead**: Small blobs expand ~5x during encoding (e.g., 38 bytes → ~190 bytes)
+- **Parallel Distribution**: Slivers are sent to multiple storage nodes simultaneously
+- **Verification Steps**: Storage nodes validate slivers before storing; consistency checks verify integrity
+- **On-Chain Tracking**: Sui blockchain records blob metadata, certificates, and point of availability events
+- **Retrieval Requirements**: Only 334 primary slivers needed to reconstruct the blob
+- **Monitoring**: Use `RUST_LOG=debug` for verbose logging or check metrics endpoints

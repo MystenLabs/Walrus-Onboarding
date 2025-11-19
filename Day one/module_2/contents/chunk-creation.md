@@ -105,3 +105,13 @@ Walrus uses Reed-Solomon erasure coding with the following properties:
 - Only 1/3 of symbols needed for reconstruction
 - Provides redundancy and fault tolerance
 
+## Key Points
+
+- **Erasure Encoding** uses Reed-Solomon codes to split blobs into symbols and create redundancy
+- **Expansion Factor** - Blob size expands by approximately 4.5-5x during encoding (independent of shard count)
+- **Systematic Encoding** - First 334 primary slivers contain the (padded) unencoded data, enabling fast reads
+- **Slivers** are collections of symbols assigned to specific shards - each blob produces many sliver pairs
+- **Blob ID** is cryptographically derived from Merkle root of sliver hashes and blob metadata
+- **Deterministic** - Same blob always produces same slivers and blob ID
+- **Reconstruction** requires only 1/3 of symbols (334 primary slivers) to recover the original blob
+- **Verifiable** - Sliver hashes allow verification of data authenticity at any point
