@@ -24,17 +24,19 @@ Understanding the fundamental cost structure
 - How costs are calculated
 - Encoded size vs unencoded size
 - Cost components breakdown
+- Storage units calculation
 
-### 2. [Storage Duration](./contents/storage-duration.md)
+### 2. [Short Storage versus Extended Storage](./contents/storage-duration.md)
 
 Understanding how storage duration affects costs
 
 - Short-term storage strategies
 - Long-term storage considerations
 - Cost implications of different durations
+- Storage resource reuse
 - When to use each approach
 
-### 3. [Budget Planning](./contents/budget-planning.md)
+### 3. [Budget Planning in Real Projects](./contents/budget-planning.md)
 
 Practical guidance for project planning
 
@@ -42,17 +44,20 @@ Practical guidance for project planning
 - Budget allocation strategies
 - Monitoring and tracking costs
 - Cost forecasting
+- Real-world budget planning examples
 
-### 4. [Cost Reduction](./contents/cost-reduction.md)
+### 4. [Cost Reduction Ideas](./contents/cost-reduction.md)
 
 Strategies to minimize storage costs
 
 - Reusing storage resources
-- Batch operations and Quilt storage
+- Batch operations and grouping small blobs
 - Optimizing blob sizes
 - Resource management strategies
+- Transaction cost optimization
+- Object cost management
 
-### 5. [Scenarios](./contents/scenarios.md)
+### 5. [Scenarios Based on Common Product Needs](./contents/scenarios.md)
 
 Real-world examples based on common product needs
 
@@ -69,6 +74,8 @@ Practical cost calculation exercises
 - Calculate costs for given scenarios
 - Use CLI tools to estimate costs
 - Compare different storage strategies
+- Create budget plans for real projects
+- Monitor and track costs
 
 ### 7. [Instructor Guide](./contents/instructor-guide.md)
 
@@ -78,12 +85,14 @@ Comprehensive teaching guide for instructors
 - Teaching tips and discussion points
 - Assessment suggestions
 - Common issues and troubleshooting
+- Module completion checklist
 
 ## Module Completion
 
 After completing this module, you should be able to:
 
 - Calculate storage costs for any blob size and duration
+- Understand encoded size and how it affects costs
 - Create accurate budget plans for projects
 - Identify and apply appropriate cost reduction strategies
 - Analyze real-world scenarios and recommend storage approaches
@@ -91,4 +100,4 @@ After completing this module, you should be able to:
 
 ---
 
-**Next Steps**: Start with the [Cost Model](./contents/cost-model.md) to understand the fundamental cost structure, then proceed through the duration, planning, and optimization sections.
+**Next Steps**: Begin with the [Cost Model](./contents/cost-model.md) to understand how storage costs are calculated in Walrus.
