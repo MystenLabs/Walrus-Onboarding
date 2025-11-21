@@ -33,13 +33,12 @@ A storage resource is required to store a blob, with an appropriate capacity
 and epoch duration. Storage resources can be:
 
 - **Acquired from the system contract**: Purchased with WAL tokens when free
-  space is available (see [`reserve_space`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L191-L205) and [`process_storage_payments`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L424-L441) in the system contract)
+  space is available (see [`reserve_space`](../../../../contracts/walrus/sources/system/system_state_inner.move) and [`process_storage_payments`](../../../../contracts/walrus/sources/system/system_state_inner.move) in the system contract)
 - **Received from other parties**: Transferred or traded
 - **Split from larger resources**: A larger resource can be split into smaller
   ones
 
 The cost of acquiring a storage resource depends on:
-
 - The encoded size of the blob (see [Encoded Size](#encoded-size))
 - The number of epochs (storage duration)
 - Current market prices
@@ -50,8 +49,7 @@ Upon blob registration, WAL is charged to cover the costs of data upload.
 This ensures that deleting blobs and reusing the same storage resource for
 storing a new blob is sustainable for the system.
 
-Upload costs are calculated in [`register_blob`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L311-L340) and are:
-
+Upload costs are calculated in [`register_blob`](../../../../contracts/walrus/sources/system/system_state_inner.move) and are:
 - Linear with the encoded size of the blob
 - Independent of storage duration (charged once at upload time)
 - Required even when reusing existing storage resources
@@ -91,20 +89,18 @@ The encoded size includes:
 
 - **Erasure-coded blob size**: Approximately 5x the original blob size (due to
   erasure coding for redundancy)
-- **Fixed metadata**: Approximately 64MB per blob (in the worst case)
+- **Fixed metadata**: Approximately 61-64MB per blob (depends on number of shards)
 
 ### Calculating Encoded Size
 
 You can calculate encoded size manually using the following formula. This is useful
-for understanding cost drivers and estimating costs before storing blobs. The exact implementation can be found in [`crates/walrus-core/src/encoding/config.rs`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs).
+for understanding cost drivers and estimating costs before storing blobs. The exact implementation can be found in [`crates/walrus-core/src/encoding/config.rs`](../../../../crates/walrus-core/src/encoding/config.rs).
 
 #### Formula
 
 ```text
 Encoded Size = (Number of Shards × Metadata Size per Shard) + Slivers Size
 ```
-
-[reference](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L783-L799)
 
 Where:
 
@@ -113,8 +109,6 @@ Where:
 ```text
 Total Metadata = Number of Shards × Metadata Size per Shard
 ```
-
-[Reference](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L727-L740)
 
 Where **Metadata Size per Shard**:
 
@@ -143,15 +137,19 @@ Single Shard Slivers Size = (Primary Symbols + Secondary Symbols) × Symbol Size
 **Symbol Size**:
 
 ```text
-Symbol Size = ceil(Unencoded Size / Total Source Symbols) rounded up to alignment
+Symbol Size = ceil(Unencoded Size / Total Source Symbols) rounded up to alignment (2 bytes for RS2)
 ```
+
+Note: For RS2 encoding, symbol size must be a multiple of 2 bytes. If the calculated size is odd, it's rounded up to the next even number.
 
 #### Simplified Approximation
 
 For quick estimates, you can use these approximations:
 
 - **Small blobs (< 10MB)**: Encoded size ≈ **64MB** (dominated by metadata)
+  - Note: This approximation is most accurate for very small blobs (< 1MB). For blobs closer to 10MB, the actual encoded size may be higher (e.g., ~84MB for 5MB, ~107MB for 10MB).
 - **Large blobs (> 10MB)**: Encoded size ≈ **5 × Unencoded Size** (dominated by erasure coding)
+  - Note: This approximation improves with blob size. For 100MB+ blobs, it's very accurate (~5.1x). For smaller large blobs (10-20MB), the ratio may be higher (~10x for 10MB).
 
 #### Example Calculations
 
@@ -163,30 +161,35 @@ Given:
 - Number of shards: 1000 (typical for Mainnet)
 - Encoding type: Reed-Solomon (RS2)
 
-Step 1: Calculate metadata size
+Step 1: Calculate primary and secondary source symbols
+
+```text
+For 1000 shards:
+- max_byzantine = (1000 - 1) / 3 = 333
+- Primary symbols = 1000 - 2 × 333 = 334
+- Secondary symbols = 1000 - 333 = 667
+- Total source symbols = 334 × 667 = 222,778
+```
+
+Step 2: Calculate metadata size
 
 ```text
 Metadata per shard = (1000 × 64) + 32 = 64,032 bytes
-Total metadata = 1000 × 64,032 = 64,032,000 bytes ≈ 64 MB
+Total metadata = 1000 × 64,032 = 64,032,000 bytes ≈ 61.07 MB
 ```
 
-Step 2: Calculate slivers size
+Step 3: Calculate slivers size
 
 ```text
-For 1000 shards, typical symbol configuration:
-- Primary symbols: ~32
-- Secondary symbols: ~32
-- Total source symbols: 32 × 32 = 1024
-
-Symbol size = ceil(1,048,576 / 1024) = 1024 bytes (aligned)
-Single shard slivers = (32 + 32) × 1024 = 65,536 bytes
-Total slivers = 1000 × 65,536 = 65,536,000 bytes ≈ 65.5 MB
+Symbol size = ceil(1,048,576 / 222,778) = 5 bytes → 6 bytes (aligned to 2)
+Single shard slivers = (334 + 667) × 6 = 6,006 bytes
+Total slivers = 1000 × 6,006 = 6,006,000 bytes ≈ 5.73 MB
 ```
 
-Step 3: Calculate total encoded size
+Step 4: Calculate total encoded size
 
 ```text
-Encoded Size = 64,032,000 + 65,536,000 = 129,568,000 bytes ≈ 129.6 MB
+Encoded Size = 64,032,000 + 6,006,000 = 70,038,000 bytes ≈ 66.8 MB
 ```
 
 ##### Example 2: Large Blob (100MB)
@@ -195,6 +198,7 @@ Given:
 
 - Unencoded size: 104,857,600 bytes (100 MB)
 - Number of shards: 1000
+- Primary symbols: 334, Secondary symbols: 667 (same as Example 1)
 
 Using the simplified approximation:
 
@@ -205,9 +209,11 @@ Encoded Size ≈ 5 × 100 MB = 500 MB
 For more precise calculation:
 
 ```text
-Metadata: ~64 MB (same as Example 1)
-Slivers: ~500 MB (5× expansion due to erasure coding)
-Total: ~564 MB
+Symbol size = ceil(104,857,600 / 222,778) = 471 bytes → 472 bytes (aligned to 2)
+Single shard slivers = (334 + 667) × 472 = 472,472 bytes
+Total slivers = 1000 × 472,472 = 472,472,000 bytes ≈ 450.58 MB
+Metadata: ~61.07 MB (same as Example 1)
+Total: ~511.65 MB ≈ 512 MB
 ```
 
 ##### Example 3: Using Storage Units
@@ -218,16 +224,16 @@ Once you have the encoded size, calculate storage units:
 Storage Units = ceil(Encoded Size / 1,048,576)
 ```
 
-For Example 1 (129.6 MB):
+For Example 1 (66.8 MB):
 
 ```text
-Storage Units = ceil(129,568,000 / 1,048,576) = ceil(123.6) = 124 units
+Storage Units = ceil(70,038,000 / 1,048,576) = ceil(66.8) = 67 units
 ```
 
-For Example 2 (564 MB):
+For Example 2 (512 MB):
 
 ```text
-Storage Units = ceil(564,000,000 / 1,048,576) = ceil(537.7) = 538 units
+Storage Units = ceil(511,650,000 / 1,048,576) = ceil(488.0) = 512 units
 ```
 
 #### Getting System Parameters
@@ -272,11 +278,10 @@ graph TB
     style L_Meta fill:#f96,stroke:#333,stroke-width:2px
 ```
 
-- **Small blobs (< 10MB)**: Costs are dominated by the fixed metadata overhead (~64MB)
-- **Large blobs (> 10MB)**: Costs are dominated by the erasure-coded blob size (5x original size)
+- **Small blobs (< 10MB)**: Costs are dominated by the fixed metadata overhead (~61-64MB depending on shard count)
+- **Large blobs (> 10MB)**: Costs are dominated by the erasure-coded blob size (approximately 5x original size for large blobs)
 
-This is why [Quilt storage](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md) is recommended for small blobs
-- it amortizes metadata costs across multiple blobs in a batch.
+For small blobs, grouping multiple files together can help amortize metadata costs across multiple blobs in a batch.
 
 ## Cost Calculation Formula
 
@@ -289,8 +294,8 @@ Total Cost = Storage Resource Cost + Upload Cost + Transaction Costs + Object Co
 Where:
 
 - **Storage Resource Cost** =
-  `storage_units × price_per_unit × epochs` (see `process_storage_payments` in [`system_state_inner.move`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move))
-- **Upload Cost** = `storage_units × write_price_per_unit` (see `register_blob` in [`system_state_inner.move`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move))
+  `storage_units × price_per_unit × epochs` (see `process_storage_payments` in [`system_state_inner.move`](../../../../contracts/walrus/sources/system/system_state_inner.move))
+- **Upload Cost** = `storage_units × write_price_per_unit` (see `register_blob` in [`system_state_inner.move`](../../../../contracts/walrus/sources/system/system_state_inner.move))
 - **Transaction Costs** = SUI gas fees (relatively fixed per transaction)
 - **Object Costs** = SUI storage fund deposit (mostly refundable)
 
@@ -302,7 +307,7 @@ Storage units are calculated from encoded size:
 storage_units = ceil(encoded_size / 1_MiB)
 ```
 
-Each storage unit is 1 MiB (1,048,576 bytes). Prices are defined in [`EpochParams`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/epoch_parameters.move).
+Each storage unit is 1 MiB (1,048,576 bytes). Prices are defined in [`EpochParams`](../../../../contracts/walrus/sources/system/epoch_parameters.move).
 
 ## Measuring Costs
 

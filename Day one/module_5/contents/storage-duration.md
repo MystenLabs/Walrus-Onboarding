@@ -36,7 +36,7 @@ Short-term storage refers to storing blobs for relatively few epochs (typically 
 
 ### Example Use Cases
 
-
+- **Web application cache**: Store cached data for a few weeks
 - **Temporary uploads**: User-uploaded files that are processed and then deleted
 - **Development builds**: Build artifacts that are replaced frequently
 - **Event data**: Logs or metrics that are only needed temporarily
@@ -78,7 +78,6 @@ Extended storage refers to storing blobs for many epochs (typically 10+ epochs, 
 ### Short-Term Storage Example
 
 Storing a 10MB blob for 1 epoch:
-
 - Storage resource: `storage_units × price_per_unit × 1 epoch`
 - Upload cost: `storage_units × write_price_per_unit`
 - Transaction costs: 2 transactions (reserve + register, certify)
@@ -87,7 +86,6 @@ Storing a 10MB blob for 1 epoch:
 ### Extended Storage Example
 
 Storing the same 10MB blob for 20 epochs:
-
 - Storage resource: `storage_units × price_per_unit × 20 epochs` (20x the short-term cost)
 - Upload cost: `storage_units × write_price_per_unit` (same as short-term)
 - Transaction costs: 2 transactions (same as short-term)
@@ -113,14 +111,14 @@ sequenceDiagram
     Note right of User: Reuses the remaining<br/>5 Epochs for free!
 ```
 
-One important optimization is **reusing storage resources** by deleting deletable blobs before they expire. This is enabled by [`delete_blob`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move) which returns the underlying [`Storage`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/storage_resource.move) resource.
+One important optimization is **reusing storage resources** by deleting deletable blobs before they expire. This is enabled by [`delete_blob`](../../../../contracts/walrus/sources/system/system_state_inner.move) which returns the underlying [`Storage`](../../../../contracts/walrus/sources/system/storage_resource.move) resource.
 
 ### How It Works
 
 1. Store a blob for 10 epochs as deletable
 2. Use the blob for 5 epochs
 3. Delete the blob early (reclaiming the storage resource)
-4. Reuse the remaining 5 epochs of storage for a new blob (using [`extend_blob_with_resource`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move))
+4. Reuse the remaining 5 epochs of storage for a new blob (using [`extend_blob_with_resource`](../../../../contracts/walrus/sources/system/system_state_inner.move))
 
 ### Benefits
 
@@ -171,7 +169,7 @@ You can combine strategies:
 - Use deletable blobs so you can reclaim storage resources
 - Delete blobs as soon as they're no longer needed
 - Batch multiple short-term stores to reduce transaction costs
-- Consider Quilt storage for small blobs
+- Consider grouping small blobs together to amortize metadata costs
 
 ### For Extended Storage
 

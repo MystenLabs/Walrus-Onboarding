@@ -9,7 +9,6 @@ One of the most effective cost reduction strategies is **reusing storage resourc
 ### How It Works
 
 When you delete a deletable blob before its expiration:
-
 - The storage resource is reclaimed
 - Remaining epochs can be reused for new blobs
 - You only pay for the epochs you actually use
@@ -62,7 +61,6 @@ When storing multiple blobs, certifications are automatically batched in the sam
 ### Programmable Transaction Blocks (PTBs)
 
 For advanced use cases, you can combine multiple operations in a single PTB:
-
 - Acquire storage resources
 - Register multiple blobs
 - Certify multiple blobs
@@ -70,35 +68,79 @@ For advanced use cases, you can combine multiple operations in a single PTB:
 
 This minimizes transaction costs and latency.
 
-## Quilt Storage for Small Blobs
+## Grouping Small Blobs for Cost Efficiency
 
-[Quilt storage](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md) is specifically designed to reduce costs for small blobs by amortizing metadata costs across multiple blobs.
+When storing multiple small blobs, grouping them together into a single storage unit can
+dramatically reduce costs by amortizing metadata overhead and transaction fees across the batch.
+This technique is especially powerful for small blobs where fixed overhead costs dominate.
 
-### When to Use Quilt
+### Basic Concept of Grouping
 
-- **Small blobs (< 10MB)**: Where metadata overhead dominates costs
-- **Multiple small files**: When storing many small files together
-- **Batch operations**: When you can group small blobs
+Grouping multiple small blobs together shares the fixed metadata overhead (~61-64MB per blob) across all blobs in the group. This is particularly cost-effective for small blobs where metadata dominates the encoded size.
 
-### Cost Benefits
+### When Grouping Makes Sense
 
-- **Reduced metadata overhead**: Metadata costs shared across batch
-- **Lower transaction costs**: Fewer transactions per blob
-- **Lower object costs**: Fewer Sui objects created
+Grouping is most effective when:
 
-### Example Savings
+- **Small blobs (< 10MB)**: Where metadata overhead dominates costs (~64MB per blob)
+- **Many small files**: Storing large numbers of small files together (hundreds of files)
+- **Similar lifetimes**: Files that need to be stored for the same duration
+- **Collections or batches**: Related files that are typically managed together (e.g., NFT image
+  collections, log files, document batches)
+
+### Cost Reduction Benefits
+
+- **Reduced metadata overhead**: Fixed metadata costs (~64MB) can be shared across multiple blobs in a batch
+- **Lower per-blob storage cost**: Instead of paying ~64MB metadata per blob, multiple blobs share metadata
+- **Lower transaction costs**: Fewer transactions when storing multiple blobs together
+- **Lower object costs**: Potentially fewer Sui objects created depending on implementation
+
+### Example Cost Savings
 
 Storing 100 small files (1MB each) individually:
-
 - Each file: ~64MB encoded size (metadata dominated)
 - Total: 6,400MB encoded size
 
-Storing same files in Quilt:
+Storing same files grouped together:
+- Shared metadata: One ~64MB metadata overhead instead of 100 × 64MB
+- Data overhead: Remaining cost is primarily data encoding (~5x original size)
+- Total: Significantly less than 6,400MB encoded size if we calculated simply.
 
-- Batch metadata: Shared across all files
-- Total: Much less than 6,400MB encoded size
+### Key Principles for Grouping-Based Cost Reduction
 
-**Savings**: Significant reduction in storage and upload costs.
+1. **Group Similar Sizes**: Blobs of similar sizes can be more efficiently grouped together
+2. **Group by Lifetime**: Group blobs that need the same storage duration for better resource management
+3. **Balance Batch Size**: Larger batches (up to hundreds of files) amortize metadata better,
+   maximizing cost savings
+4. **Consider Access Patterns**: Group files that are typically accessed together for operational efficiency
+
+### Trade-offs and Limitations
+
+While grouping provides significant cost savings, consider these trade-offs:
+
+**Limitations:**
+
+- **Individual operations**: Operations like delete, extend, or share must be applied to the entire
+  batch, not individual blobs
+- **ID system**: Blobs in a batch use a different ID system than regular blobs (batch-specific IDs
+  rather than content-derived IDs)
+- **Batch size limits**: There are practical limits on how many blobs can be grouped (typically
+  hundreds)
+
+**When NOT to use grouping:**
+
+- Files that need individual lifecycle management (different expiration dates, individual deletion)
+- Files that need to be shared or extended independently
+- Very large files (> 10MB) where overhead is less significant
+- Files where content-derived IDs are required
+
+### Best Practices
+
+- **Batch small files together**: Group files under 10MB, especially those under 100KB
+- **Use for collections**: Perfect for NFT images, log files, document batches, or any related
+  small files
+- **Plan batch composition**: Group files that will be managed together throughout their lifetime
+- **Leverage metadata**: Use identifiers and tags for efficient lookup within batches
 
 ## Optimizing Blob Sizes
 
@@ -155,7 +197,6 @@ Storage resources can be transferred and traded:
 ### Combine Operations
 
 Use Programmable Transaction Blocks to combine:
-
 - Storage resource acquisition
 - Blob registration
 - Blob certification
@@ -184,13 +225,11 @@ walrus burn-blobs --object-ids <BLOB_OBJECT_ID>
 ```
 
 **Benefits**:
-
 - Reclaims SUI storage fund deposit
 - Reduces ongoing SUI costs
 - Doesn't delete the blob on Walrus
 
 **Considerations**:
-
 - Can't extend blob lifetime after burning
 - Can't delete blob to reclaim storage resource
 - Can't add attributes after burning
@@ -198,7 +237,6 @@ walrus burn-blobs --object-ids <BLOB_OBJECT_ID>
 ### When to Burn
 
 Burn objects when:
-
 - Blob lifetime is fixed and won't need extension
 - You don't need to delete the blob early
 - You don't need to add attributes
@@ -207,7 +245,6 @@ Burn objects when:
 ### When Not to Burn
 
 Keep objects when:
-
 - You might need to extend blob lifetime
 - You want to delete blob early to reuse storage
 - You need blob lifecycle management features
@@ -232,7 +269,6 @@ Keep objects when:
 ### Track Costs
 
 Regularly monitor your costs:
-
 - **Per blob**: Track cost per blob stored
 - **Per operation**: Track cost per operation type
 - **Over time**: Track cost trends
@@ -240,11 +276,10 @@ Regularly monitor your costs:
 ### Identify Optimization Opportunities
 
 Look for:
-
 - **Unused blobs**: Delete blobs that are no longer needed
 - **Over-provisioned storage**: Reduce storage duration where possible
 - **Inefficient operations**: Optimize transaction patterns
-- **Small blob opportunities**: Use Quilt for small blobs
+- **Small blob opportunities**: Group small blobs together to amortize metadata costs
 
 ### Regular Reviews
 
@@ -258,7 +293,7 @@ Use this checklist to optimize your storage costs:
 
 - [ ] Use deletable blobs and delete them early when done
 - [ ] Batch multiple uploads together
-- [ ] Use Quilt storage for small blobs (< 10MB)
+- [ ] Group small blobs together (batch storage) to reduce metadata overhead and transaction costs
 - [ ] Compress data before storing when appropriate
 - [ ] Buy larger storage resources and split as needed
 - [ ] Combine operations in PTBs to reduce transaction costs

@@ -25,13 +25,11 @@ walrus info
 ```
 
 This shows:
-
 - Price per encoded storage unit per epoch
 - Write price per encoded storage unit
 - Maximum blob size
 
 **Note**: Prices can change over time. For long-term planning, consider:
-
 - Current prices as a baseline
 - Potential price volatility
 - Historical price trends (if available)
@@ -43,7 +41,7 @@ Remember that costs are based on **encoded size**, not original size:
 - **Small blobs (< 10MB)**: Encoded size ≈ 64MB (dominated by metadata)
 - **Large blobs (> 10MB)**: Encoded size ≈ 5 × original size (erasure coding)
 
-For precise calculation logic, refer to [`crates/walrus-core/src/encoding/config.rs`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs).
+For precise calculation logic, refer to [`crates/walrus-core/src/encoding/config.rs`](../../../../crates/walrus-core/src/encoding/config.rs).
 
 For more accurate estimates, use dry-run:
 
@@ -55,7 +53,7 @@ walrus store <SAMPLE_FILE> --epochs 1 --dry-run
 
 For each blob:
 
-```text
+```
 Storage Resource Cost = storage_units × price_per_unit × epochs
 ```
 
@@ -65,7 +63,7 @@ Where `storage_units = ceil(encoded_size / 1_MiB)`
 
 For each blob:
 
-```text
+```
 Upload Cost = storage_units × write_price_per_unit
 ```
 
@@ -81,14 +79,13 @@ Multiply by the number of blobs you'll store.
 ### Step 7: Estimate Object Costs
 
 Object costs are:
-
 - Fixed SUI deposit per blob object
 - Mostly refundable when objects are burned
 - Consider whether you'll burn objects early
 
 ### Step 8: Calculate Total Costs
 
-```text
+```
 Total Cost = (Storage Resource Cost + Upload Cost) × number_of_blobs + Transaction Costs + Object Costs
 ```
 
@@ -98,12 +95,11 @@ Total Cost = (Storage Resource Cost + Upload Cost) × number_of_blobs + Transact
 
 Allocate a fixed budget per blob:
 
-```text
+```
 Budget per blob = Storage Cost + Upload Cost + Transaction Costs
 ```
 
 Useful when:
-
 - Blobs are similar in size and duration
 - You have a fixed number of blobs to store
 - Simple cost tracking
@@ -112,12 +108,11 @@ Useful when:
 
 Allocate a total budget for the entire project:
 
-```text
+```
 Total Budget = Sum of all blob costs + Buffer for unexpected costs
 ```
 
 Useful when:
-
 - Multiple types of blobs with varying costs
 - Need flexibility in allocation
 - Want to optimize across different blob types
@@ -126,12 +121,11 @@ Useful when:
 
 Allocate budget per time period (monthly, quarterly):
 
-```text
+```
 Period Budget = Expected new blobs in period × Average cost per blob
 ```
 
 Useful when:
-
 - Continuous data ingestion
 - Need to track spending over time
 - Want to control monthly/quarterly costs
@@ -177,12 +171,11 @@ Set up alerts for:
 
 Based on current usage patterns:
 
-```text
+```
 Forecast = Current monthly cost × Number of months
 ```
 
 Adjust for:
-
 - Expected growth in data volume
 - Planned new features or use cases
 - Seasonal variations
@@ -219,7 +212,7 @@ Review your budget regularly:
 Look for opportunities to reduce costs:
 
 - **Delete unused blobs**: Reclaim storage resources
-- **Optimize blob sizes**: Use Quilt for small blobs
+- **Optimize blob sizes**: Group small blobs together to reduce metadata overhead
 - **Batch operations**: Reduce transaction costs
 - **Burn unused objects**: Reclaim SUI storage fund deposits
 - **Adjust storage duration**: Use shorter durations when possible
@@ -237,7 +230,6 @@ Always include a buffer in your budget:
 ### Scenario: Document Storage Service
 
 **Requirements**:
-
 - Store 10,000 documents per month
 - Average document size: 2MB
 - Storage duration: 6 months (12 epochs)
@@ -274,7 +266,7 @@ Always include a buffer in your budget:
 
 ### Optimization Opportunities
 
-- Use Quilt storage for small documents (reduces metadata overhead)
+- Group small documents together to reduce metadata overhead
 - Delete documents early when possible (reuse storage resources)
 - Batch uploads to reduce transaction costs
 - Burn blob objects after 6 months to reclaim SUI

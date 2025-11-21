@@ -30,10 +30,13 @@ Check current Walrus prices:
 walrus info
 ```
 
-Record the following:
+**Tip**: For precise values, use `walrus info --json`.
 
-- Price per encoded storage unit per epoch: ________ WAL
-- Write price per encoded storage unit: ________ WAL
+Record the following:
+- Price per encoded storage unit per epoch: ________ FROST (convert to WAL: divide by 1,000,000,000)
+- Write price per encoded storage unit: ________ FROST (convert to WAL: divide by 1,000,000,000)
+
+**Note**: Prices are shown in FROST (smaller unit of WAL). 1 WAL = 1,000,000,000 FROST.
 
 ### Step 2: Create a Test File
 
@@ -56,29 +59,26 @@ walrus store test-5mb.bin --epochs 1 --dry-run
 ```
 
 Record:
-
-- Encoded size: ________ bytes
-- Storage units: ________ (calculate: ceil(encoded_size / 1_MiB))
+- Encoded size: ________ bytes (or MiB as shown in output)
+- Storage units: ________ (YOU MUST CALCULATE: ceil(encoded_size / 1_MiB))
+- Estimated cost: ________ WAL (shown in dry-run output as "Cost to store as new blob")
 
 ### Step 4: Calculate Storage Cost
 
 Calculate the cost for storing this blob for 10 epochs:
 
 **Storage Resource Cost**:
-
-```text
+```
 Storage units × Price per unit per epoch × Epochs = ________ WAL
 ```
 
 **Upload Cost**:
-
-```text
+```
 Storage units × Write price per unit = ________ WAL
 ```
 
 **Total WAL Cost**:
-
-```text
+```
 Storage Resource Cost + Upload Cost = ________ WAL
 ```
 
@@ -91,7 +91,6 @@ walrus store test-5mb.bin --epochs 10
 ```
 
 Check the transaction in Sui Explorer and compare:
-
 - Actual WAL cost: ________ WAL
 - Actual SUI cost: ________ SUI
 - How does this compare to your estimate?
@@ -100,7 +99,7 @@ Check the transaction in Sui Explorer and compare:
 
 Calculate the cost per epoch:
 
-```text
+```
 Total WAL Cost / Epochs = ________ WAL per epoch
 ```
 
@@ -163,7 +162,7 @@ In this exercise, you'll calculate costs for a realistic scenario.
 **Requirements**:
 - Store 1,000 documents per month
 - Average document size: 2MB
-- Storage duration: 6 months (12 epochs)
+- Storage duration: 6 months (~13 epochs, since 1 epoch = 14 days)
 - Documents are deletable after 6 months
 
 ### Step 1: Get Current Prices
@@ -171,6 +170,8 @@ In this exercise, you'll calculate costs for a realistic scenario.
 ```sh
 walrus info
 ```
+
+**Tip**: For precise values, use `walrus info --json`.
 
 Record current prices.
 
@@ -191,7 +192,7 @@ Record:
 
 **Storage Resource Cost**:
 ```
-Storage units × Price per unit per epoch × 12 epochs = ________ WAL
+Storage units × Price per unit per epoch × 13 epochs = ________ WAL
 ```
 
 **Upload Cost**:
@@ -211,10 +212,11 @@ Storage Resource Cost + Upload Cost = ________ WAL
 1,000 documents × Cost per document = ________ WAL/month
 ```
 
-**Monthly SUI Cost** (estimate):
+**Monthly SUI Cost** (approximate estimate):
 ```
 1,000 documents × 2 transactions × ~0.01 SUI = ________ SUI/month
 ```
+**Note**: SUI gas costs vary with network conditions. This is a rough estimate.
 
 ### Step 5: Calculate Total 6-Month Cost
 
@@ -232,8 +234,8 @@ Monthly SUI Cost × 6 months = ________ SUI
 
 Now apply optimization strategies:
 
-**Option A: Use Quilt Storage**
-- Estimate: 60% reduction in storage costs
+**Option A: Group Small Blobs Together**
+- Estimate: 60% reduction in storage costs by amortizing metadata
 - Optimized WAL cost: ________ WAL/month
 
 **Option B: Delete Early (after 3 months)**
@@ -250,11 +252,11 @@ In this exercise, you'll compare different storage duration strategies.
 
 ### Scenario
 
-Store a 10MB blob for 1 year (24 epochs).
+Store a 10MB blob for 1 year (~26 epochs, since 1 epoch = 14 days).
 
 ### Step 1: Calculate Upfront Cost
 
-Calculate cost for storing 24 epochs upfront:
+Calculate cost for storing 26 epochs upfront:
 
 ```sh
 # Create 10MB file
@@ -263,33 +265,33 @@ walrus store test-10mb.bin --epochs 1 --dry-run
 ```
 
 Record encoded size and calculate:
-- Cost for 24 epochs upfront: ________ WAL
+- Cost for 26 epochs upfront: ________ WAL
 
 ### Step 2: Calculate Periodic Extension Cost
 
-Calculate cost for storing 6 epochs at a time, extending 4 times:
+Calculate cost for storing ~6-7 epochs at a time, extending multiple times to reach 26 epochs:
 
-- Cost for 6 epochs: ________ WAL
-- Extension cost (4 extensions): ________ WAL
+- Cost for initial 7 epochs: ________ WAL
+- Extension cost for additional epochs (3-4 extensions): ________ WAL
 - Total cost: ________ WAL
 
-**Note**: Extension costs are typically just the additional epochs.
+**Note**: Extension costs are typically just the additional epochs. With 26 epochs total, you might do: 7 + 7 + 7 + 5 epochs across 4 transactions.
 
 ### Step 3: Calculate Early Deletion Cost
 
-Calculate cost for storing 24 epochs but deleting after 12 epochs:
+Calculate cost for storing 26 epochs but deleting after 13 epochs:
 
-- Cost for 24 epochs: ________ WAL
-- If deletable, can reuse remaining 12 epochs
-- Effective cost: ________ WAL (only paying for 12 epochs used)
+- Cost for 26 epochs: ________ WAL
+- If deletable, can reuse remaining 13 epochs
+- Effective cost: ________ WAL (only paying for 13 epochs used)
 
 ### Step 4: Compare Strategies
 
 | Strategy | Total Cost | Pros | Cons |
 |----------|------------|------|------|
-| Upfront (24 epochs) | ________ WAL | Simple, guaranteed | Higher upfront cost |
-| Periodic (6 epochs × 4) | ________ WAL | Lower upfront, flexible | More transactions |
-| Early deletion (24 epochs, delete at 12) | ________ WAL | Reuse resources | Requires management |
+| Upfront (26 epochs) | ________ WAL | Simple, guaranteed | Higher upfront cost |
+| Periodic (6-7 epochs × 4) | ________ WAL | Lower upfront, flexible | More transactions |
+| Early deletion (26 epochs, delete at 13) | ________ WAL | Reuse resources | Requires management |
 
 **Which strategy is best for your use case?**
 
@@ -304,17 +306,17 @@ Select one of these projects or create your own:
 **Option A: Photo Sharing App**
 - 10,000 photos/month
 - Average size: 5MB
-- Storage duration: 1 year
+- Storage duration: 1 year (~26 epochs)
 
 **Option B: Log Analytics Platform**
 - 100,000 log files/month
 - Average size: 500KB
-- Storage duration: 3 months
+- Storage duration: 3 months (~6-7 epochs)
 
 **Option C: Video Archive**
 - 500 videos/month
 - Average size: 1GB
-- Storage duration: 5 years
+- Storage duration: 5 years (~130 epochs)
 
 ### Step 1: Define Requirements
 
@@ -330,6 +332,8 @@ Document your project requirements:
 walrus info
 ```
 
+**Tip**: For precise values, use `walrus info --json`.
+
 Record current prices.
 
 ### Step 3: Calculate Base Costs
@@ -342,7 +346,7 @@ Calculate costs without optimization:
 ### Step 4: Identify Optimization Opportunities
 
 List optimization strategies that apply:
-- [ ] Quilt storage
+- [ ] Group small blobs together
 - [ ] Early deletion
 - [ ] Compression
 - [ ] Batch operations

@@ -1,6 +1,6 @@
-# Storage Costs Curriculum
+# Storage Costs Developer Curriculum
 
-Welcome to the Storage Costs Curriculum! This curriculum is designed to help developers understand how storage costs work in Walrus, estimate costs for their use cases, and optimize their storage spending.
+Welcome to the Storage Costs Developer Curriculum! This curriculum is designed to help developers understand how storage costs work in Walrus, estimate costs for their use cases, and optimize their storage spending.
 
 ## Learning Objectives
 
@@ -33,7 +33,7 @@ This curriculum is organized into the following sections:
 
 4. **[Cost Reduction Ideas](./cost-reduction.md)** - Strategies to minimize storage costs
    - Reusing storage resources
-   - Batch operations and Quilt storage
+   - Batch operations
    - Optimizing blob sizes
    - Resource management strategies
 
