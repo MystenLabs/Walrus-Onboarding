@@ -108,17 +108,254 @@ sequenceDiagram
     User->>Walrus: 3. Delete Blob A
     Walrus-->>Resource: Release Resource (5 Epochs left)
     User->>Walrus: 4. Store Blob B
-    Note right of User: Reuses the remaining<br/>5 Epochs for free!
+    Note right of User: Reuses the remaining<br/>5 Epochs (only pays write cost)
 ```
 
-One important optimization is **reusing storage resources** by deleting deletable blobs before they expire. This is enabled by [`delete_blob`](../../../../contracts/walrus/sources/system/system_state_inner.move) which returns the underlying [`Storage`](../../../../contracts/walrus/sources/system/storage_resource.move) resource.
+One important optimization is **reusing storage resources** by deleting deletable blobs before they expire. This is enabled by [`delete_blob`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L365-L368) which returns the underlying [`Storage`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/storage_resource.move) resource.
 
-### How It Works
+### How It Works: Step-by-Step Explanation
 
-1. Store a blob for 10 epochs as deletable
-2. Use the blob for 5 epochs
-3. Delete the blob early (reclaiming the storage resource)
-4. Reuse the remaining 5 epochs of storage for a new blob (using [`extend_blob_with_resource`](../../../../contracts/walrus/sources/system/system_state_inner.move))
+#### Step 1: Understanding Storage Resources
+
+When you store a blob, Walrus uses a **Storage Resource** object (of type [`Storage`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/storage_resource.move#L17-L23)) that contains:
+- **storage_size**: The size of the blob
+- *start_epoch**: The number of epochs purchased (e.g., 10 epochs)
+- **end_epoch**: When this Storage will be expired.
+
+This Storage Resource is a Sui object that you own and can transfer or reuse.
+
+#### Step 2: Storing a Deletable Blob
+
+First you call `register_blob`:
+
+**Step 2a: The Wrapper Function** (`register_blob` in [`system.move`](https://github.com/MystenLabs/walrus/blob/682587efb05f915476d88b458eac8db1d0a24b33/contracts/walrus/sources/system.move#L129-L155))
+
+```move
+/// Registers a new blob in the system.
+/// `size` is the size of the unencoded blob. The reserved space in `storage` must be at
+/// least the size of the encoded blob.
+public fun register_blob(
+    self: &mut System,
+    storage: Storage,
+    blob_id: u256,
+    root_hash: u256,
+    size: u64,
+    encoding_type: u8,
+    deletable: bool,
+    write_payment: &mut Coin<WAL>,
+    ctx: &mut TxContext,
+): Blob {
+    self
+        .inner_mut()
+        .register_blob(
+            storage,
+            blob_id,
+            root_hash,
+            size,
+            encoding_type,
+            deletable,
+            write_payment,
+            ctx,
+        )
+}
+```
+
+This wrapper function delegates to `SystemStateInnerV1.register_blob()`.
+
+**Step 2b: The Actual Implementation** (`register_blob` in [`system_state_inner.move`](https://github.com/MystenLabs/walrus/blob/682587efb05f915476d88b458eac8db1d0a24b33/contracts/walrus/sources/system/system_state_inner.move#L311-L340))
+
+The actual implementation in `SystemStateInnerV1`:
+
+```move
+public(package) fun register_blob(
+    self: &mut SystemStateInnerV1,
+    storage: Storage,
+    blob_id: u256,
+    root_hash: u256,
+    size: u64,
+    encoding_type: u8,
+    deletable: bool,
+    write_payment_coin: &mut Coin<WAL>,
+    ctx: &mut TxContext,
+): Blob {
+    let blob = blob::new(
+        storage,
+        blob_id,
+        root_hash,
+        size,
+        encoding_type,
+        deletable,
+        self.epoch(),
+        self.n_shards(),
+        ctx,
+    );
+    let write_price = self.write_price(blob.encoded_size(self.n_shards()));
+    let payment = write_payment_coin.balance_mut().split(write_price);
+    let accounts = self.future_accounting.ring_lookup_mut(0).rewards_balance().join(payment);
+    blob
+}
+```
+
+**What this code does:**
+
+1. **Creates the blob**: Calls `blob::new()` which takes the `Storage` resource, effectively transferring ownership to the new blob object.
+2. **Calculates write price**: Determines the cost to write the blob based on its encoded size.
+3. **Charges payment**: Splits the required amount from the provided `write_payment_coin`.
+4. **Deposits rewards**: Adds the payment to the system's future accounting (rewards).
+
+**Key Point**: The `Storage` resource is transferred to the blob object via `blob::new()`. You still pay the **write price** (upload cost) even when reusing a reclaimed Storage Resource, but you do **not** pay for storage capacity again.
+
+#### Step 3: Deleting a Deletable Blob Early
+
+When you call [`delete_blob`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L365-L368):
+
+**Step 3a: The Wrapper Function** (`delete_blob` in `SystemStateInnerV1`)
+
+```move
+public(package) fun delete_blob(self: &SystemStateInnerV1, blob: Blob): Storage {
+    blob.delete(self.epoch())
+}
+```
+
+This wrapper function:
+1. Gets the current epoch from the system state (`self.epoch()`)
+2. Calls `blob.delete()` with the current epoch
+3. Returns the `Storage` resource that `blob.delete()` returns
+
+**Step 3b: The Actual Implementation** (`blob.delete()` in [`blob.move`](https://github.com/MystenLabs/walrus/blob/682587efb05f915476d88b458eac8db1d0a24b33/contracts/walrus/sources/system/blob.move#L236-L252))
+
+```move
+/// Deletes a deletable blob and returns the contained storage.
+///
+/// Emits a `BlobDeleted` event for the given epoch.
+/// Aborts if the Blob is not deletable or already expired.
+/// Also removes any metadata associated with the blob.
+public(package) fun delete(mut self: Blob, epoch: u32): Storage {
+    // 1. Remove any metadata associated with the blob
+    dynamic_field::remove_if_exists<_, Metadata>(&mut self.id, METADATA_DF);
+    
+    // 2. Destructure the blob to extract its components
+    let Blob {
+        id,
+        storage,
+        deletable,
+        blob_id,
+        certified_epoch,
+        ..,
+    } = self;
+    
+    // 3. Verify the blob is deletable (aborts if not)
+    assert!(deletable, EBlobNotDeletable);
+    
+    // 4. Verify the storage hasn't expired (aborts if expired)
+    assert!(storage.end_epoch() > epoch, EResourceBounds);
+    
+    // 5. Get the object ID for the event
+    let object_id = id.to_inner();
+    
+    // 6. Delete the blob object's UID
+    id.delete();
+    
+    // 7. Emit the BlobDeleted event
+    emit_blob_deleted(epoch, blob_id, storage.end_epoch(), object_id, certified_epoch.is_some());
+    
+    // 8. Return the Storage resource (with remaining epochs intact)
+    storage
+}
+```
+
+**What this code actually does:**
+
+1. **Removes metadata**: Cleans up any metadata dynamic fields associated with the blob
+2. **Destructures the blob**: Extracts the `storage` field (and other fields) from the blob struct
+3. **Validates deletability**: Aborts if the blob is not deletable (permanent blobs cannot be deleted)
+4. **Validates expiration**: Aborts if the storage has already expired (`storage.end_epoch() > epoch`)
+5. **Deletes the blob object**: Removes the blob's UID (the Sui object is destroyed)
+6. **Emits event**: Records the deletion event for tracking
+7. **Returns Storage resource**: Returns the `storage` field, which contains:
+   - The capacity (size)
+   - The start epoch
+   - **The end epoch** (which determines remaining epochs)
+
+**Key Insight:** The Storage resource returned still has its original `end_epoch` value. The remaining epochs are calculated as `end_epoch - current_epoch`. The Storage resource itself doesn't need to be modified because:
+- It already contains the `end_epoch` (when storage expires)
+- The remaining epochs = `end_epoch - current_epoch`
+- When you reuse it, the system checks if `current_epoch < end_epoch`
+
+**Example:** If you stored a blob with storage ending at epoch 100, and you delete it at epoch 95, the returned Storage resource still has `end_epoch = 100`. The remaining 5 epochs (100 - 95) are implicit in the difference between the end epoch and when you use it.
+
+#### Step 4: Reusing the Storage Resource
+
+Now you have a Storage Resource with remaining epochs (e.g., 5 epochs left). You can reuse it:
+
+**Option A: Store a new blob** (using [`register_blob`](https://github.com/MystenLabs/walrus/blob/682587efb05f915476d88b458eac8db1d0a24b33/contracts/walrus/sources/system.move#L129-L155) and [`system_state_inner.move`](https://github.com/MystenLabs/walrus/blob/682587efb05f915476d88b458eac8db1d0a24b33/contracts/walrus/sources/system/system_state_inner.move#L311-L340))
+
+You can reuse your reclaimed Storage Resource by calling `register_blob()` again with the same Storage Resource:
+
+```move
+// From system.move (wrapper)
+public fun register_blob(
+    self: &mut System,
+    storage: Storage,  // Your reclaimed Storage resource
+    blob_id: u256,
+    root_hash: u256,
+    size: u64,
+    encoding_type: u8,
+    deletable: bool,
+    write_payment: &mut Coin<WAL>,
+    ctx: &mut TxContext,
+): Blob {
+    // Delegates to system_state_inner.register_blob()
+    // which transfers the Storage resource to the new blob
+}
+```
+
+**Important:**
+- The Storage Resource must match the encoded size of the new blob
+- You still pay the write cost (upload cost) for the new blob
+- But you don't need to buy a new Storage Resource - you reuse the one you reclaimed!
+- The Storage Resource's `end_epoch` determines how long the new blob will be stored
+
+**Option B: Extend an existing blob** (Advanced)
+
+You can also use a reclaimed Storage Resource to extend another blob, but this is more complex because the storage periods must be **contiguous**.
+
+1. **The Challenge**: `extend_with_resource` requires the new storage to start exactly when the current blob's storage ends (`fuse_periods` checks for adjacency).
+2. **The Solution**: If your reclaimed storage starts in the past (e.g., epoch 10) but you want to extend a blob that ends now (e.g., epoch 15), you must first use `walrus::storage_resource::split_by_epoch` to slice the storage resource.
+   - Split [10, 20) at epoch 15 → returns [15, 20) and modifies original to [10, 15)
+   - Use the [15, 20) piece to extend your blob
+   - Destroy or discard the [10, 15) piece
+
+This allows you to "top up" an existing blob with the remainder of a deleted blob's life.
+
+### Why This Works
+
+1. **Deletable vs Permanent**: Only deletable blobs can be deleted early. Permanent blobs cannot be deleted, so their Storage Resources cannot be reclaimed.
+
+2. **Storage Resource Ownership**: The Storage Resource is a Sui object that you own. When stored with a blob, it's transferred but not destroyed. Deleting the blob returns it to you.
+
+3. **Epoch Tracking**: The Storage Resource tracks remaining epochs. When you delete early, you get back the unused epochs.
+
+4. **Size Matching**: Storage Resources must match in size (encoded size) to be reused. A resource for a 100MB blob can only be reused for another 100MB blob.
+
+### Complete Example Flow
+
+1. **Store a blob for 10 epochs as deletable**
+   - Buy Storage Resource: 10 epochs, 100MB capacity
+   - Store blob → Storage Resource transferred to blob
+
+2. **Use the blob for 5 epochs**
+   - 5 epochs pass
+   - Blob still has 5 epochs remaining
+
+3. **Delete the blob early** (reclaiming the storage resource)
+   - Call `delete_blob()` → Returns Storage Resource with 5 epochs remaining
+   - You now own the Storage Resource again
+
+4. **Reuse the remaining 5 epochs** for a new blob
+   - Call `register_blob()` with the reclaimed Storage Resource
+   - No need to buy a new Storage Resource!
+   - The new blob uses the remaining 5 epochs
 
 ### Benefits
 

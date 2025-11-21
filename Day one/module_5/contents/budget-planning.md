@@ -41,7 +41,7 @@ Remember that costs are based on **encoded size**, not original size:
 - **Small blobs (< 10MB)**: Encoded size ≈ 64MB (dominated by metadata)
 - **Large blobs (> 10MB)**: Encoded size ≈ 5 × original size (erasure coding)
 
-For precise calculation logic, refer to [`crates/walrus-core/src/encoding/config.rs`](../../../../crates/walrus-core/src/encoding/config.rs).
+For precise calculation logic, refer to [`crates/walrus-core/src/encoding/config.rs`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs).
 
 For more accurate estimates, use dry-run:
 

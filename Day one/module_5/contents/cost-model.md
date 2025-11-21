@@ -33,7 +33,7 @@ A storage resource is required to store a blob, with an appropriate capacity
 and epoch duration. Storage resources can be:
 
 - **Acquired from the system contract**: Purchased with WAL tokens when free
-  space is available (see [`reserve_space`](../../../../contracts/walrus/sources/system/system_state_inner.move) and [`process_storage_payments`](../../../../contracts/walrus/sources/system/system_state_inner.move) in the system contract)
+  space is available (see [`reserve_space`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L190-L205) and [`process_storage_payments`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L424-L441) in the system contract)
 - **Received from other parties**: Transferred or traded
 - **Split from larger resources**: A larger resource can be split into smaller
   ones
@@ -49,7 +49,7 @@ Upon blob registration, WAL is charged to cover the costs of data upload.
 This ensures that deleting blobs and reusing the same storage resource for
 storing a new blob is sustainable for the system.
 
-Upload costs are calculated in [`register_blob`](../../../../contracts/walrus/sources/system/system_state_inner.move) and are:
+Upload costs are calculated in [`register_blob`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L311-L340) and are:
 - Linear with the encoded size of the blob
 - Independent of storage duration (charged once at upload time)
 - Required even when reusing existing storage resources
@@ -93,54 +93,176 @@ The encoded size includes:
 
 ### Calculating Encoded Size
 
-You can calculate encoded size manually using the following formula. This is useful
-for understanding cost drivers and estimating costs before storing blobs. The exact implementation can be found in [`crates/walrus-core/src/encoding/config.rs`](../../../../crates/walrus-core/src/encoding/config.rs).
+You can calculate encoded size manually using the formulas below. This is useful for understanding cost drivers and estimating costs before storing blobs.
 
-#### Formula
+**Implementation Location:** [`crates/walrus-core/src/encoding/config.rs`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs)
+
+#### Main Formula
 
 ```text
 Encoded Size = (Number of Shards × Metadata Size per Shard) + Slivers Size
 ```
 
-Where:
+**Implementation:** [`encoded_blob_length_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L285-L299)
 
-**Total Metadata Size**:
+```rust
+pub fn encoded_blob_length_for_n_shards(
+    n_shards: NonZeroU16,
+    unencoded_length: u64,
+    encoding_type: EncodingType,
+) -> Option<u64> {
+    let slivers_size =
+        encoded_slivers_length_for_n_shards(n_shards, unencoded_length, encoding_type)?;
+    Some(u64::from(n_shards.get()) * metadata_length_for_n_shards(n_shards) + slivers_size)
+}
+```
 
+---
+
+#### Component Breakdown
+
+The main formula has two components: **Metadata** and **Slivers**. Each component is calculated as follows:
+
+##### 1. Metadata Size
+
+**Total Metadata:**
 ```text
 Total Metadata = Number of Shards × Metadata Size per Shard
 ```
 
-Where **Metadata Size per Shard**:
-
+**Metadata Size per Shard:**
 ```text
 Metadata Size per Shard = (Number of Shards × 64 bytes) + 32 bytes
 ```
 
-This includes:
-
-- Hash digests: `Number of Shards × 32 bytes × 2` (primary + secondary hashes
-  per shard)
+**Breakdown:**
+- Hash digests: `Number of Shards × 32 bytes × 2` (primary + secondary hashes per shard)
 - Blob ID: `32 bytes` (stored once per shard)
 
-**Slivers Size**:
+**Implementation:** [`metadata_length_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L250-L260)
 
+```rust
+pub fn metadata_length_for_n_shards(n_shards: NonZeroU16) -> u64 {
+    (
+        // The hashes: n_shards × 32 bytes × 2
+        usize::from(n_shards.get()) * DIGEST_LEN * 2
+        // The blob ID: 32 bytes
+        + BlobId::LENGTH
+    )
+        .try_into()
+        .expect("this always fits into a `u64`")
+}
+```
+
+**Note:** `DIGEST_LEN = 32` bytes, `BlobId::LENGTH = 32` bytes
+
+---
+
+##### 2. Slivers Size
+
+**Total Slivers:**
 ```text
 Slivers Size = Number of Shards × Single Shard Slivers Size
 ```
 
-**Single Shard Slivers Size**:
-
+**Single Shard Slivers Size:**
 ```text
 Single Shard Slivers Size = (Primary Symbols + Secondary Symbols) × Symbol Size
 ```
 
-**Symbol Size**:
+**Implementation:** [`encoded_slivers_length_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L301-L325)
 
+```rust
+pub fn encoded_slivers_length_for_n_shards(
+    n_shards: NonZeroU16,
+    unencoded_length: u64,
+    encoding_type: EncodingType,
+) -> Option<u64> {
+    let (source_symbols_primary, source_symbols_secondary) = source_symbols_for_n_shards(n_shards);
+    let single_shard_slivers_size = (u64::from(source_symbols_primary.get())
+        + u64::from(source_symbols_secondary.get()))
+        * u64::from(
+            utils::compute_symbol_size(
+                unencoded_length,
+                source_symbols_per_blob_for_n_shards(n_shards),
+                encoding_type.required_alignment(),
+            )
+            .ok()?
+            .get(),
+        );
+    Some(u64::from(n_shards.get()) * single_shard_slivers_size)
+}
+```
+
+---
+
+#### Sub-Components for Slivers Calculation
+
+To calculate slivers size, you need these sub-components:
+
+##### Symbol Size
+
+**Formula:**
 ```text
 Symbol Size = ceil(Unencoded Size / Total Source Symbols) rounded up to alignment (2 bytes for RS2)
 ```
 
-Note: For RS2 encoding, symbol size must be a multiple of 2 bytes. If the calculated size is odd, it's rounded up to the next even number.
+**Implementation:** [`utils::compute_symbol_size`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs)
+
+```rust
+utils::compute_symbol_size(
+    unencoded_length,                                    // Unencoded Size
+    source_symbols_per_blob_for_n_shards(n_shards),     // Total Source Symbols
+    encoding_type.required_alignment(),                  // Alignment (2 for RS2)
+)
+```
+
+**Note:** For RS2 encoding, symbol size must be a multiple of 2 bytes. If the calculated size is odd, it's rounded up to the next even number.
+
+---
+
+##### Total Source Symbols
+
+**Formula:**
+```text
+Total Source Symbols = Primary Symbols × Secondary Symbols
+```
+
+**Implementation:** [`source_symbols_per_blob_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L277-L283)
+
+```rust
+fn source_symbols_per_blob_for_n_shards(n_shards: NonZeroU16) -> NonZeroU32 {
+    let (source_symbols_primary, source_symbols_secondary) = source_symbols_for_n_shards(n_shards);
+    NonZeroU32::from(source_symbols_primary)
+        .checked_mul(source_symbols_secondary.into())
+        .expect("product of two u16 always fits into a u32")
+}
+```
+
+**Primary/Secondary Symbols:** Calculated by [`source_symbols_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs) based on Byzantine fault tolerance requirements.
+
+---
+
+#### Quick Reference: Calculation Order
+
+1. Calculate **Primary/Secondary Symbols** from number of shards
+2. Calculate **Total Source Symbols** = Primary × Secondary
+3. Calculate **Symbol Size** = ceil(Unencoded Size / Total Source Symbols), aligned to 2 bytes
+4. Calculate **Single Shard Slivers Size** = (Primary + Secondary) × Symbol Size
+5. Calculate **Slivers Size** = Number of Shards × Single Shard Slivers Size
+6. Calculate **Metadata Size per Shard** = (Number of Shards × 64) + 32
+7. Calculate **Total Metadata** = Number of Shards × Metadata Size per Shard
+8. Calculate **Encoded Size** = Total Metadata + Slivers Size
+
+---
+
+#### Test Cases
+
+The implementation includes comprehensive test cases in [`config.rs`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L327-L420):
+
+- [`test_encoded_size_reed_solomon`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L360-L380) - Tests encoded size calculations
+- [`test_source_symbols_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L382-L400) - Tests source symbol calculations
+- [`test_sliver_size_for_blob`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L327-L358) - Tests sliver size calculations
 
 #### Simplified Approximation
 
@@ -218,23 +340,43 @@ Total: ~511.65 MB ≈ 512 MB
 
 ##### Example 3: Using Storage Units
 
-Once you have the encoded size, calculate storage units:
+Once you have the encoded size, calculate storage units. Storage units are used for billing and represent 1 MiB (1,048,576 bytes) each. The calculation always rounds **up** to the nearest whole unit.
 
+**Formula:**
 ```text
-Storage Units = ceil(Encoded Size / 1,048,576)
+Storage Units = ceil(Encoded Size in bytes / 1,048,576)
 ```
 
-For Example 1 (66.8 MB):
+**For Example 1:**
+
+The encoded size from Example 1 is 70,038,000 bytes (≈ 66.8 MB).
 
 ```text
-Storage Units = ceil(70,038,000 / 1,048,576) = ceil(66.8) = 67 units
+Storage Units = ceil(70,038,000 / 1,048,576)
+              = ceil(66.8)
+              = 67 units
 ```
 
-For Example 2 (512 MB):
+**Explanation:** Even though the blob is only 66.8 MB, it requires 67 storage units because you pay for complete units. The 0.8 MB fraction requires a full additional unit.
+
+**For Example 2:**
+
+The encoded size from Example 2 is 536,504,000 bytes (≈ 511.65 MB).
 
 ```text
-Storage Units = ceil(511,650,000 / 1,048,576) = ceil(488.0) = 512 units
+Total encoded size = 64,032,000 + 472,472,000 = 536,504,000 bytes ≈ 511.65 MB
+Storage Units = ceil(536,504,000 / 1,048,576)
+              = ceil(511.65)
+              = 512 units
 ```
+
+**Explanation:**
+- The actual encoded size is **511.65 MB** (not exactly 512 MB)
+- However, storage units are calculated by dividing bytes by 1,048,576 and rounding **up**
+- Since 511.65 MB is greater than 511 full units, it rounds up to **512 storage units**
+- The heading "512 MB" refers to the rounded storage units (512 units × 1 MB each), not the exact encoded size
+
+**Key Point:** Storage units always round up, so a blob that's 511.65 MB still requires 512 storage units for billing purposes.
 
 #### Getting System Parameters
 
@@ -294,8 +436,8 @@ Total Cost = Storage Resource Cost + Upload Cost + Transaction Costs + Object Co
 Where:
 
 - **Storage Resource Cost** =
-  `storage_units × price_per_unit × epochs` (see `process_storage_payments` in [`system_state_inner.move`](../../../../contracts/walrus/sources/system/system_state_inner.move))
-- **Upload Cost** = `storage_units × write_price_per_unit` (see `register_blob` in [`system_state_inner.move`](../../../../contracts/walrus/sources/system/system_state_inner.move))
+  `storage_units × price_per_unit × epochs` (see `process_storage_payments` in [`system_state_inner.move`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L424-L441))
+- **Upload Cost** = `storage_units × write_price_per_unit` (see `register_blob` in [`system_state_inner.move`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L311-L340))
 - **Transaction Costs** = SUI gas fees (relatively fixed per transaction)
 - **Object Costs** = SUI storage fund deposit (mostly refundable)
 
@@ -307,7 +449,7 @@ Storage units are calculated from encoded size:
 storage_units = ceil(encoded_size / 1_MiB)
 ```
 
-Each storage unit is 1 MiB (1,048,576 bytes). Prices are defined in [`EpochParams`](../../../../contracts/walrus/sources/system/epoch_parameters.move).
+Each storage unit is 1 MiB (1,048,576 bytes). Prices are defined in [`EpochParams`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/epoch_parameters.move#L6-L14).
 
 ## Measuring Costs
 

@@ -14,20 +14,21 @@ By the end of this module, students should be able to:
 
 ### For Students
 
-- Basic understanding of the Walrus CLI (see [CLI Curriculum](../cli/index.md))
+- Basic understanding of the Walrus CLI
 - Familiarity with WAL and SUI tokens
 - Basic command-line interface experience
-- Understanding of epochs and storage duration (from [Epochs and Storage Continuity](../epochs_continuity/index.md))
+- Understanding of epochs and storage duration
 - Ability to perform basic arithmetic calculations
 
 ### For Instructor
 
 - Deep understanding of the Walrus cost model and encoding system
 - Familiarity with `system_state_inner.move` contract functions (`reserve_space`, `register_blob`, `process_storage_payments`)
-- Knowledge of erasure coding and metadata overhead calculations (see [`crates/walrus-core/src/encoding/config.rs`](../../../../crates/walrus-core/src/encoding/config.rs))
+- Knowledge of erasure coding and metadata overhead calculations (see [`crates/walrus-core/src/encoding/config.rs`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs))
 - Understanding of storage resource lifecycle and reuse mechanisms
 - Prepared examples of cost calculations for different blob sizes
 - Access to current Walrus prices (via `walrus info`)
+- Understanding of FROST/WAL conversion (1 WAL = 1,000,000,000 FROST)
 
 ## Section-by-Section Guidance
 
@@ -90,11 +91,13 @@ By the end of this module, students should be able to:
 
 - "If I store a blob for 20 epochs but delete it after 5 epochs, can I reuse the remaining 15 epochs?" (Answer: Yes, if it's deletable and you have a matching storage resource).
 - "What's the difference in cost between storing for 1 epoch vs. 10 epochs?" (Answer: Storage resource cost is 10x higher; upload and transaction costs are the same).
+- "When reusing a reclaimed Storage resource, do I pay the storage resource cost again?" (Answer: No, you only pay the write cost/upload cost).
 
 **Discussion Points:**
 
 - When should you use short-term storage vs. extended storage? (Consider data lifetime, budget constraints, optimization opportunities).
 - What are the trade-offs of the "buy long, delete early" strategy? (Requires active management, but maximizes resource reuse).
+- How does the Storage resource track remaining epochs? (Via `end_epoch` - remaining epochs = `end_epoch - current_epoch`).
 
 ---
 
@@ -113,6 +116,8 @@ By the end of this module, students should be able to:
 - Emphasize the importance of getting current prices (`walrus info`) - prices can change.
 - Show how to use dry-run for accurate encoded size estimation before committing to storage.
 - Discuss the real-world example in detail - students can use it as a template for their own projects.
+- Highlight the cost forecasting section - students should plan for different scenarios (best case, base case, worst case).
+- Emphasize the importance of regular budget reviews (monthly, quarterly, annually).
 
 **Quick Check:**
 
@@ -179,6 +184,7 @@ By the end of this module, students should be able to:
 
 - What are the trade-offs of grouping blobs? (Lose individual lifecycle management, but gain significant cost savings).
 - When should you burn blob objects? (When you don't need lifecycle management and want to reclaim SUI deposits).
+- When should you NOT use grouping? (Files that need individual lifecycle management, different expiration dates, independent sharing/extending, very large files, content-derived IDs required).
 
 ---
 
@@ -222,9 +228,9 @@ By the end of this module, students should be able to:
 ## Additional Resources
 
 - **Walrus Source Code**: 
-  - Cost calculations: [`contracts/walrus/sources/system/system_state_inner.move`](../../../../contracts/walrus/sources/system/system_state_inner.move)
-  - Encoding configuration: [`crates/walrus-core/src/encoding/config.rs`](../../../../crates/walrus-core/src/encoding/config.rs)
-  - Storage resources: [`contracts/walrus/sources/system/storage_resource.move`](../../../../contracts/walrus/sources/system/storage_resource.move)
+  - Cost calculations: [`contracts/walrus/sources/system/system_state_inner.move`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move)
+  - Encoding configuration: [`crates/walrus-core/src/encoding/config.rs`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs)
+  - Storage resources: [`contracts/walrus/sources/system/storage_resource.move`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/storage_resource.move)
 - **CLI Documentation**: `walrus info`, `walrus store --dry-run` commands for cost estimation
 - **Sui Explorer**: To view actual transaction costs and WAL/SUI balances
 

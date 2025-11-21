@@ -53,7 +53,7 @@ This curriculum is organized into the following sections:
 
 Before starting this curriculum, you should have:
 
-- Basic understanding of the Walrus CLI (see [CLI Curriculum](../cli/index.md))
+- Basic understanding of the Walrus CLI
 - Familiarity with WAL and SUI tokens
 - Basic command-line interface experience
 
