@@ -1,0 +1,31 @@
+{
+  "name": "sdk-upload-relay-verification",
+  "version": "1.0.0",
+  "description": "Verification environment for SDK Upload Relay code examples",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsx src/run-all.ts",
+    "test:basic-upload": "tsx src/examples/basic-upload-example.ts",
+    "test:basic-download": "tsx src/examples/basic-download-example.ts",
+    "test:hands-on": "tsx src/examples/hands-on-lab.ts",
+    "test:retry": "tsx src/examples/retry-patterns.ts",
+    "test:partial-failures": "tsx src/examples/partial-failures.ts",
+    "test:integrity-checks": "tsx src/examples/integrity-checks.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mysten/sui": "^1.45.0",
+    "@mysten/walrus": "^0.8.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.9.3"
+  }
+}
+
