@@ -83,7 +83,7 @@ This is how Walrus ensures your data is safe and "durable" (i.e., it doesn't get
 
 2. **Split & Encode:** You upload your file (blob). The client, using RedStuff, splits the file into many small "slivers" and creates the redundant (parity) slivers.
 
-3. **Distribute:** The client-distributes these hundreds or thousands of slivers across the decentralized network of storage nodes.
+3. **Distribute:** The client distributes these hundreds or thousands of slivers across the decentralized network of storage nodes.
 
 4. **Record:** The client then registers the blob's metadata (like a receipt or table of contents) as a smart contract "object" on the Sui blockchain. This object acts as the proof of ownership and the "map" to find the data.
 
