@@ -1,0 +1,145 @@
+# 1. Chunk Creation & Encoding
+
+In the Walrus protocol, files (blobs) are not stored as single contiguous files. Instead, they are processed through an **Erasure Encoding** pipeline that splits them into smaller pieces called **slivers**. This ensures redundancy and availability even if some storage nodes go offline.
+
+## The Encoding Process
+
+The encoding process uses **Reed-Solomon (RS)** encoding, specifically `RS(n, k)`, where:
+- `k` is the number of source symbols (the original data).
+- `n` is the total number of symbols generated (source + parity).
+
+This allows the original data to be reconstructed from any `k` symbols out of the `n` total symbols.
+
+### Reed-Solomon Parameters ($n, k$)
+
+The parameters $n$ and $k$ are not arbitrary. They are derived from the system's **shard count** ($n$) and **Byzantine fault tolerance** settings ($f$), where $f < n/3$.
+
+-   **Primary Encoding**: $k_{primary} \le n - 2f$
+-   **Secondary Encoding**: $k_{secondary} \le n - f$
+
+This ensures data availability even in the presence of malicious nodes. In the codebase, these are calculated in `crates/walrus-core/src/encoding/config.rs`.
+
+### Visualizing the Process
+
+```mermaid
+flowchart LR
+    File[Original File] -->|1. Input Validation| Splitter
+    Splitter -- "2. Matrix Expansion (Split into k chunks)" --> Encoder[RS Encoder]
+    
+    subgraph Encoding ["Erasure Encoding (Reed-Solomon)"]
+        direction TB
+        Encoder -->|4. Sliver Generation| Primary["Primary Slivers<br/>(Data)"]
+        Encoder -->|4. Sliver Generation| Secondary["Secondary Slivers<br/>(Parity)"]
+    end
+    
+    subgraph Meta ["Metadata Generation"]
+        Encoder -->|3. Compute Hash| Hasher[Merkle Tree Hasher]
+        Hasher --> Root[Merkle Root]
+        Root --> ID[Blob ID]
+    end
+
+    Primary --> Package[Walrus Blob]
+    Secondary --> Package
+    ID --> Package
+```
+
+### Key Concepts
+
+1.  **Slivers**: The fundamental unit of storage in Walrus.
+    -   **Primary Slivers**: Contain the original data.
+    -   **Secondary Slivers**: Contain parity data (redundancy) for error recovery.
+2.  **Metadata**: Includes the blob ID, size, and the **Merkle Root** of the encoded symbols, which ensures integrity.
+3.  **Blob ID**: Derived from the hash of the content, ensuring content-addressability.
+
+## Detailed Encoding Process
+
+The encoding pipeline executes the following steps for each blob:
+
+1.  **Input Validation**:
+    -   The client checks if the blob size exceeds the maximum allowed limit (e.g., based on the current protocol configuration).
+    -   If multiple blobs are being encoded, the total size is checked.
+
+2.  **Matrix Expansion (RS Encoding)**:
+    -   The raw binary data is treated as a matrix of bytes.
+    -   The `BlobEncoder` expands this matrix by adding "parity rows" based on the Reed-Solomon parameters.
+    -   This step is computationally intensive and is often parallelized.
+
+3.  **Metadata Computation**:
+    -   While the matrix is being processed, the Merkle tree of the symbols is computed.
+    -   The root hash of this tree becomes the core component of the **Blob ID**.
+    -   This ensures that the ID is cryptographically bound to the content.
+
+4.  **Sliver Generation**:
+    -   The expanded matrix is sliced into **Primary Slivers** (original data) and **Secondary Slivers** (parity data).
+    -   Each sliver is paired with its index and metadata.
+    -   The output is a collection of `SliverPair` objects ready for distribution.
+
+## Code Trace: Encoding Logic
+
+The encoding logic resides primarily in `crates/walrus-core` and is orchestrated by the SDK.
+
+### 1. SDK Entry Point
+The process starts in `ts-sdks/packages/walrus/src/client.ts` with `encodeBlob`.
+
+```typescript
+// ts-sdks/packages/walrus/src/client.ts
+
+async encodeBlob(blob: Uint8Array) {
+    const systemState = await this.systemState();
+    // ...
+    const numShards = systemState.committee.n_shards;
+    const bindings = await this.#wasmBindings();
+    const { blobId, metadata, sliverPairs, rootHash } = bindings.encodeBlob(numShards, blob);
+
+    // ... reorganizes slivers by node ...
+
+    return { blobId, metadata, rootHash, sliversByNode };
+}
+```
+
+### 2. Core Encoding Logic
+The actual Reed-Solomon encoding happens via WASM bindings to the Rust `walrus-core` crate.
+
+```rust
+// crates/walrus-core/src/encoding/blob_encoding.rs
+
+pub fn encode_with_metadata(&self) -> (Vec<SliverPair>, VerifiedBlobMetadataWithId) {
+    // ...
+    tracing::debug!("starting to encode blob with metadata");
+    
+    // Matrix operations for RS encoding
+    let mut expanded_matrix = self.get_expanded_matrix();
+    let metadata = expanded_matrix.get_metadata();
+
+    // ...
+    
+    tracing::debug!(
+        blob_id = %metadata.blob_id(),
+        "successfully encoded blob"
+    );
+
+    (sliver_pairs, metadata)
+}
+```
+
+## Log Tracing
+
+### TypeScript SDK
+The TypeScript SDK does not emit debug logs by default. Monitor the `encodeBlob` function execution.
+
+### Rust SDK (Reference)
+When running a Walrus client (using `crates/walrus-sdk`) with debug logs enabled, look for these messages:
+
+-   `starting to encode blob with metadata`
+-   `successfully encoded blob`
+-   `encoded sliver pairs and metadata`
+
+These logs indicate that the local client has successfully transformed your file into the format required for the Walrus network.
+
+## Key Takeaways
+
+- **Client-Side Processing**: Files are encoded into slivers locally; raw data never leaves the client intact.
+- **Erasure Encoding**: Reed-Solomon encoding creates redundancy (parity slivers), allowing data recovery even if nodes fail.
+- **Blob ID Derivation**: The Blob ID is cryptographically derived from the content (Merkle root), ensuring content-addressability.
+- **Metadata Generation**: Essential metadata, including the Merkle root and encoding parameters, is generated alongside the slivers.
+
