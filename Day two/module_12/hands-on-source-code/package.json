@@ -1,0 +1,22 @@
+{
+  "name": "walrus-failure-handling-lab",
+  "version": "1.0.0",
+  "description": "Hands-on lab for Failure Handling module",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "debug-scenario": "tsx ts/debug-scenario.ts",
+    "solution": "tsx ts/debug-scenario-solution.ts"
+  },
+  "dependencies": {
+    "@mysten/sui": "^1.45.0",
+    "@mysten/walrus": "^0.8.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
+
+
