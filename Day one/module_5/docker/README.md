@@ -16,7 +16,7 @@ SUI_WALLET_PATH=~/.sui/sui_config make run
 | `make build` | Build the Docker image |
 | `make run` | Start interactive shell |
 | `make single-blob-cost` | Calculate cost for a single blob |
-| `make compare-sizes` | Compare costs for different sizes (requires wallet) |
-| `make encoding-overhead` | Understand encoding overhead (creates test file) |
+| `make compare-sizes` | Compare costs for different sizes |
+| `make encoding-overhead` | Understand encoding overhead |
 | `make clean` | Remove containers and images |
 

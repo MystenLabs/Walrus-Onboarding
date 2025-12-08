@@ -40,31 +40,14 @@ compare-sizes:
 		echo "Files created:" && \
 		ls -lh *.bin && \
 		echo "" && \
-		if [ -f /home/student/.sui/sui_config/client.yaml ]; then \
-			echo "Comparing storage costs..." && \
-			echo "" && \
-			echo "=== Small file (1MB) ===" && \
-			walrus store small-1mb.bin --epochs 1 --dry-run 2>&1 | grep -A 5 "blob will be stored" && \
-			echo "" && \
-			echo "=== Large file (100MB) ===" && \
-			walrus store large-100mb.bin --epochs 1 --dry-run 2>&1 | grep -A 5 "blob will be stored"; \
-		else \
-			echo "⚠️  Wallet not configured. To see actual cost comparison:" && \
-			echo "   Run: SUI_WALLET_PATH=~/.sui/sui_config make compare-sizes" && \
-			echo "" && \
-			echo "Manual comparison commands:" && \
-			echo "   walrus store small-1mb.bin --epochs 1 --dry-run" && \
-			echo "   walrus store large-100mb.bin --epochs 1 --dry-run"; \
-		fi'
+		echo "Check costs with: walrus store <file> --epochs 1 --dry-run"'
 
 encoding-overhead:
 	docker-compose run --rm storage-costs-lab /bin/bash -c '\
 		echo "=== Understand Encoding Overhead ===" && \
 		dd if=/dev/urandom of=sample-2mb.bin bs=1M count=2 2>/dev/null && \
-		echo "File created: sample-2mb.bin" && \
-		echo "" && \
-		echo "To check encoded size, run: walrus store sample-2mb.bin --epochs 1 --dry-run" && \
-		echo "Note: Requires SUI_WALLET_PATH to be set"'
+		echo "Checking encoded size..." && \
+		walrus store sample-2mb.bin --epochs 1 --dry-run'
 
 clean:
 	docker-compose down -v
