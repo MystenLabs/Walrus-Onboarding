@@ -310,27 +310,3 @@ c) Re-encode the retrieved data and verify the blob ID matches expectations. Use
 
 **c)** Store for 1 year (not permanent). Reasoning: Videos may become outdated, user preferences change, storage costs accumulate. Better to extend epochs periodically for popular content and let unpopular content expire. Permanent storage locks in costs forever for content that may not be accessed long-term. Can implement analytics to decide which videos to keep.
 
----
-
-## Instructor Notes
-
-### Assessment Focus
-
-This quiz assesses understanding across all Day 1 modules:
-- **Sections 1-6**: Core required content
-- **Sections 7-8**: Bonus sections for advanced understanding
-
-### Common Mistakes to Watch For
-
-- Confusing Publishers with Storage Nodes
-- Thinking Walrus provides privacy by default
-- Not understanding the difference between retryable and non-retryable failures
-- Assuming CLI and SDK have the same capabilities
-- Forgetting that encoding is deterministic
-
-### Discussion Points After Quiz
-
-- Review questions where students struggled most
-- Clarify any misconceptions about trust boundaries
-- Reinforce the importance of client-side encryption for sensitive data
-- Discuss real-world tradeoffs in the practical scenario
