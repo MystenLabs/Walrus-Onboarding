@@ -98,15 +98,26 @@ The storage node receives the request and stores it. See `crates/walrus-service/
 ```rust
 // crates/walrus-service/src/node/server/routes.rs
 
-pub async fn put_sliver(...) -> ... {
+pub async fn put_sliver<S: SyncServiceState>(
+    State(state): State<RestApiState<S>>,
+    Path((blob_id, sliver_pair_index, sliver_type)): Path<(BlobIdString, SliverPairIndex, SliverType)>,
+    body: axum::body::Bytes,
+) -> Result<ApiSuccess<&'static str>, OrRejection<StoreSliverError>> {
     // ...
     state.service.store_sliver(blob_id, sliver_pair_index, sliver).await?;
     Ok(ApiSuccess::ok("sliver stored successfully"))
 }
+```
 
+```rust
 // crates/walrus-service/src/node.rs
 
-pub(crate) async fn store_sliver_unchecked(...) -> Result<bool, StoreSliverError> {
+pub(crate) async fn store_sliver_unchecked(
+    &self,
+    metadata: VerifiedBlobMetadataWithId,
+    sliver_pair_index: SliverPairIndex,
+    sliver: Sliver,
+) -> Result<bool, StoreSliverError> {
     // ... checks shard assignment ...
     
     // Verifies the sliver against the metadata (integrity check)

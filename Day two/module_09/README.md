@@ -84,6 +84,28 @@ The module is organized into 8 comprehensive lessons:
    - Identify bottlenecks and failures
    - Verify each stage completion
 
+### Instructor Resources
+
+- **[Instructor's Guide](./contents/instructor-guide.md)** - Comprehensive teaching guide
+  - Section-by-section timing and key points
+  - Common misconceptions and corrections
+  - Discussion questions and quick checks
+  - Assessment checklist and exit tickets
+
+## 🐳 Docker Environment
+
+A Docker environment is provided for the hands-on exercises. This allows students to trace the upload lifecycle in a controlled environment.
+
+**Quick Start:**
+
+```sh
+cd docker
+make build
+SUI_WALLET_PATH=~/.sui/sui_config make trace-lifecycle
+```
+
+See the [Docker README](./docker/README.md) for all available commands and setup instructions.
+
 ---
 
 **Ready to start?** Head to [contents/index.md](./contents/index.md) or jump straight to [Lesson 1: Chunk Creation & Encoding](./contents/01-chunk-creation.md)!

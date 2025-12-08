@@ -1,0 +1,13 @@
+services:
+  lifecycle-lab:
+    build: .
+    container_name: walrus-lifecycle-lab
+    volumes:
+      - ./workspace:/workspace
+      - ${SUI_WALLET_PATH:-./wallet}:/home/student/.sui/sui_config:ro
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    environment:
+      - RUST_LOG=${RUST_LOG:-walrus_sdk=debug,walrus_core=debug,walrus_sui=debug}
+

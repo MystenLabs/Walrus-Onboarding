@@ -7,6 +7,22 @@ In this hands-on exercise, you will run a local upload and inspect the logs to i
 -   The `walrus` CLI installed.
 -   Access to log output (e.g., via `docker logs` or running the binary directly).
 
+## Running in Docker (Recommended for Consistent Results)
+
+For a consistent environment across all operating systems, use the Docker setup in the `docker/` directory:
+
+```sh
+# From the upload_transaction_lifecycle module directory
+cd docker
+make build
+SUI_WALLET_PATH=~/.sui/sui_config make run
+
+# Or run the trace lifecycle exercise
+make trace-lifecycle
+```
+
+> 💡 **Docker Benefits:** Debug logging is pre-configured to show all lifecycle stages.
+
 ## Step 1: Prepare the Environment
 
 Set the `RUST_LOG` environment variable to enable debug logs for the client.

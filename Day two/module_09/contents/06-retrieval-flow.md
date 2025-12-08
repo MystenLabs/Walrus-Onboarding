@@ -8,6 +8,8 @@ Retrieving a blob involves reversing the upload process: fetching enough slivers
 2.  **Fetch Slivers**: The client requests slivers from a subset of storage nodes. It only needs `k` (source symbols) amount of data to reconstruct, but may request more to ensure low latency.
 3.  **Reconstruction**: The client decodes the slivers back into the original file.
 
+> **Note**: The value of `k` (minimum slivers needed) is network-specific, computed as $k_{primary} = n - 2f$ where $n$ is the shard count and $f = \lfloor(n-1)/3\rfloor$. For example, on a 1000-shard network, $k = 334$ primary slivers are needed for reconstruction.
+
 ### Visualizing Retrieval
 
 ```mermaid

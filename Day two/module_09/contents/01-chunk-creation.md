@@ -12,12 +12,19 @@ This allows the original data to be reconstructed from any `k` symbols out of th
 
 ### Reed-Solomon Parameters ($n, k$)
 
-The parameters $n$ and $k$ are not arbitrary. They are derived from the system's **shard count** ($n$) and **Byzantine fault tolerance** settings ($f$), where $f < n/3$.
+The parameters $n$ and $k$ are not arbitrary. They are derived from the system's **shard count** ($n$) and **Byzantine fault tolerance** settings ($f$), where $f = \lfloor(n-1)/3\rfloor$ (i.e., $f < n/3$).
 
--   **Primary Encoding**: $k_{primary} \le n - 2f$
--   **Secondary Encoding**: $k_{secondary} \le n - f$
+-   **Primary Encoding**: $k_{primary} = n - 2f$
+-   **Secondary Encoding**: $k_{secondary} = n - f$
 
-This ensures data availability even in the presence of malicious nodes. In the codebase, these are calculated in `crates/walrus-core/src/encoding/config.rs`.
+This ensures data availability even in the presence of malicious nodes.
+
+> **Codebase Note**: In the Rust implementation (`crates/walrus-core/src/encoding/config.rs`), these parameters are named `source_symbols_primary` and `source_symbols_secondary` respectively. The formula is computed using the `bft::max_n_faulty()` helper function.
+
+**Example**: For a network with 1000 shards:
+- $f = \lfloor(1000-1)/3\rfloor = 333$
+- $k_{primary} = 1000 - 2 \times 333 = 334$ (primary source symbols needed for reconstruction)
+- $k_{secondary} = 1000 - 333 = 667$ (secondary source symbols)
 
 ### Visualizing the Process
 
@@ -128,11 +135,14 @@ pub fn encode_with_metadata(&self) -> (Vec<SliverPair>, VerifiedBlobMetadataWith
 The TypeScript SDK does not emit debug logs by default. Monitor the `encodeBlob` function execution.
 
 ### Rust SDK (Reference)
-When running a Walrus client (using `crates/walrus-sdk`) with debug logs enabled, look for these messages:
+When running a Walrus client with debug logs enabled, look for these messages:
 
--   `starting to encode blob with metadata`
--   `successfully encoded blob`
--   `encoded sliver pairs and metadata`
+**In `walrus-core` (encoding layer)**:
+-   `starting to encode blob with metadata` — encoding begins
+-   `successfully encoded blob` — encoding complete with blob ID
+
+**In `walrus-sdk` (client layer)**:
+-   `encoded sliver pairs and metadata` — client has finished encoding
 
 These logs indicate that the local client has successfully transformed your file into the format required for the Walrus network.
 
