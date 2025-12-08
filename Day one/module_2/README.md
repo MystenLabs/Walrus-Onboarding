@@ -23,11 +23,37 @@ module_2/
 │   ├── 03-data-flow.md       # Upload and retrieval flows
 │   ├── 04-hands-on.md        # Practical walkthrough
 │   └── instructor-guide.md   # Teaching guide for instructors
+├── docker/                   # Docker environment for hands-on exercises
+│   ├── README.md             # Docker setup instructions
+│   ├── Dockerfile            # Container definition
+│   ├── docker-compose.yml    # Service configuration
+│   ├── Makefile              # Convenient commands
+│   └── workspace/            # Working directory (mounted)
 ├── images/                   # SVG diagrams
 └── assets/                   # Excalidraw source files for diagrams
 ```
 
 ## Getting Started
+
+### Setup Options
+
+**Option 1: Docker Environment (Recommended)**
+
+For a consistent, cross-platform experience:
+
+```bash
+cd docker
+make build
+SUI_WALLET_PATH=~/.sui/sui_config make run
+```
+
+See [Docker README](./docker/README.md) for all available commands.
+
+**Option 2: Local Installation**
+
+Install Walrus CLI locally following the [Getting Started guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/started.md).
+
+### Learning Path
 
 1. **Start with the [Module Index](./contents/index.md)** - Overview and learning path
 2. **Read [System Components](./contents/01-components.md)** - Understand the building blocks
@@ -93,7 +119,10 @@ Before starting this module, you should have:
 - Basic understanding of blockchain concepts
 - Familiarity with HTTP APIs
 - Access to a Walrus network (testnet or mainnet)
-- Walrus CLI installed (for hands-on exercises)
+
+**For Hands-On Exercises:**
+- **Docker** (recommended): Docker and docker-compose installed
+- **OR Local Setup**: Walrus CLI installed following the [Getting Started guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/started.md)
 
 ## Resources
 

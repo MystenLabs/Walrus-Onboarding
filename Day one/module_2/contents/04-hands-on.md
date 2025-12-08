@@ -16,17 +16,16 @@ Before starting, ensure you have:
 
 ## Running in Docker (Recommended for Consistent Results)
 
-For a consistent environment across all operating systems:
+For a consistent environment across all operating systems, use the Docker setup in the `docker/` directory:
 
-```bash
-# Navigate to the curriculum docker directory
-cd docs/book/curriculum/docker
+```sh
+# From the walrus_architecture module directory
+cd docker
+make build
+SUI_WALLET_PATH=~/.sui/sui_config make run
 
-# Build and start interactive CLI environment
-make build-cli
-SUI_WALLET_PATH=~/.sui/sui_config make cli
-
-# Inside the container, all commands work identically on Mac/Linux/Windows
+# Or run the trace upload exercise with debug logging
+make trace-upload
 ```
 
 > 💡 **Docker Benefits:**
