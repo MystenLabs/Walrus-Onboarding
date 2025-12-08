@@ -49,7 +49,7 @@ When a blob is stored in Walrus:
 ## Encoding Implementation
 
 The encoding process is implemented in the `BlobEncoder`. See the core encoding function:
-[`encode_with_metadata`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/blob_encoding.rs#L165-L185)
+[`encode_with_metadata`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/blob_encoding.rs) (search for `encode_with_metadata`)
 
 The encoding process:
 1. Creates an expanded matrix from the blob data
@@ -69,12 +69,20 @@ Walrus provides multiple consistency check mechanisms:
 - **Strict check**: Re-encodes the blob and verifies the blob ID matches
 - **Storage node checks**: Storage nodes can detect encoding inconsistencies and mark blobs as invalid
 
+```admonish note title="Consistency Check Default Changed in v1.37"
+Starting with Walrus CLI v1.37, the default consistency check is the more performant
+"default check" described above. Prior versions used the strict consistency check by default.
+
+- The strict check can still be enabled with `--strict-consistency-check`
+- For trusted blob writers, consistency checks can be disabled with `--skip-consistency-check`
+```
+
 
 ## Related Sections
 
-- **[System Components](./components.md)** - Learn about Storage Nodes that store the encoded slivers
-- **[Data Flow](./data-flow.md)** - See how encoding fits into the complete upload and retrieval flows
-- **[Hands-On Walkthrough](./hands-on.md)** - Practice encoding and storing blobs
+- **[System Components](./01-components.md)** - Learn about Storage Nodes that store the encoded slivers
+- **[Data Flow](./03-data-flow.md)** - See how encoding fits into the complete upload and retrieval flows
+- **[Hands-On Walkthrough](./04-hands-on.md)** - Practice encoding and storing blobs
 
 ## Key Concepts
 
@@ -105,7 +113,7 @@ Walrus uses Reed-Solomon erasure coding with the following properties:
 - Only 1/3 of symbols needed for reconstruction
 - Provides redundancy and fault tolerance
 
-## Key Points
+## Key Takeaways
 
 - **Erasure Encoding** uses Reed-Solomon codes to split blobs into symbols and create redundancy
 - **Expansion Factor** - Blob size expands by approximately 4.5-5x during encoding (independent of shard count)
@@ -115,3 +123,7 @@ Walrus uses Reed-Solomon erasure coding with the following properties:
 - **Deterministic** - Same blob always produces same slivers and blob ID
 - **Reconstruction** requires only 1/3 of symbols (334 primary slivers) to recover the original blob
 - **Verifiable** - Sliver hashes allow verification of data authenticity at any point
+
+## Next Steps
+
+Now that you understand how blobs are encoded, proceed to [Data Flow](./03-data-flow.md) to see how the encoding fits into the complete upload and retrieval flows.

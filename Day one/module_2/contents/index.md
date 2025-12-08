@@ -17,25 +17,25 @@ By the end of this curriculum, you will be able to:
 
 Follow this recommended learning path:
 
-1. **[System Components](./components.md)** - Start here to understand the building blocks of Walrus
+1. **[System Components](./01-components.md)** - Start here to understand the building blocks of Walrus
    - Core component: Storage Nodes
    - Optional components: Publishers and Aggregators
 
-2. **[Chunk Creation and Encoding](./chunk-creation.md)** - Learn how data is transformed
+2. **[Chunk Creation and Encoding](./02-chunk-creation.md)** - Learn how data is transformed
    - Encoding process and erasure coding
    - Sliver creation and blob ID computation
 
-3. **[Data Flow](./data-flow.md)** - See how everything works together
+3. **[Data Flow](./03-data-flow.md)** - See how everything works together
    - Upload flow: Client → Publisher → Storage Nodes → Point of Availability
    - Retrieval flow: Client → Aggregator → Storage Nodes → Client
 
-4. **[Hands-On Walkthrough](./hands-on.md)** - Practice what you've learned
+4. **[Hands-On Walkthrough](./04-hands-on.md)** - Practice what you've learned
    - Upload a blob and trace its journey
    - Retrieve a blob and see reconstruction in action
 
 ## Next Steps
 
-Start with [System Components](./components.md) to understand the building blocks of Walrus, then learn about [Chunk Creation and Encoding](./chunk-creation.md) to understand how data is transformed, and finally proceed to [Data Flow](./data-flow.md) to see how everything works together.
+Start with [System Components](./01-components.md) to understand the building blocks of Walrus, then learn about [Chunk Creation and Encoding](./02-chunk-creation.md) to understand how data is transformed, and finally proceed to [Data Flow](./03-data-flow.md) to see how everything works together.
 
 ## Key Points
 

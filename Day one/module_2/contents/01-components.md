@@ -2,7 +2,7 @@
 
 This section covers the core and optional components of the Walrus architecture. The core component is Storage Nodes, which form the decentralized storage infrastructure. Optional infrastructure components include Publishers and Aggregators, which provide convenient HTTP interfaces for storing and retrieving blobs.
 
-For information about how blobs are encoded into slivers, see the dedicated [Chunk Creation and Encoding](./chunk-creation.md) section.
+For information about how blobs are encoded into slivers, see the dedicated [Chunk Creation and Encoding](./02-chunk-creation.md) section.
 
 For the architectural overview and security assumptions, see the [Architecture documentation](https://github.com/MystenLabs/walrus/blob/main/docs/design/architecture.md). For a developer perspective on components, see the [Developer Guide Components](https://github.com/MystenLabs/walrus/blob/main/docs/dev-guide/components.md).
 
@@ -49,7 +49,7 @@ Storage nodes:
 #### Storing Slivers
 
 When a storage node receives a sliver, it validates and stores it. See the implementation:
-[`store_sliver_unchecked` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/node.rs#L2730-L2779)
+[`store_sliver_unchecked` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/node.rs) (search for `store_sliver_unchecked`)
 
 The storage process:
 1. Determines which shard should store this sliver
@@ -105,7 +105,7 @@ Publishers expose an HTTP API that accepts blob uploads. They use the Walrus cli
 #### HTTP Endpoint Implementation
 
 The publisher HTTP endpoint receives PUT requests with blob data. See the implementation:
-[`put_blob` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs#L659-L704)
+[`put_blob` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs) (search for `put_blob`)
 
 The endpoint:
 1. Validates authentication (if JWT is configured)
@@ -114,8 +114,12 @@ The endpoint:
 4. Returns the blob store result with blob ID
 
 ```admonish info title="Publisher Authentication"
-Publishers can be configured to require authentication (JWT tokens) for uploads, allowing fine-grained control over storage parameters like maximum blob size and storage duration. For setup instructions, see the [Authenticated Publisher guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/auth-publisher.md).
+Publishers can be configured to require authentication (JWT tokens) for uploads,
+allowing fine-grained control over storage parameters like maximum blob size and
+storage duration.
 ```
+
+📖 **Setup guide:** [Authenticated Publisher guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/auth-publisher.md)
 
 ## Aggregator Role
 
@@ -163,7 +167,7 @@ Aggregators use the Walrus read client to:
 #### HTTP Endpoint Implementation
 
 The aggregator HTTP endpoint receives GET requests with blob IDs. See the implementation:
-[`get_blob` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs#L201-L240)
+[`get_blob` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs) (search for `async fn get_blob`)
 
 The endpoint:
 1. Extracts the blob ID from the URL path
@@ -172,8 +176,10 @@ The endpoint:
 4. Returns the reconstructed blob data with appropriate headers
 
 ```admonish tip title="Aggregators as CDNs"
-Aggregators can act as CDNs, splitting the cost of blob reconstruction over many requests, providing better connectivity, and reducing latency for end users. For information about running an aggregator, see the [Aggregator Operator Guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/aggregator.md).
+Aggregators can act as CDNs, splitting the cost of blob reconstruction over many requests, providing better connectivity, and reducing latency for end users.
 ```
+
+📖 **Operator guide:** [Aggregator Operator Guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/aggregator.md)
 
 ## Component Interactions
 
@@ -185,9 +191,9 @@ These components work together to provide decentralized storage:
 - **Aggregators** fetch slivers from **Storage Nodes** and reconstruct blobs
 - All components interact with **Sui blockchain** for coordination and metadata
 
-In the next section, we'll see how these components work together in the complete [data flow](./data-flow.md).
+In the next section, we'll see how these components work together in the complete [data flow](./03-data-flow.md).
 
-## Key Points
+## Key Takeaways
 
 - **Storage Nodes** are the core infrastructure - they actually store the encoded blob data in shards
 - **Shard Assignment** is controlled by Sui smart contracts and changes every storage epoch (2 weeks on Mainnet)
@@ -196,3 +202,7 @@ In the next section, we'll see how these components work together in the complet
 - **Aggregators** are optional - they reconstruct blobs from slivers and serve them via HTTP GET requests
 - **Aggregators don't perform on-chain actions** - they only read from Sui and fetch from storage nodes
 - **Byzantine tolerance** - Walrus assumes more than 2/3 of shards are managed by correct storage nodes
+
+## Next Steps
+
+Now that you understand the system components, proceed to [Chunk Creation and Encoding](./02-chunk-creation.md) to learn how blobs are transformed into distributed slivers.

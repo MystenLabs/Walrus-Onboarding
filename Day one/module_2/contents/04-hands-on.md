@@ -6,13 +6,35 @@ This hands-on section walks you through an actual upload flow with a visual sequ
 
 Before starting, ensure you have:
 
-- Completed the [System Components](./components.md) section to understand the architecture
-- Reviewed the [Data Flow](./data-flow.md) section to understand how data moves through the system
-- Understood [Chunk Creation and Encoding](./chunk-creation.md) to know how blobs are encoded
+- Completed the [System Components](./01-components.md) section to understand the architecture
+- Reviewed the [Data Flow](./03-data-flow.md) section to understand how data moves through the system
+- Understood [Chunk Creation and Encoding](./02-chunk-creation.md) to know how blobs are encoded
 - Walrus CLI installed (see [Getting Started](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/started.md))
 - Access to a Walrus network (testnet or mainnet)
 - A wallet with sufficient SUI and WAL tokens (for direct uploads)
 - Or access to a publisher endpoint (for HTTP uploads)
+
+## Running in Docker (Recommended for Consistent Results)
+
+For a consistent environment across all operating systems:
+
+```bash
+# Navigate to the curriculum docker directory
+cd docs/book/curriculum/docker
+
+# Build and start interactive CLI environment
+make build-cli
+SUI_WALLET_PATH=~/.sui/sui_config make cli
+
+# Inside the container, all commands work identically on Mac/Linux/Windows
+```
+
+```admonish tip title="Docker Benefits"
+Docker provides:
+- Identical environment across all operating systems
+- Pre-installed Walrus CLI with correct configuration
+- All required Unix tools (curl, jq, etc.)
+```
 
 ## Scenario: Uploading a File
 
@@ -22,8 +44,22 @@ Let's upload a simple text file to Walrus and trace its journey through the syst
 
 First, create a simple file to upload:
 
+**Mac/Linux:**
+
 ```bash
 echo "Hello, Walrus! " > my-blob.txt
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+echo Hello, Walrus!  > my-blob.txt
+```
+
+**Windows (PowerShell):**
+
+```powershell
+"Hello, Walrus! " | Out-File -Encoding utf8 my-blob.txt
 ```
 
 This creates a small text file that we'll store in Walrus.
@@ -46,16 +82,38 @@ This command:
 5. Returns the blob ID
 
 ```admonish info title="Blob Size Limits"
-Walrus currently supports blobs up to a maximum size of 13.3 GiB. Larger blobs can be split into smaller chunks before storage. Check the maximum blob size using `walrus info`.
+Walrus currently supports blobs up to a maximum size.
+Check `walrus info` for the current limit.
+Larger blobs can be split into smaller chunks before storage.
 ```
 
 For detailed CLI command reference, see the [Client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/usage/client-cli.md).
 
 #### Option B: Upload via Publisher (Using HTTP)
 
+**Mac/Linux:**
+
 ```bash
 curl -X PUT http://publisher.example.com:31416/ \
   -H "Content-Type: application/octet-stream" \
+  --data-binary @my-blob.txt
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$content = Get-Content -Raw -Path my-blob.txt
+Invoke-RestMethod -Uri "http://publisher.example.com:31416/" `
+  -Method Put `
+  -ContentType "application/octet-stream" `
+  -Body $content
+```
+
+**Windows (Command Prompt - requires curl):**
+
+```cmd
+curl -X PUT http://publisher.example.com:31416/ ^
+  -H "Content-Type: application/octet-stream" ^
   --data-binary @my-blob.txt
 ```
 
@@ -118,36 +176,16 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant PC as Publisher/Client
-    participant SN1 as Storage Node (Shard 1)
-    participant SN2 as Storage Node (Shard 2)
-    participant SN3 as Storage Node (Shard 3)
-    participant SNN as Storage Node (Shard N)
+    participant SN as Storage Nodes (1..N)
     participant Sui as Sui Blockchain
 
     Note over PC: Has: 1000 sliver pairs
 
-    par Parallel Distribution
-        PC->>SN1: Store Sliver 1 + Metadata
-        PC->>SN2: Store Sliver 2 + Metadata
-        PC->>SN3: Store Sliver 3 + Metadata
-        PC->>SNN: Store Sliver N + Metadata
-    end
+    PC->>SN: Distribute slivers (parallel)
+    Note over SN: Each node validates hash & blob ID<br/>Stores assigned sliver
+    SN-->>PC: Return signed certificates
 
-    par Validation & Storage
-        Note over SN1: Validate: Hash OK, Blob ID OK<br/>Store: Sliver 1
-        Note over SN2: Validate: Hash OK, Blob ID OK<br/>Store: Sliver 2
-        Note over SN3: Validate: Hash OK, Blob ID OK<br/>Store: Sliver 3
-        Note over SNN: Validate: Hash OK, Blob ID OK<br/>Store: Sliver N
-    end
-
-    par Return Signatures
-        SN1-->>PC: Signed Certificate
-        SN2-->>PC: Signed Certificate
-        SN3-->>PC: Signed Certificate
-        SNN-->>PC: Signed Certificate
-    end
-
-    Note over PC: Collect signatures<br/>Aggregate into confirmation certificate
+    Note over PC: Collect signatures (need 2/3 quorum)<br/>Aggregate into confirmation certificate
 
     PC->>Sui: Post Certificate
     Note over Sui: • Blob ID: 0xabc123...<br/>• Signatures: [sig1, sig2...]<br/>• Status: Certified<br/><br/>Event Emitted:<br/>• Point of Availability
@@ -157,11 +195,27 @@ sequenceDiagram
 
 After the upload completes, you'll receive a blob ID. Verify it was stored:
 
-```bash
-# Using CLI
-walrus read <blob-id>
+**All Platforms (CLI):**
 
-# Or via aggregator HTTP
+```bash
+walrus read <blob-id>
+```
+
+**Mac/Linux (HTTP via curl):**
+
+```bash
+curl http://aggregator.example.com:31415/<blob-id>
+```
+
+**Windows (PowerShell HTTP):**
+
+```powershell
+Invoke-RestMethod -Uri "http://aggregator.example.com:31415/<blob-id>"
+```
+
+**Windows (Command Prompt - requires curl):**
+
+```cmd
 curl http://aggregator.example.com:31415/<blob-id>
 ```
 
@@ -234,12 +288,36 @@ sequenceDiagram
 
 You can monitor the upload process:
 
+**Mac/Linux:**
+
 ```bash
 # Enable verbose logging
 RUST_LOG=debug walrus store my-blob.txt
 
 # Or check metrics (if publisher/aggregator exposes them)
 curl http://publisher.example.com:9090/metrics
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Enable verbose logging
+set RUST_LOG=debug
+walrus store my-blob.txt
+
+:: Check metrics (requires curl)
+curl http://publisher.example.com:9090/metrics
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Enable verbose logging
+$env:RUST_LOG = "debug"
+walrus store my-blob.txt
+
+# Or check metrics
+Invoke-RestMethod -Uri "http://publisher.example.com:9090/metrics"
 ```
 
 Look for:
@@ -266,9 +344,9 @@ Look for:
 
 ## Related Sections
 
-- **[System Components](./components.md)** - Review the components you've interacted with
-- **[Chunk Creation and Encoding](./chunk-creation.md)** - Deep dive into the encoding process you've seen
-- **[Data Flow](./data-flow.md)** - Review the complete flow you've just executed
+- **[System Components](./01-components.md)** - Review the components you've interacted with
+- **[Chunk Creation and Encoding](./02-chunk-creation.md)** - Deep dive into the encoding process you've seen
+- **[Data Flow](./03-data-flow.md)** - Review the complete flow you've just executed
 
 ## Summary
 
@@ -281,7 +359,7 @@ You've now seen:
 
 Congratulations! You now understand the Walrus architecture and data flow.
 
-## Key Points
+## Key Takeaways
 
 - **Two Upload Methods**: Direct CLI upload (`walrus store`) or HTTP upload via Publisher (`curl PUT`)
 - **Encoding Overhead**: Small blobs expand ~5x during encoding (e.g., 38 bytes → ~190 bytes)
@@ -290,3 +368,18 @@ Congratulations! You now understand the Walrus architecture and data flow.
 - **On-Chain Tracking**: Sui blockchain records blob metadata, certificates, and point of availability events
 - **Retrieval Requirements**: Only 334 primary slivers needed to reconstruct the blob
 - **Monitoring**: Use `RUST_LOG=debug` for verbose logging or check metrics endpoints
+
+## Next Steps
+
+Congratulations on completing the Walrus Architecture module! You now have hands-on experience with:
+
+- ✅ Understanding system components (Storage Nodes, Publishers, Aggregators)
+- ✅ How erasure coding transforms blobs into slivers
+- ✅ The complete upload and retrieval data flows
+- ✅ Practical blob storage and retrieval operations
+
+Continue your learning with:
+
+- **[CLI Deep Dive](../../cli/contents/index.md)** - Master advanced CLI commands and configuration
+- **[Storage Costs](../../storage_costs/contents/index.md)** - Understand pricing and cost optimization
+- **[Epochs and Continuity](../../epochs_continuity/contents/index.md)** - Learn about storage duration and extensions

@@ -27,7 +27,9 @@ A client wants to store a blob. The client can either:
 For this walkthrough, we'll follow the publisher path as it's more common.
 
 ```admonish info title="Blob Size Limits"
-Walrus currently supports blobs up to a maximum size of 13.3 GiB. Larger blobs can be split into smaller chunks before storage. The maximum blob size can be checked using the `walrus info` command.
+Walrus currently supports blobs up to a maximum size.
+Check `walrus info` for the current limit.
+Larger blobs can be split into smaller chunks before storage.
 ```
 
 ### Step 2: Publisher Receives Blob
@@ -100,10 +102,10 @@ For each shard:
 #### Code: Distributing Slivers
 
 The client sends slivers to storage nodes using the storage node client. See the implementation:
-[`store_sliver` and `store_sliver_by_type` functions](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-storage-node-client/src/client.rs#L669-L696)
+[`store_sliver` and `store_sliver_by_type` functions](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-storage-node-client/src/client.rs) (search for `store_sliver`)
 
 The distribution happens in parallel across all storage nodes, with the client coordinating the upload. See the coordination function:
-[`send_blob_data_and_get_certificate` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L1647-L1772)
+[`send_blob_data_and_get_certificate` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs) (search for `send_blob_data_and_get_certificate`)
 
 This function:
 1. Gets the current committee of storage nodes
@@ -222,10 +224,10 @@ The aggregator needs 334 primary slivers to reconstruct the blob. It:
 #### Code: Fetching Slivers
 
 The aggregator fetches slivers from storage nodes. See the implementation:
-[`get_sliver` and `get_sliver_status` functions](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-storage-node-client/src/client.rs#L474-L503)
+[`get_sliver` and `get_sliver_status` functions](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-storage-node-client/src/client.rs) (search for `get_sliver`)
 
 The client fetches slivers in parallel with concurrency limits. See the parallel fetching logic:
-[Parallel sliver fetching with concurrency limits](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L803-L835)
+[Parallel sliver fetching with concurrency limits](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs) (search for sliver fetching logic in `read_blob_internal`)
 
 ### Step 4: Aggregator Reconstructs Blob
 
@@ -240,10 +242,15 @@ The aggregator:
    - **Strict check** (optional): Re-encodes and verifies blob ID matches
 3. **Returns blob**: Serves the reconstructed blob to the client
 
+```admonish note title="Default Changed in v1.37"
+Starting with v1.37, the CLI and aggregator use the default (performant) consistency check.
+Use `--strict-consistency-check` for the strict check when needed.
+```
+
 #### Code: Blob Reconstruction
 
 The reconstruction happens in the read client's internal method. See the implementation:
-[`read_blob_internal` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs#L476-L522)
+[`read_blob_internal` function](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client.rs) (search for `read_blob_internal`)
 
 This method:
 1. Checks the blob ID format
@@ -313,15 +320,15 @@ For detailed information about Walrus operations (store, read, certify availabil
 
 ## Related Sections
 
-- **[System Components](./components.md)** - Learn about the individual components (Storage Nodes, Publishers, Aggregators)
-- **[Chunk Creation and Encoding](./chunk-creation.md)** - Understand how blobs are encoded into slivers
-- **[Hands-On Walkthrough](./hands-on.md)** - See the data flow in action with a practical example
+- **[System Components](./01-components.md)** - Learn about the individual components (Storage Nodes, Publishers, Aggregators)
+- **[Chunk Creation and Encoding](./02-chunk-creation.md)** - Understand how blobs are encoded into slivers
+- **[Hands-On Walkthrough](./04-hands-on.md)** - See the data flow in action with a practical example
 
 ## Next Steps
 
-Now that you understand the data flow, proceed to the [Hands-On Walkthrough](./hands-on.md) to see this in action with a practical example.
+Now that you understand the data flow, proceed to the [Hands-On Walkthrough](./04-hands-on.md) to see this in action with a practical example.
 
-## Key Points
+## Key Takeaways
 
 - **Upload Flow**: Client → Publisher (encodes) → Sui (registers) → Storage Nodes (store slivers) → Certificates → Point of Availability
 - **Retrieval Flow**: Client → Aggregator → Sui (queries metadata) → Storage Nodes (fetch slivers) → Aggregator (reconstructs) → Client
