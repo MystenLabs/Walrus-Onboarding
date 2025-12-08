@@ -271,7 +271,14 @@ Always include a buffer in your budget:
 - Batch uploads to reduce transaction costs
 - Burn blob objects after 6 months to reclaim SUI
 
+## Key Takeaways
+
+- **8-step estimation process**: Data profile → prices → encoded size → storage cost → upload cost → transaction cost → object cost → total
+- **Check current prices**: Always use `walrus info` before estimating - prices can change over time
+- **Multiple budget strategies**: Per-blob, per-project, per-time-period, and tiered budgets suit different use cases
+- **Include buffers**: 10-20% buffer for unexpected costs, price volatility, and growth is essential
+- **Monitor and review**: Track actual vs. planned costs monthly, review quarterly, plan annually
+
 ## Next Steps
 
-Now that you understand budget planning, learn about [Cost Reduction Ideas](./cost-reduction.md) to optimize your storage spending.
-
+Now that you understand budget planning, learn about [Cost Reduction Ideas](./04-cost-reduction.md) to optimize your storage spending.

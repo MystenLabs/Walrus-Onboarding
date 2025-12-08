@@ -519,8 +519,14 @@ walrus burn-blobs --object-ids <BLOB_OBJECT_ID>
 - `reserve_space` has SUI costs that grow with epochs, and WAL costs linear
   with both encoded size and epochs
 
+## Key Takeaways
+
+- **Four cost sources**: Storage resources (WAL, scales with size × epochs), upload costs (WAL, one-time), transaction gas (SUI, fixed per op), object deposits (SUI, refundable)
+- **Encoded size drives costs**: Costs are based on encoded size (~64MB metadata + ~5x erasure coding), not original file size
+- **Small blobs are expensive per MB**: The ~64MB fixed metadata overhead dominates costs for files < 10MB
+- **Storage units round up**: `storage_units = ceil(encoded_size / 1_MiB)` - a 66.8MB encoded blob requires 67 storage units
+- **Use dry-run for estimates**: `walrus store --dry-run` shows exact encoded size without storing
+
 ## Next Steps
 
-Now that you understand the cost model, learn about how [Storage
-Duration](./storage-duration.md) affects costs and optimization strategies.
-
+Now that you understand the cost model, learn about how [Storage Duration](./02-storage-duration.md) affects costs and optimization strategies.

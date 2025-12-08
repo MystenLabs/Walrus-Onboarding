@@ -70,13 +70,17 @@ This minimizes transaction costs and latency.
 
 ## Grouping Small Blobs for Cost Efficiency
 
+> 💡 **Walrus Quilt - Official Batch Storage:** Walrus provides **Quilt** as the native batch storage tool for grouping small blobs. Quilt can reduce costs by **up to 409x** for 10KB files (storing 600 files as a single quilt vs. individual blobs).
+
+📖 **Learn more:** [Quilt documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md) - implementation details and full cost savings table
+
 When storing multiple small blobs, grouping them together into a single storage unit can
 dramatically reduce costs by amortizing metadata overhead and transaction fees across the batch.
 This technique is especially powerful for small blobs where fixed overhead costs dominate.
 
 ### Basic Concept of Grouping
 
-Grouping multiple small blobs together shares the fixed metadata overhead (~61-64MB per blob) across all blobs in the group. This is particularly cost-effective for small blobs where metadata dominates the encoded size.
+Grouping multiple small blobs together shares the fixed metadata overhead (~61-64MB per blob) across all blobs in the group. This is particularly cost-effective for small blobs where metadata dominates the encoded size. **[Walrus Quilt](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md)** implements this pattern natively, allowing up to 666 blobs per quilt (QuiltV1).
 
 ### When Grouping Makes Sense
 
@@ -302,7 +306,14 @@ Use this checklist to optimize your storage costs:
 - [ ] Monitor costs regularly and identify optimization opportunities
 - [ ] Delete unused blobs to reclaim storage resources
 
+## Key Takeaways
+
+- **Resource reuse is most powerful**: Delete deletable blobs early to reclaim and reuse remaining epochs
+- **Quilt for small blobs**: [Walrus Quilt](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md) can reduce costs up to 409x for small files by sharing metadata overhead
+- **Batch operations save SUI**: Combine multiple operations in PTBs to reduce transaction costs
+- **Burn objects when lifecycle management isn't needed**: Reclaim SUI deposits by burning blob objects
+- **Trade-offs exist**: Grouping loses individual control, burning removes lifecycle management
+
 ## Next Steps
 
-Now that you understand cost reduction strategies, explore [Real-World Scenarios](./scenarios.md) to see how these strategies apply to common use cases.
-
+Now that you understand cost reduction strategies, explore [Real-World Scenarios](./05-scenarios.md) to see how these strategies apply to common use cases.

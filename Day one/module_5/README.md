@@ -16,7 +16,7 @@ By the end of this module, you will be able to:
 
 This module is organized into the following sections:
 
-### 1. [Cost Model](./contents/cost-model.md)
+### 1. [Cost Model](./contents/01-cost-model.md)
 
 Understanding the fundamental cost structure
 
@@ -26,7 +26,7 @@ Understanding the fundamental cost structure
 - Cost components breakdown
 - Storage units calculation
 
-### 2. [Short Storage versus Extended Storage](./contents/storage-duration.md)
+### 2. [Short Storage versus Extended Storage](./contents/02-storage-duration.md)
 
 Understanding how storage duration affects costs
 
@@ -36,7 +36,7 @@ Understanding how storage duration affects costs
 - Storage resource reuse
 - When to use each approach
 
-### 3. [Budget Planning in Real Projects](./contents/budget-planning.md)
+### 3. [Budget Planning in Real Projects](./contents/03-budget-planning.md)
 
 Practical guidance for project planning
 
@@ -46,7 +46,7 @@ Practical guidance for project planning
 - Cost forecasting
 - Real-world budget planning examples
 
-### 4. [Cost Reduction Ideas](./contents/cost-reduction.md)
+### 4. [Cost Reduction Ideas](./contents/04-cost-reduction.md)
 
 Strategies to minimize storage costs
 
@@ -57,7 +57,7 @@ Strategies to minimize storage costs
 - Transaction cost optimization
 - Object cost management
 
-### 5. [Scenarios Based on Common Product Needs](./contents/scenarios.md)
+### 5. [Scenarios Based on Common Product Needs](./contents/05-scenarios.md)
 
 Real-world examples based on common product needs
 
@@ -67,7 +67,7 @@ Real-world examples based on common product needs
 - Permanent archive storage
 - High-volume use cases
 
-### 6. [Hands-On Exercises](./contents/hands-on.md)
+### 6. [Hands-On Exercises](./contents/06-hands-on.md)
 
 Practical cost calculation exercises
 
@@ -100,4 +100,4 @@ After completing this module, you should be able to:
 
 ---
 
-**Next Steps**: Begin with the [Cost Model](./contents/cost-model.md) to understand how storage costs are calculated in Walrus.
+**Next Steps**: Begin with the [Cost Model](./contents/01-cost-model.md) to understand how storage costs are calculated in Walrus.

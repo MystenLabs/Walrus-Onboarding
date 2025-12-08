@@ -1,0 +1,13 @@
+services:
+  storage-costs-lab:
+    build: .
+    container_name: walrus-storage-costs-lab
+    volumes:
+      - ./workspace:/workspace
+      - ${SUI_WALLET_PATH:-./wallet}:/home/student/.sui/sui_config:ro
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    environment:
+      - RUST_LOG=${RUST_LOG:-info}
+

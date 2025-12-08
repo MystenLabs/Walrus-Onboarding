@@ -415,6 +415,14 @@ You can combine strategies:
 - Plan ahead to avoid frequent extensions
 - Use permanent blobs if you need guaranteed availability
 
+## Key Takeaways
+
+- **Duration affects only storage resource cost**: Upload, transaction, and object costs are duration-independent
+- **Linear scaling**: 10 epochs costs 10x more than 1 epoch for storage resources
+- **Resource reuse is powerful**: Delete deletable blobs early to reclaim and reuse remaining epochs for free
+- **"Buy long, delete early" strategy**: Store for many epochs as deletable, delete when done to maximize reuse
+- **Storage resources track end_epoch**: Remaining epochs = `end_epoch - current_epoch`
+
 ## Next Steps
 
-Now that you understand storage duration, learn about [Budget Planning](./budget-planning.md) for real projects and how to estimate costs for your specific use cases.
+Now that you understand storage duration, learn about [Budget Planning](./03-budget-planning.md) for real projects and how to estimate costs for your specific use cases.

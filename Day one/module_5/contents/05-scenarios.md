@@ -169,7 +169,14 @@ A data analytics platform that stores:
 - Early deletion and resource reuse are critical for temporary data
 - Compression helps for large files
 
+## Key Takeaways
+
+- **Small files are expensive per MB**: Metadata overhead (~64MB) dominates costs for files < 10MB
+- **High volume amplifies costs**: 1M small files costs more than 100 large files due to per-blob overhead
+- **Always check current prices**: Use `walrus info` - Testnet and Mainnet prices differ significantly
+- **Each scenario has different optimizations**: Quilt for small files, compression for large files, early deletion for temporary data
+- **Duration matters for archives**: Long-term storage benefits from extended duration planning
+
 ## Next Steps
 
-Now that you've seen real-world scenarios, try the [Hands-On Exercises](./hands-on.md) to practice calculating costs for your own scenarios.
-
+Now that you've seen real-world scenarios, try the [Hands-On Exercises](./06-hands-on.md) to practice calculating costs for your own scenarios.

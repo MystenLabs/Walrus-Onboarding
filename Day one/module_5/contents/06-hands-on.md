@@ -9,7 +9,7 @@ Before starting, ensure you have:
 1. ✅ Walrus CLI installed and configured
 2. ✅ A Sui wallet with SUI and WAL tokens
 3. ✅ Network connectivity
-4. ✅ Basic understanding of the cost model (see [Cost Model](./cost-model.md))
+4. ✅ Basic understanding of the cost model (see [Cost Model](./01-cost-model.md))
 
 Verify your setup:
 
@@ -17,6 +17,24 @@ Verify your setup:
 walrus --version
 walrus info
 ```
+
+## Running in Docker (Recommended for Consistent Results)
+
+For a consistent environment across all operating systems, use the Docker setup in the `docker/` directory:
+
+```sh
+# From the storage_costs module directory
+cd docker
+make build
+SUI_WALLET_PATH=~/.sui/sui_config make run
+
+# Or run specific exercises
+make single-blob-cost   # Calculate cost for a single blob
+make compare-sizes      # Compare costs for different sizes
+make encoding-overhead  # Understand encoding overhead
+```
+
+> 💡 **Docker for Windows Users:** Docker provides the most reliable experience for Windows users, as all Unix-specific commands (`dd`, `wc`, etc.) work identically inside the container.
 
 ## Exercise 1: Calculate Cost for a Single Blob
 
@@ -42,12 +60,30 @@ Record the following:
 
 Create a test file of a specific size:
 
+**Mac/Linux:**
+
 ```sh
-# Create a 5MB file
+# Create a 5MB file with random data
 dd if=/dev/urandom of=test-5mb.bin bs=1M count=5
 
 # Or on macOS:
 mkfile 5m test-5mb.bin
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Create a 5MB file (filled with zeros)
+fsutil file createnew test-5mb.bin 5242880
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Create a 5MB file with random data
+$bytes = New-Object byte[] (5MB)
+(New-Object Random).NextBytes($bytes)
+[System.IO.File]::WriteAllBytes("test-5mb.bin", $bytes)
 ```
 
 ### Step 3: Estimate Encoded Size
@@ -111,12 +147,38 @@ In this exercise, you'll compare costs for small and large blobs.
 
 Create files of different sizes:
 
+**Mac/Linux:**
+
 ```sh
 # Small file: 1MB
 dd if=/dev/urandom of=small-1mb.bin bs=1M count=1
 
 # Large file: 100MB
 dd if=/dev/urandom of=large-100mb.bin bs=1M count=100
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Small file: 1MB
+fsutil file createnew small-1mb.bin 1048576
+
+:: Large file: 100MB
+fsutil file createnew large-100mb.bin 104857600
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Small file: 1MB with random data
+$bytes1 = New-Object byte[] (1MB)
+(New-Object Random).NextBytes($bytes1)
+[System.IO.File]::WriteAllBytes("small-1mb.bin", $bytes1)
+
+# Large file: 100MB with random data
+$bytes100 = New-Object byte[] (100MB)
+(New-Object Random).NextBytes($bytes100)
+[System.IO.File]::WriteAllBytes("large-100mb.bin", $bytes100)
 ```
 
 ### Step 2: Estimate Costs for Small Blob
@@ -179,8 +241,26 @@ Record current prices.
 
 Create a sample 2MB file and check encoded size:
 
+**Mac/Linux:**
+
 ```sh
 dd if=/dev/urandom of=sample-2mb.bin bs=1M count=2
+walrus store sample-2mb.bin --epochs 1 --dry-run
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+fsutil file createnew sample-2mb.bin 2097152
+walrus store sample-2mb.bin --epochs 1 --dry-run
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$bytes = New-Object byte[] (2MB)
+(New-Object Random).NextBytes($bytes)
+[System.IO.File]::WriteAllBytes("sample-2mb.bin", $bytes)
 walrus store sample-2mb.bin --epochs 1 --dry-run
 ```
 
@@ -258,9 +338,29 @@ Store a 10MB blob for 1 year (~26 epochs, since 1 epoch = 14 days).
 
 Calculate cost for storing 26 epochs upfront:
 
+**Mac/Linux:**
+
 ```sh
 # Create 10MB file
 dd if=/dev/urandom of=test-10mb.bin bs=1M count=10
+walrus store test-10mb.bin --epochs 1 --dry-run
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Create 10MB file
+fsutil file createnew test-10mb.bin 10485760
+walrus store test-10mb.bin --epochs 1 --dry-run
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Create 10MB file
+$bytes = New-Object byte[] (10MB)
+(New-Object Random).NextBytes($bytes)
+[System.IO.File]::WriteAllBytes("test-10mb.bin", $bytes)
 walrus store test-10mb.bin --epochs 1 --dry-run
 ```
 
@@ -460,10 +560,17 @@ After completing these exercises, you should be able to:
 4. ✅ Create budget plans for real projects
 5. ✅ Monitor and track actual costs
 
+## Key Takeaways
+
+- **Dry-run before storing**: Always use `walrus store --dry-run` to estimate costs without spending tokens
+- **Encoded size surprises**: A 1MB file costs ~67 storage units due to metadata overhead, not 1 unit
+- **Cost ratio ≠ size ratio**: Small and large blobs have different cost drivers (metadata vs. erasure coding)
+- **Verify calculations**: Compare estimates to actual stores to build intuition for cost patterns
+- **Practice reinforces learning**: Hands-on experience is essential for accurate cost estimation
+
 ## Next Steps
 
-- Review the [Cost Model](./cost-model.md) if you need clarification
-- Explore [Cost Reduction Ideas](./cost-reduction.md) for more optimization strategies
-- Check [Scenarios](./scenarios.md) for additional real-world examples
+- Review the [Cost Model](./01-cost-model.md) if you need clarification
+- Explore [Cost Reduction Ideas](./04-cost-reduction.md) for more optimization strategies
+- Check [Scenarios](./05-scenarios.md) for additional real-world examples
 - Apply these skills to your own projects!
-
