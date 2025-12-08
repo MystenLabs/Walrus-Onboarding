@@ -380,7 +380,16 @@ If you encounter an error not covered here:
 4. Verify you're using the latest CLI version
 5. Review the [client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md) for additional usage details
 
+## Key Takeaways
+
+- **Configuration errors** often stem from missing files, invalid syntax, or wrong object IDs for the network
+- **Input validation errors** provide clear messages about what's wrong - read them carefully
+- **Network errors** can often be resolved by trying different RPC endpoints or waiting briefly
+- **Debug logging** (`RUST_LOG=walrus=debug`) is your most powerful troubleshooting tool
+- Error messages include source code references - use these to understand the exact cause
+- Most errors have straightforward solutions documented in this guide
+
 ## Next Steps
 
-Learn best practices for avoiding errors in [Operational Habits](./operational-habits.md).
+Learn best practices for avoiding errors in [Operational Habits](./07-operational-habits.md).
 

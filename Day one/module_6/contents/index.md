@@ -14,19 +14,19 @@ By the end of this curriculum, you will be able to:
 
 This curriculum is organized into the following sections:
 
-1. **[Install CLI](./install.md)** - Set up the Walrus CLI tool on your system
+1. **[Install CLI](./01-install.md)** - Set up the Walrus CLI tool on your system
    - Prerequisites
    - Installation methods
    - Basic setup
 
-2. **[Configuration](./configuration.md)** - Configure the CLI to connect to Walrus networks
+2. **[Configuration](./02-configuration.md)** - Configure the CLI to connect to Walrus networks
    - Configuration file structure
    - Multiple contexts (Mainnet/Testnet)
    - Wallet configuration and generation
    - Advanced settings
    - Global CLI options (JSON output, completion, JSON mode)
 
-3. **[Upload Workflow](./upload-workflow.md)** - Understanding how to store data on Walrus
+3. **[Upload Workflow](./03-upload-workflow.md)** - Understanding how to store data on Walrus
    - Basic upload commands
    - Storage duration options
    - Blob types (deletable vs permanent)
@@ -34,31 +34,31 @@ This curriculum is organized into the following sections:
    - Quilt storage (batch storage for small blobs)
    - Blob lifecycle management (extend, share, delete, burn)
 
-4. **[Download Workflow](./download-workflow.md)** - Understanding how to retrieve data from Walrus
+4. **[Download Workflow](./04-download-workflow.md)** - Understanding how to retrieve data from Walrus
    - Reading blobs
    - Output options
    - Consistency checks
    - Reading from quilts
 
-5. **[Inspect Commands](./inspect-commands.md)** - Tools for examining stored objects
+5. **[Inspect Commands](./05-inspect-commands.md)** - Tools for examining stored objects
    - Checking blob status
    - Listing owned blobs
    - Blob ID utilities
    - System information (info subcommands)
    - Health checks with advanced options
 
-6. **[Common Errors](./common-errors.md)** - Troubleshooting CLI failures
+6. **[Common Errors](./06-common-errors.md)** - Troubleshooting CLI failures
    - Configuration errors
    - Network issues
    - Storage errors
    - Recovery strategies
 
-7. **[Operational Habits](./operational-habits.md)** - Best practices for CLI usage
+7. **[Operational Habits](./07-operational-habits.md)** - Best practices for CLI usage
    - Cost optimization
    - Error prevention
    - Monitoring and maintenance
 
-8. **[Hands-On Exercises](./hands-on.md)** - Practical exercises
+8. **[Hands-On Exercises](./08-hands-on.md)** - Practical exercises
    - Full upload and download workflow
    - Inspecting stored objects
    - Triggering and recovering from failures
@@ -82,5 +82,5 @@ If you're teaching this curriculum, see the [Instructor's Guide](./instructor-gu
 
 ## Next Steps
 
-Start with [Install CLI](./install.md) to set up the Walrus CLI tool, then configure it using [Configuration](./configuration.md), and proceed through the workflow sections to learn how to upload and download data, followed by inspection and troubleshooting sections.
+Start with [Install CLI](./01-install.md) to set up the Walrus CLI tool, then configure it using [Configuration](./02-configuration.md), and proceed through the workflow sections to learn how to upload and download data, followed by inspection and troubleshooting sections.
 

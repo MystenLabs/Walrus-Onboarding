@@ -54,6 +54,8 @@ If it's already stored for sufficient epochs, you can skip the upload.
 
 Always save the blob ID returned after uploading:
 
+**Mac/Linux:**
+
 ```sh
 walrus store file.txt --epochs 10 > upload-log.txt
 ```
@@ -63,6 +65,23 @@ Or capture it programmatically:
 ```sh
 BLOB_ID=$(walrus store file.txt --epochs 10 | grep "Blob ID" | awk '{print $3}')
 echo $BLOB_ID
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+walrus store file.txt --epochs 10 > upload-log.txt
+```
+
+**Windows (PowerShell):**
+
+```powershell
+walrus store file.txt --epochs 10 | Out-File upload-log.txt
+
+# Capture programmatically
+$output = walrus store file.txt --epochs 10
+$BLOB_ID = ($output | Select-String "Blob ID").Line.Split()[-1]
+Write-Output $BLOB_ID
 ```
 
 ### Verify Downloads
@@ -141,9 +160,24 @@ Verify:
 
 Walrus Testnet resets periodically, and Mainnet may have updates. Keep your configuration current:
 
+**Mac/Linux:**
+
 ```sh
 # Download latest config periodically
 curl https://docs.wal.app/setup/client_config.yaml -o ~/.config/walrus/client_config.yaml
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Download latest config periodically
+Invoke-WebRequest -Uri "https://docs.wal.app/setup/client_config.yaml" -OutFile "$env:USERPROFILE\.config\walrus\client_config.yaml"
+```
+
+**Windows (Command Prompt - requires curl):**
+
+```cmd
+curl https://docs.wal.app/setup/client_config.yaml -o %USERPROFILE%\.config\walrus\client_config.yaml
 ```
 
 ### Use Contexts for Multiple Networks
@@ -175,18 +209,48 @@ If this fails, your configuration likely needs updating.
 ### Use Appropriate Log Levels
 
 - **Default (info)**: Sufficient for normal operations
-- **Debug**: When troubleshooting issues:
-  ```sh
-  RUST_LOG=walrus=debug walrus <command>
-  ```
-- **Trace**: For deep debugging (very verbose):
-  ```sh
-  RUST_LOG=walrus=trace walrus <command>
-  ```
+- **Debug**: When troubleshooting issues
+- **Trace**: For deep debugging (very verbose)
+
+**Mac/Linux:**
+
+```sh
+# Debug level
+RUST_LOG=walrus=debug walrus <command>
+
+# Trace level (very verbose)
+RUST_LOG=walrus=trace walrus <command>
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Debug level
+set RUST_LOG=walrus=debug
+walrus <command>
+
+:: Trace level
+set RUST_LOG=walrus=trace
+walrus <command>
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Debug level
+$env:RUST_LOG = "walrus=debug"
+walrus <command>
+
+# Trace level
+$env:RUST_LOG = "walrus=trace"
+walrus <command>
+```
 
 ### Log Important Operations
 
 For production workflows, log important operations:
+
+**Mac/Linux:**
 
 ```sh
 # Log uploads
@@ -194,6 +258,16 @@ walrus store important-file.txt --epochs 20 2>&1 | tee upload-$(date +%Y%m%d).lo
 
 # Log downloads
 walrus read <BLOB_ID> --out file.txt 2>&1 | tee download-$(date +%Y%m%d).log
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Log uploads (with timestamp in filename)
+walrus store important-file.txt --epochs 20 *>&1 | Tee-Object -FilePath "upload-$(Get-Date -Format 'yyyyMMdd').log"
+
+# Log downloads
+walrus read <BLOB_ID> --out file.txt *>&1 | Tee-Object -FilePath "download-$(Get-Date -Format 'yyyyMMdd').log"
 ```
 
 ## Security Practices
@@ -245,10 +319,21 @@ Regularly update to the latest CLI version:
 ```sh
 # Check current version
 walrus --version
+```
 
-# Update (if using install script)
+**Mac/Linux (update using install script):**
+
+```sh
 curl -sSf https://install.wal.app | sh -s -- -f
 ```
+
+**Windows (PowerShell - update using install script):**
+
+```powershell
+iwr https://install.wal.app/install.ps1 -useb | iex
+```
+
+> **Note**: For Windows users without the install script, download the latest binary from the [releases page](https://github.com/MystenLabs/walrus/releases) and replace your existing installation.
 
 New versions may include:
 - Bug fixes
@@ -260,28 +345,36 @@ New versions may include:
 
 Ensure you're using the intended binary:
 
+**Mac/Linux:**
+
 ```sh
 which walrus
 ```
 
+**Windows (Command Prompt):**
+
+```cmd
+where walrus
+```
+
+**Windows (PowerShell):**
+
+```powershell
+Get-Command walrus | Select-Object -ExpandProperty Source
+```
+
 If you have multiple installations, this helps identify which one is being used.
 
-## Summary
+## Key Takeaways
 
-Good operational habits include:
-
-1. ✅ **Cost optimization**: Reuse resources, understand pricing, choose appropriate blob types
-2. ✅ **Error prevention**: Verify before operations, save blob IDs, verify downloads
-3. ✅ **Monitoring**: Regular health checks, blob status monitoring, configuration updates
-4. ✅ **Security**: Protect wallets, understand public nature, verify downloads
-5. ✅ **Workflow**: Use scripts, document processes, test before production
-6. ✅ **Maintenance**: Keep CLI and configuration updated, verify installations
-
-For more information on CLI usage and advanced features, see the [client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md).
-
-Following these practices will help you use Walrus CLI effectively and reliably.
+- **Cost optimization**: Reuse storage resources, batch uploads, and choose appropriate blob types and durations
+- **Error prevention**: Verify blob status before uploading, save blob IDs, and verify downloads match originals
+- **Monitoring**: Perform regular health checks, track blob expirations, and keep configuration updated
+- **Security**: Protect wallet files, understand that all blobs are public, and use consistency checks
+- **Workflow**: Document blob IDs and purposes, test on Testnet first, and log important operations
+- **Maintenance**: Keep CLI updated, verify binary locations, and refresh configuration periodically
 
 ## Next Steps
 
-Put these concepts into practice with [Hands-On Exercises](./hands-on.md).
+Put these concepts into practice with [Hands-On Exercises](./08-hands-on.md).
 

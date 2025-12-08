@@ -255,9 +255,9 @@ For more information on storage costs and how to optimize them, see the [costs g
 
 Quilts allow you to efficiently batch-store multiple small blobs into a single storage unit, significantly reducing overhead and cost. For efficiently storing large numbers of small blobs, Walrus provides the Quilt feature.
 
-```admonish info title="Visual Diagram"
-The quilt structure diagram illustrates how small blobs are batched into quilts. Import [`cli-quilt-structure.excalidraw.json`](../assets/cli-quilt-structure.excalidraw.json) into [Excalidraw.com](https://excalidraw.com) to view or edit.
-```
+> ℹ️ **Visual Diagram:** The quilt structure diagram illustrates how small blobs are batched into quilts.
+
+📖 **Edit diagram:** Import [`cli-quilt-structure.excalidraw.json`](../assets/cli-quilt-structure.excalidraw.json) into [Excalidraw.com](https://excalidraw.com)
 
 ![Quilt Structure Diagram](../images/cli-quilt-structure.svg)
 
@@ -405,7 +405,16 @@ walrus burn-blobs --all-expired --yes
 
 **Warning**: Burning blob objects removes your ability to extend, delete, or modify attributes for those blobs. The blob data remains on Walrus, but you lose control over the blob objects.
 
+## Key Takeaways
+
+- **Blob IDs are deterministic**: Same content always produces the same blob ID, enabling deduplication
+- **Storage duration** must be specified using `--epochs`, `--earliest-expiry-time`, or `--end-epoch`
+- **Deletable blobs** (default since v1.33) can be removed early; **permanent blobs** guarantee availability
+- **Quilts** efficiently batch multiple small blobs, reducing overhead and cost significantly
+- **Lifecycle operations** include extend, share, delete, and burn - each with specific use cases
+- Use `--dry-run` to estimate costs before committing to storage
+
 ## Next Steps
 
-After successfully uploading data, learn how to retrieve it in [Download Workflow](./download-workflow.md).
+After successfully uploading data, learn how to retrieve it in [Download Workflow](./04-download-workflow.md).
 

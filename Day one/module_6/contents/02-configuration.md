@@ -7,10 +7,19 @@ configuration is essential for the CLI to interact with the Walrus system.
 
 The Walrus CLI looks for configuration files in the following locations (in order):
 
+**Mac/Linux:**
+
 1. Current working directory (`./client_config.yaml` or `./client_config.yml`)
 2. `$XDG_CONFIG_HOME/walrus/client_config.yaml` (if `XDG_CONFIG_HOME` is set)
 3. `~/.config/walrus/client_config.yaml`
 4. `~/.walrus/client_config.yaml`
+
+**Windows:**
+
+1. Current working directory (`.\client_config.yaml` or `.\client_config.yml`)
+2. `%LOCALAPPDATA%\walrus\client_config.yaml`
+3. `%USERPROFILE%\.config\walrus\client_config.yaml`
+4. `%USERPROFILE%\.walrus\client_config.yaml`
 
 The CLI accepts both `.yaml` and `.yml` file extensions.
 
@@ -20,12 +29,42 @@ For more details on configuration file structure and advanced options, see the [
 
 The easiest way to get started is to download the default configuration:
 
+**Mac/Linux:**
+
 ```sh
 # For Mainnet
 curl https://docs.wal.app/setup/client_config.yaml -o ~/.config/walrus/client_config.yaml
 
 # For Testnet
 curl https://docs.wal.app/setup/client_config_testnet.yaml -o ~/.config/walrus/client_config.yaml
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Create config directory if it doesn't exist
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.config\walrus"
+
+# For Mainnet
+Invoke-WebRequest -Uri "https://docs.wal.app/setup/client_config.yaml" `
+  -OutFile "$env:USERPROFILE\.config\walrus\client_config.yaml"
+
+# For Testnet
+Invoke-WebRequest -Uri "https://docs.wal.app/setup/client_config_testnet.yaml" `
+  -OutFile "$env:USERPROFILE\.config\walrus\client_config.yaml"
+```
+
+**Windows (Command Prompt - requires curl):**
+
+```cmd
+:: Create config directory
+mkdir %USERPROFILE%\.config\walrus
+
+:: For Mainnet
+curl https://docs.wal.app/setup/client_config.yaml -o %USERPROFILE%\.config\walrus\client_config.yaml
+
+:: For Testnet
+curl https://docs.wal.app/setup/client_config_testnet.yaml -o %USERPROFILE%\.config\walrus\client_config.yaml
 ```
 
 This gives you a working configuration with all required fields pre-configured.
@@ -97,8 +136,8 @@ contexts:
       - https://fullnode.mainnet.sui.io:443
 
   testnet:
-    system_object: 0xa2637d13d171b278eadfa8a3fbe8379b5e471e1f3739092e5243da17fc8090eb
-    staking_object: 0xca7cf321e47a1fc9bfd032abc31b253f5063521fd5b4c431f2cdd3fee1b4ec00
+    system_object: 0x6c2547cbbc38025cf3adac45f63cb0a8d12ecf777cdc75a4971612bf97fdf6af
+    staking_object: 0xbe46180321c30aab2f8b3501e24048377287fa708018a5b7c2792b35fe339ee3
     rpc_urls:
       - https://fullnode.testnet.sui.io:443
 ```
@@ -228,7 +267,7 @@ This is useful for scripting and automation.
 
 ### Shell Completion
 
-Generate shell completion scripts for bash, zsh, or fish:
+Generate shell completion scripts for your shell:
 
 ```sh
 # Generate completion script (will prompt for shell type)
@@ -238,16 +277,36 @@ walrus completion
 walrus completion --shell bash
 walrus completion --shell zsh
 walrus completion --shell fish
+walrus completion --shell powershell
 ```
 
 Place the generated script in the appropriate directory:
+
+**Mac/Linux:**
 - **bash**: `~/.local/share/bash-completion/completions/walrus` or `/usr/local/etc/bash_completion.d/walrus`
 - **zsh**: `~/.zsh/completions/_walrus` or add to `fpath`
 - **fish**: `~/.config/fish/completions/walrus.fish`
 
+**Windows (PowerShell):**
+Add to your PowerShell profile (`$PROFILE`):
+
+```powershell
+# Generate and add to profile
+walrus completion --shell powershell >> $PROFILE
+```
+
+Or save to a separate file and source it in your profile:
+
+```powershell
+walrus completion --shell powershell > "$env:USERPROFILE\Documents\WindowsPowerShell\walrus-completion.ps1"
+# Then add to $PROFILE: . "$env:USERPROFILE\Documents\WindowsPowerShell\walrus-completion.ps1"
+```
+
 ### JSON Mode
 
 Run commands using JSON input (useful for programmatic access):
+
+**Mac/Linux:**
 
 ```sh
 # Read JSON from stdin
@@ -255,6 +314,22 @@ echo '{"command":{"read":{"blobId":"<BLOB_ID>","out":"output.txt"}}}' | walrus j
 
 # Provide JSON as argument
 walrus json '{"command":{"info":{}}}'
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Read JSON from stdin
+'{"command":{"read":{"blobId":"<BLOB_ID>","out":"output.txt"}}}' | walrus json
+
+# Provide JSON as argument
+walrus json '{"command":{"info":{}}}'
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+echo {"command":{"info":{}}} | walrus json
 ```
 
 In JSON mode, all options use camelCase instead of kebab-case. See the [JSON API documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/json-api.md) for details.
@@ -480,15 +555,9 @@ quilt_client_config:
   timeout_secs: 10
 ```
 
-```admonish tip
-Most users don't need to modify these advanced settings. Only adjust them if you're
-experiencing performance issues or have specific networking requirements. The defaults are
-optimized for typical use cases.
+> 💡 **Tip:** Most users don't need to modify these advanced settings. Only adjust them if you're experiencing performance issues or have specific networking requirements. The defaults are optimized for typical use cases.
 
-The configuration file structure is defined in the
-[SDK configuration module](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/config.rs),
-which handles loading and validation of the configuration.
-```
+📖 **Source code:** [SDK configuration module](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/config.rs) - handles loading and validation
 
 ## Complete Configuration Example
 
@@ -621,7 +690,7 @@ contexts:
     staking_object: 0xbe46180321c30aab2f8b3501e24048377287fa708018a5b7c2792b35fe339ee3
     cache_ttl_secs: 10
     
-    # Testnet typically has exchange objects configured
+    # Testnet has exchange objects configured for WAL token exchange
     exchange_objects:
       - 0xf4d164ea2def5fe07dc573992a029e010dba09b1a8dcbc44c5c2e79567f39073
       - 0x19825121c52080bb1073662231cfea5c0e4d905fd13e95f21e9a018f2ef41862
@@ -701,9 +770,27 @@ If you see errors, check:
 
 **Solution**:
 
+**Mac/Linux:**
+
 - Check which configuration file is being used: `RUST_LOG=info walrus info`
-- Verify you're using the correct `--context` flag
-- Ensure `default_context` is set if not using `--context`
+
+**Windows (Command Prompt):**
+
+```cmd
+set RUST_LOG=info
+walrus info
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:RUST_LOG = "info"
+walrus info
+```
+
+Also verify:
+- You're using the correct `--context` flag
+- `default_context` is set if not using `--context`
 
 ### Multiple Configuration Files
 
@@ -723,7 +810,15 @@ order. To use a specific file, use `--config`.
 5. **Document custom settings**: If you modify advanced settings, document why for future
    reference
 
+## Key Takeaways
+
+- Configuration files require `system_object` and `staking_object` IDs specific to each network
+- Use **contexts** to manage multiple networks (Mainnet/Testnet) in a single configuration file
+- Wallet configuration can be automatic (default locations), explicit (config file), or per-command (`--wallet`)
+- The CLI searches multiple default locations for configuration files - download official configs to get started quickly
+- Advanced settings (communication, refresh, quilt) have sensible defaults; only modify if you have specific requirements
+
 ## Next Steps
 
-Once your configuration is set up, proceed to [Upload Workflow](./upload-workflow.md) to
+Once your configuration is set up, proceed to [Upload Workflow](./03-upload-workflow.md) to
 learn how to store data on Walrus.

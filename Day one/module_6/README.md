@@ -19,20 +19,41 @@ This module provides step-by-step guidance for developers who want to learn how 
 | File | Description |
 |------|-------------|
 | [index.md](./contents/index.md) | Curriculum overview and learning objectives |
-| [install.md](./contents/install.md) | CLI installation instructions |
-| [configuration.md](./contents/configuration.md) | Configuration setup and options |
-| [upload-workflow.md](./contents/upload-workflow.md) | Uploading data to Walrus |
-| [download-workflow.md](./contents/download-workflow.md) | Downloading data from Walrus |
-| [inspect-commands.md](./contents/inspect-commands.md) | Inspecting objects and system info |
-| [common-errors.md](./contents/common-errors.md) | Troubleshooting guide |
-| [operational-habits.md](./contents/operational-habits.md) | Best practices and tips |
-| [hands-on.md](./contents/hands-on.md) | Practical exercises |
+| [01-install.md](./contents/01-install.md) | CLI installation instructions |
+| [02-configuration.md](./contents/02-configuration.md) | Configuration setup and options |
+| [03-upload-workflow.md](./contents/03-upload-workflow.md) | Uploading data to Walrus |
+| [04-download-workflow.md](./contents/04-download-workflow.md) | Downloading data from Walrus |
+| [05-inspect-commands.md](./contents/05-inspect-commands.md) | Inspecting objects and system info |
+| [06-common-errors.md](./contents/06-common-errors.md) | Troubleshooting guide |
+| [07-operational-habits.md](./contents/07-operational-habits.md) | Best practices and tips |
+| [08-hands-on.md](./contents/08-hands-on.md) | Practical exercises |
 
 ### Supporting Materials
 
 - **[instructor-guide.md](./contents/instructor-guide.md)** - Comprehensive guide for instructors teaching this curriculum
+- **[docker/](./docker/)** - Docker environment for hands-on exercises
 - **[assets/](./assets/)** - Source files for diagrams (Excalidraw format)
 - **[images/](./images/)** - Rendered diagram images (SVG format)
+
+## Docker Environment
+
+For hands-on practice, a complete Docker environment is provided in the **[docker/](./docker/)** directory:
+
+```sh
+cd docker
+make build
+SUI_WALLET_PATH=~/.sui/sui_config make run
+```
+
+Available commands:
+- `make build` - Build the Docker image
+- `make run` - Start interactive shell
+- `make upload-download` - Test upload and download workflow
+- `make inspect` - Inspect objects and system info
+- `make failure-recovery` - Test failure scenarios
+- `make clean` - Remove containers and images
+
+See [docker/README.md](./docker/README.md) for detailed instructions.
 
 ## File Descriptions
 

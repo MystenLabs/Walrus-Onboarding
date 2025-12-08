@@ -323,7 +323,16 @@ walrus list-blobs | grep <BLOB_ID>
 
 For more detailed information about inspection commands and additional CLI features, see the [client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md).
 
+## Key Takeaways
+
+- **`blob-status`** checks availability and expiration of blobs by ID or file
+- **`list-blobs`** shows all blob objects owned by your wallet, including expired ones with `--include-expired`
+- **`blob-id`** computes the deterministic blob ID from any file - useful for verification and lookup
+- **`info`** provides system information: epoch, storage prices, node counts, and limits
+- **`health`** checks storage node status - essential for troubleshooting and planning operations
+- Blob attributes (key-value pairs) can be set, retrieved, and removed per blob object
+
 ## Next Steps
 
-Learn about common errors and how to handle them in [Common Errors](./common-errors.md).
+Learn about common errors and how to handle them in [Common Errors](./06-common-errors.md).
 

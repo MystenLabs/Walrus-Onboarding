@@ -45,7 +45,10 @@ Instructors should:
 
 **Teaching Tips:**
 - Have students verify installation immediately
-- Show how to check which binary is being used (`which walrus`)
+- Show how to check which binary is being used:
+  - Mac/Linux: `which walrus`
+  - Windows (PowerShell): `Get-Command walrus`
+  - Windows (Cmd): `where walrus`
 - Demonstrate version checking (`walrus --version`)
 
 **Quick Check:**

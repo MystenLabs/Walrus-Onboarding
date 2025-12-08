@@ -250,7 +250,15 @@ This shows:
 
 For more information about quilts, see the [Quilt documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md).
 
+## Key Takeaways
+
+- **Basic download** uses `walrus read <BLOB_ID>` with optional `--out` to specify output file
+- **Consistency checks** ensure data integrity: default is performant, strict is thorough, skip only when you trust the source
+- **Quilt retrieval** supports multiple methods: by identifier, by tag, by QuiltPatchId, or all patches
+- **Verification** after download is recommended: compare blob IDs of original and downloaded files
+- Use `--rpc-url` to specify alternative Sui RPC endpoints if experiencing connectivity issues
+
 ## Next Steps
 
-Learn how to inspect stored objects in [Inspect Commands](./inspect-commands.md).
+Learn how to inspect stored objects in [Inspect Commands](./05-inspect-commands.md).
 

@@ -18,6 +18,27 @@ walrus --version
 walrus info
 ```
 
+## Running in Docker (Recommended for Consistent Results)
+
+For a consistent environment across all operating systems, use the Docker setup in the `docker/` directory:
+
+```sh
+# From the cli module directory
+cd docker
+make build
+SUI_WALLET_PATH=~/.sui/sui_config make run
+
+# Or run specific exercises
+make upload-download   # Full upload and download workflow
+make inspect           # Inspect objects and system info
+make failure-recovery  # Test failure scenarios
+```
+
+> 📝 **Docker Requirements:**
+> - Docker Desktop must be installed and running
+> - You need a Sui wallet with SUI and WAL tokens
+> - Mount your wallet config using `SUI_WALLET_PATH`
+
 ## Exercise 1: Full Upload and Download Workflow
 
 This exercise walks you through a complete upload and download cycle.
@@ -26,9 +47,25 @@ This exercise walks you through a complete upload and download cycle.
 
 Create a simple test file:
 
+**Mac/Linux:**
+
 ```sh
 echo "Hello, Walrus! This is a test file for the CLI curriculum." > test-file.txt
 cat test-file.txt
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+echo Hello, Walrus! This is a test file for the CLI curriculum. > test-file.txt
+type test-file.txt
+```
+
+**Windows (PowerShell):**
+
+```powershell
+"Hello, Walrus! This is a test file for the CLI curriculum." | Out-File -Encoding utf8 test-file.txt
+Get-Content test-file.txt
 ```
 
 ### Step 2: Get the Blob ID
@@ -89,6 +126,8 @@ walrus read <BLOB_ID> --out downloaded-file.txt
 
 Compare the original and downloaded files:
 
+**Mac/Linux:**
+
 ```sh
 # Compare blob IDs (should be identical)
 walrus blob-id test-file.txt
@@ -96,8 +135,26 @@ walrus blob-id downloaded-file.txt
 
 # Compare file contents
 diff test-file.txt downloaded-file.txt
-# Or on macOS/Linux:
+# Or:
 cmp test-file.txt downloaded-file.txt
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+walrus blob-id test-file.txt
+walrus blob-id downloaded-file.txt
+
+fc test-file.txt downloaded-file.txt
+```
+
+**Windows (PowerShell):**
+
+```powershell
+walrus blob-id test-file.txt
+walrus blob-id downloaded-file.txt
+
+Compare-Object (Get-Content test-file.txt) (Get-Content downloaded-file.txt)
 ```
 
 The files should be identical. If they differ, investigate why (check for errors in the download).
@@ -126,10 +183,32 @@ This exercise focuses on inspection and metadata commands.
 
 Create and upload multiple test files:
 
+**Mac/Linux:**
+
 ```sh
 echo "File 1 content" > file1.txt
 echo "File 2 content" > file2.txt
 echo "File 3 content" > file3.txt
+
+walrus store file1.txt file2.txt file3.txt --epochs 5
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+echo File 1 content > file1.txt
+echo File 2 content > file2.txt
+echo File 3 content > file3.txt
+
+walrus store file1.txt file2.txt file3.txt --epochs 5
+```
+
+**Windows (PowerShell):**
+
+```powershell
+"File 1 content" | Out-File -Encoding utf8 file1.txt
+"File 2 content" | Out-File -Encoding utf8 file2.txt
+"File 3 content" | Out-File -Encoding utf8 file3.txt
 
 walrus store file1.txt file2.txt file3.txt --epochs 5
 ```
@@ -217,9 +296,30 @@ walrus read 00000000000000000000000000000000000000000000 --out test.txt
 
 If you have a wallet with very few tokens, try uploading a large file:
 
+**Mac/Linux:**
+
 ```sh
 # Create a large test file (adjust size based on your token balance)
 dd if=/dev/zero of=large-file.bin bs=1M count=100
+
+walrus store large-file.bin --epochs 10
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Create a 100MB file
+fsutil file createnew large-file.bin 104857600
+
+walrus store large-file.bin --epochs 10
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Create a 100MB file filled with zeros
+$bytes = New-Object byte[] (100MB)
+[System.IO.File]::WriteAllBytes("large-file.bin", $bytes)
 
 walrus store large-file.bin --epochs 10
 ```
@@ -247,10 +347,23 @@ walrus store test-file.txt --epochs 1000
 
 Try downloading with a slightly modified blob ID:
 
+**Mac/Linux:**
+
 ```sh
 # Get a real blob ID first
 REAL_BLOB_ID=$(walrus blob-id test-file.txt)
 echo "Real blob ID: $REAL_BLOB_ID"
+
+# Try with a modified ID (this will fail)
+walrus read "${REAL_BLOB_ID}x" --out test.txt
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Get a real blob ID first
+$REAL_BLOB_ID = walrus blob-id test-file.txt
+Write-Output "Real blob ID: $REAL_BLOB_ID"
 
 # Try with a modified ID (this will fail)
 walrus read "${REAL_BLOB_ID}x" --out test.txt
@@ -279,8 +392,24 @@ walrus info --config /nonexistent/config.yaml
 
 Enable debug logging to see detailed information:
 
+**Mac/Linux:**
+
 ```sh
 RUST_LOG=walrus=debug walrus blob-status --file test-file.txt
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+set RUST_LOG=walrus=debug
+walrus blob-status --file test-file.txt
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:RUST_LOG = "walrus=debug"
+walrus blob-status --file test-file.txt
 ```
 
 **What to observe**:
@@ -312,6 +441,8 @@ walrus blob-id test-file.txt
 
 Upload multiple files and verify all were stored:
 
+**Mac/Linux:**
+
 ```sh
 # Create multiple files
 for i in {1..5}; do
@@ -325,6 +456,23 @@ walrus store batch-file-*.txt --epochs 5
 for i in {1..5}; do
   walrus blob-status --file "batch-file-$i.txt"
 done
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Create multiple files
+1..5 | ForEach-Object {
+  "Content of file $_" | Out-File -Encoding utf8 "batch-file-$_.txt"
+}
+
+# Upload all at once
+walrus store batch-file-1.txt batch-file-2.txt batch-file-3.txt batch-file-4.txt batch-file-5.txt --epochs 5
+
+# Verify all are stored
+1..5 | ForEach-Object {
+  walrus blob-status --file "batch-file-$_.txt"
+}
 ```
 
 ### Bonus 2: Blob Attributes
@@ -350,6 +498,8 @@ walrus remove-blob-attribute-fields <BLOB_OBJ_ID> --keys "Author"
 
 Compare default and strict consistency checks:
 
+**Mac/Linux:**
+
 ```sh
 BLOB_ID=$(walrus blob-id test-file.txt)
 
@@ -363,17 +513,29 @@ time walrus read $BLOB_ID --out strict-check.txt --strict-consistency-check
 diff default-check.txt strict-check.txt
 ```
 
-## Summary
+**Windows (PowerShell):**
 
-After completing these exercises, you should be able to:
+```powershell
+$BLOB_ID = walrus blob-id test-file.txt
 
-1. ✅ Upload files to Walrus and retrieve them
-2. ✅ Inspect blob status and system information
-3. ✅ Handle common errors and recover from failures
-4. ✅ Use debug logging for troubleshooting
-5. ✅ Work with blob IDs and verify data integrity
+# Default check
+Measure-Command { walrus read $BLOB_ID --out default-check.txt }
 
-For more examples and use cases, see the [examples documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/examples.md) and the [client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md).
+# Strict check
+Measure-Command { walrus read $BLOB_ID --out strict-check.txt --strict-consistency-check }
+
+# Verify both downloads are identical
+Compare-Object (Get-Content default-check.txt) (Get-Content strict-check.txt)
+```
+
+## Key Takeaways
+
+- **Complete workflow**: Upload → verify status → download → verify integrity forms the core usage pattern
+- **Deterministic blob IDs**: Same content always produces the same blob ID, enabling verification
+- **Debug logging**: `RUST_LOG=walrus=debug` reveals configuration, network requests, and detailed errors
+- **Error recovery**: Most failures have clear solutions - read error messages and check system status
+- **Verification**: Always compare blob IDs of original and downloaded files to ensure integrity
+- **Docker option**: Use the provided Docker setup for consistent, reproducible exercise environments
 
 ## Next Steps
 
@@ -382,5 +544,7 @@ For more examples and use cases, see the [examples documentation](https://github
 - Integrate Walrus CLI into your own workflows and scripts
 - Refer back to the curriculum sections as needed
 
-Congratulations on completing the Walrus CLI Developer Curriculum!
+For more examples and use cases, see the [examples documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/examples.md) and the [client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md).
+
+**Congratulations on completing the Walrus CLI Developer Curriculum!** 🎉
 
