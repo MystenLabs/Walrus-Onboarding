@@ -182,7 +182,7 @@ async getSlivers({ blobId, signal }: GetSliversOptions) {
           totalErrorCount += 1;
 
           const remainingTasks = sliverPairIndices.length - (slivers.length + totalErrorCount);
-          const tooManyFailures = slivers.length + remainingIndices < minSymbols;
+          const tooManyFailures = slivers.length + remainingTasks < minSymbols;
 
           if (tooManyFailures) {
             const abortError = new NotEnoughSliversReceivedError(

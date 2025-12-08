@@ -84,8 +84,9 @@ async function main() {
   }
 }
 
-// Run if executed directly
-if (import.meta.url.endsWith(process.argv[1] || '') || import.meta.url.includes('basic-upload-example.ts')) {
+// Run if executed directly (not when imported as a module)
+const isDirectRun = process.argv[1]?.includes('basic-upload-example');
+if (isDirectRun) {
   main().catch(console.error);
 }
 

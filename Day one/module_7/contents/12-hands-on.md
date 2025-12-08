@@ -28,9 +28,32 @@ flowchart LR
     style E fill:#ffcdd2
 ```
 
-## Setup
+## Running in Docker (Recommended for Consistent Results)
 
-Ensure you have the SDK installed:
+For a consistent environment across all operating systems, use the Docker setup in `hands_on_code/`:
+
+```sh
+# From the sdk_upload_relay module directory
+cd hands_on_code
+make build
+PASSPHRASE='your testnet passphrase' make test-hands-on
+
+# Or run all tests
+PASSPHRASE='your testnet passphrase' make test
+
+# Interactive shell
+make shell
+```
+
+> 💡 **Docker Benefits:**
+> - Identical Node.js version across all systems
+> - Pre-installed SDK dependencies
+> - Consistent test results
+> - No local environment conflicts
+
+## Local Setup (Alternative)
+
+If you prefer running locally without Docker, ensure you have the SDK installed:
 
 ```bash
 npm install @mysten/walrus @mysten/sui
@@ -132,17 +155,43 @@ main().catch(console.error);
 
 Run your script.
 
+**All Platforms:**
+
 ```bash
 npx ts-node lab-upload.ts
 ```
 
 Working inside the verification harness? You can run the maintained solution with:
 
+**Mac/Linux:**
+
 ```bash
 # Docker path
 PASSPHRASE="your passphrase" make test-hands-on
 
 # Local Node path
+npm run test:hands-on
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Docker path (using environment variable)
+$env:PASSPHRASE = "your passphrase"
+docker-compose run --rm test-hands-on
+
+# Local Node path
+npm run test:hands-on
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Docker path
+set PASSPHRASE=your passphrase
+docker-compose run --rm test-hands-on
+
+:: Local Node path
 npm run test:hands-on
 ```
 

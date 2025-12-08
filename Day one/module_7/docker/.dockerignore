@@ -5,10 +5,11 @@ dist
 .git
 .gitignore
 *.md
-!README.md
+!hands-on-source-code/README.md
 .vscode
 .idea
 .env
 .env.local
 .env.*.local
+results
 

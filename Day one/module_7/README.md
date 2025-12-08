@@ -61,15 +61,85 @@ Before starting this module, ensure you have:
 
 1. **Read the curriculum**: Start with the [index page](./contents/index.md)
 2. **Follow along**: Progress through lessons 1-12 in order
-3. **Run examples**: Use the hands-on code in the `hands_on_code/` directory
+3. **Run examples**: Use the hands-on code in the `hands-on-source-code/` directory
 4. **Practice**: Complete the hands-on lab in lesson 12
+
+## 🐳 Docker Environment (Recommended)
+
+This module includes a Docker environment for consistent, hassle-free setup across all platforms. The Docker setup provides:
+
+- ✅ Pre-configured Node.js 20 environment
+- ✅ All dependencies installed automatically
+- ✅ No local Node.js/npm setup required
+- ✅ Consistent behavior across Windows, macOS, and Linux
+
+### Using Docker
+
+Navigate to the `docker/` directory and use the Makefile commands:
+
+```bash
+cd docker
+
+# Build the Docker image
+make build
+
+# Run all tests (requires your passphrase)
+PASSPHRASE='your passphrase here' make test
+
+# Run specific tests
+PASSPHRASE='your passphrase' make test-upload
+PASSPHRASE='your passphrase' make test-hands-on
+make test-download  # No passphrase needed
+```
+
+### Available Docker Commands
+
+| Command | Description | Requires Passphrase? |
+|---------|-------------|---------------------|
+| `make build` | Build the Docker image | ❌ No |
+| `make test` | Run all tests | ✅ Yes |
+| `make test-upload` | Run basic upload test | ✅ Yes |
+| `make test-download` | Run basic download test | ❌ No |
+| `make test-hands-on` | Run hands-on lab | ✅ Yes |
+| `make test-integrity` | Run integrity checks | ✅ Yes |
+| `make test-retry` | Run retry patterns test | ✅ Yes |
+| `make test-partial-failures` | Run partial failures test | ✅ Yes |
+| `make shell` | Open interactive shell | Optional |
+| `make clean` | Remove containers and images | ❌ No |
+
+### Important Notes
+
+- ⚠️ **You need a funded Sui testnet wallet passphrase** for most operations
+- ⚠️ **Never commit your passphrase** to version control
+- ⚠️ Source code is mounted from `hands-on-source-code/`, so you can edit locally and changes reflect immediately
+
+For detailed Docker setup instructions, see [docker/README.md](./docker/README.md)
 
 ## 💻 Hands-On Code Examples
 
-The `hands_on_code/` directory contains runnable TypeScript examples:
-See [hands_on_code/README.md](./hands_on_code/README.md) for detailed instructions.
+The `hands-on-source-code/` directory contains runnable TypeScript examples for all lessons.
+
+### Running Examples
+
+#### Option 1: Docker (Recommended)
+
+```bash
+cd docker
+make build
+PASSPHRASE='your passphrase' make test
+```
+
+#### Option 2: Local Setup
+
+```bash
+cd hands-on-source-code
+npm install
+export PASSPHRASE='your passphrase'
+npm test
+```
+
+See [hands-on-source-code/README.md](./hands-on-source-code/README.md) for detailed local setup instructions or [docker/README.md](./docker/README.md) for Docker-specific information.
 
 ---
 
 **Ready to start?** Head to [contents/index.md](./contents/index.md) or jump straight to [Lesson 1: Chunk Creation](./contents/01-chunk-creation.md)!
-
