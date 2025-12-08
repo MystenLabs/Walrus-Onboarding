@@ -18,7 +18,7 @@ This module contains the following materials:
 ### Core Content
 
 - **[Index](./contents/index.md)** - Curriculum overview and navigation
-- **[Epochs, Continuity, and Extension](./contents/epochs-continuity.md)** - Core concepts covering:
+- **[Epochs, Continuity, and Extension](./contents/01-epochs-continuity.md)** - Core concepts covering:
   - Epoch lifecycle and system parameters
   - Storage continuity mechanisms
   - Storage extension rules and mechanics
@@ -26,7 +26,7 @@ This module contains the following materials:
 
 ### Practical Exercises
 
-- **[Hands-On Exercises](./contents/hands-on.md)** - Practice problems including:
+- **[Hands-On Exercises](./contents/02-hands-on.md)** - Practice problems including:
   - Interpreting epoch timelines
   - Solving continuity puzzles
   - Analyzing extension race scenarios
@@ -41,5 +41,5 @@ This module contains the following materials:
 
 ## Quick Start
 
-1. **Read [Epochs, Continuity, and Extension](./contents/epochs-continuity.md)** to master the core concepts
-2. **Complete the [Hands-On Exercises](./contents/hands-on.md)** to test your understanding
+1. **Read [Epochs, Continuity, and Extension](./contents/01-epochs-continuity.md)** to master the core concepts
+2. **Complete the [Hands-On Exercises](./contents/02-hands-on.md)** to test your understanding

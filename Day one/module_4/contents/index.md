@@ -15,17 +15,17 @@ By the end of this curriculum, you will be able to:
 
 This curriculum is organized into the following sections:
 
-1. **[Epochs, Continuity, and Extension](./epochs-continuity.md)** - Core concepts
+1. **[Epochs, Continuity, and Extension](./01-epochs-continuity.md)** - Core concepts
    - Epoch lifecycle
    - Storage continuity mechanisms
    - Storage extension rules
    - Real-world scenarios
 
-1. **[Hands-On Exercises](./hands-on.md)** - Practical application
+1. **[Hands-On Exercises](./02-hands-on.md)** - Practical application
    - Interpret epoch timelines
    - Solve continuity puzzles
 
 ## Next Steps
 
-Start with [Epochs, Continuity, and Extension](./epochs-continuity.md) to master the concepts, then
-test your understanding with the [Hands-On Exercises](./hands-on.md).
+Start with [Epochs, Continuity, and Extension](./01-epochs-continuity.md) to master the concepts, then
+test your understanding with the [Hands-On Exercises](./02-hands-on.md).

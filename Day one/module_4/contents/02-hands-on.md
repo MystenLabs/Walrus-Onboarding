@@ -125,3 +125,31 @@ Analyze the following scenarios and predict whether each extension transaction w
    - **Avoid**: Waiting until Epoch 104 (the last active epoch) risks a race condition if the network transitions to Epoch 105 before the transaction executes.
    - **Best Practice**: Extend when you have at least 2-3 epochs remaining before expiry.
 </details>
+
+---
+
+## Key Takeaways
+
+- **Epoch math is straightforward**: `end_epoch = start_epoch + duration`
+- **Exclusive end epoch**: A blob with `end_epoch: 105` is valid during epochs 100-104 (5 epochs total)
+- **Extension calculation**: `extended_epochs = target_epoch - current_end_epoch`
+- **Race conditions are real**: Last-minute extensions (1 epoch buffer) are risky and may fail
+- **Safe buffer**: Always extend with at least 2-3 epochs remaining before expiry
+- **No recovery**: Once `current_epoch >= end_epoch`, the blob cannot be extended
+
+## Next Steps
+
+Congratulations on completing the Epochs and Storage Continuity curriculum! You now understand:
+
+- ✅ How Walrus manages time through epochs
+- ✅ The exclusive nature of `end_epoch` in storage resources
+- ✅ Why extensions must happen before expiry
+- ✅ How to identify and avoid extension race conditions
+- ✅ Best practices for planning storage duration and extensions
+
+### Further Exploration
+
+- **CLI Practice**: Try storing blobs with different `--epochs` values on Testnet (1-day epochs)
+- **Extension Workflow**: Practice extending blobs using `walrus extend`
+- **Monitoring**: Use `walrus blob-status` to check blob expiration times
+- **Automation**: Consider building automated extension services for production applications

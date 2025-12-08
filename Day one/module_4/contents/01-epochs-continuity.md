@@ -8,7 +8,8 @@ and the mechanics of extending storage duration.
 Walrus time is divided into **epochs**. An epoch is a fixed period of time during which the set of
 storage nodes (the committee) and system parameters (like price and capacity) remain constant.
 
-On Walrus Mainnet, an epoch is **2 weeks** long.
+On Walrus Mainnet, an epoch is **2 weeks** long. On Testnet, epochs are **1 day** long for faster
+iteration during development.
 
 The system defines epoch parameters in the `EpochParams` struct:
 
@@ -163,7 +164,9 @@ assert!(accounts_old_epoch.epoch() == old_epoch, EInvalidAccountingEpoch);
 ```
 
 This rotation ensures that the system always has a fixed window of future epochs available for
-reservation (up to `MAX_MAX_EPOCHS_AHEAD`, which is 1000).
+reservation. While the contract enforces an upper limit of `MAX_MAX_EPOCHS_AHEAD` (1000), both
+Mainnet and Testnet are configured with a practical limit of **53 epochs** (approximately 2 years
+on Mainnet, or 53 days on Testnet).
 
 ## 5. Timeline Diagram
 
@@ -264,3 +267,17 @@ public(package) fun assert_certified_not_expired(self: &Blob, current_epoch: u32
 
 - **Result**: The transaction aborts with `EResourceBounds`.
 - **Consequence**: The blob is now expired and cannot be extended. It is eligible for deletion.
+
+## Key Takeaways
+
+- **Epochs are time units**: Mainnet uses 2-week epochs; Testnet uses 1-day epochs for faster iteration
+- **End epoch is exclusive**: `end_epoch: 13` means valid through Epoch 12, expires when Epoch 13 starts
+- **Extensions must happen before expiry**: The `assert_certified_not_expired` check enforces `current_epoch < end_epoch`
+- **Race conditions exist**: Transactions submitted near epoch boundaries may execute in the next epoch
+- **Maximum storage is 53 epochs**: Approximately 2 years on Mainnet, 53 days on Testnet
+- **Once expired, data is lost**: There is no way to recover or extend an expired blob
+
+## Next Steps
+
+Now that you understand epochs and storage continuity, proceed to the
+[Hands-On Exercises](./02-hands-on.md) to practice epoch calculations and analyze extension scenarios.
