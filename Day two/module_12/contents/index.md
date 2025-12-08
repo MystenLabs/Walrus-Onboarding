@@ -1,4 +1,4 @@
-# Module 8: Failure Handling & Robustness
+# Module 12: Failure Handling & Robustness
 
 Welcome to the **Failure Handling & Robustness** curriculum! This module focuses on building resilient applications on Walrus. You will learn how to handle common failure scenarios, implement robust client logic, and ensure your application remains reliable even when individual components fail.
 

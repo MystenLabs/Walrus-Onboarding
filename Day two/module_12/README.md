@@ -88,11 +88,38 @@ The module is organized into 8 comprehensive lessons:
 
 The `hands-on-source-code/` directory contains practical TypeScript examples:
 
-- **Broken Upload Script**: A deliberately buggy script for debugging practice
-- **Reference Solution**: Complete implementation with proper error handling and retry logic
-- **Pattern Examples**: Reusable retry and fallback patterns
+```
+hands-on-source-code/
+├── ts/
+│   ├── debug-scenario.ts          # Broken code - students fix this
+│   └── debug-scenario-solution.ts # Complete solution with retry patterns
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+- **debug-scenario.ts**: A deliberately buggy upload script for debugging practice
+- **debug-scenario-solution.ts**: Complete implementation with proper error handling and retry logic
 
 See the hands-on lab in [contents/08-hands-on-debug-scenario.md](./contents/08-hands-on-debug-scenario.md) for detailed instructions.
+
+## 🐳 Docker Environment
+
+The `docker/` directory provides a containerized environment for running the hands-on exercises:
+
+```sh
+cd docker/
+make build      # Build the Docker image
+make test       # Run the debug scenario (broken code)
+make solution   # Run the solution
+make shell      # Open interactive shell
+```
+
+This is useful for consistent environments without local Node.js setup. See [docker/README.md](./docker/README.md) for details.
+
+## 👨‍🏫 Instructor Resources
+
+- **[Instructor Guide](./contents/instructor-guide.md)** - Teaching notes, timing suggestions, discussion points, and assessment checklists for instructors delivering this module.
 
 ---
 

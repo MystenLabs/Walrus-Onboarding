@@ -71,28 +71,38 @@ if (status.type === 'nonexistent') {
     throw new Error("Blob does not exist or has expired");
 }
 
-if (status.type === 'permanent' || status.type === 'deletable') {
+// Note: Only 'permanent' type blobs have endEpoch.
+// 'deletable' blobs don't have a fixed end epoch in the status response.
+if (status.type === 'permanent') {
     const currentEpoch = (await client.stakingState()).epoch;
     if (status.endEpoch <= currentEpoch) {
         throw new Error("Blob storage has expired");
     }
     console.log(`Blob valid until epoch ${status.endEpoch}`);
 }
+
+if (status.type === 'deletable') {
+    // For deletable blobs, check if they're still certified
+    if (status.initialCertifiedEpoch === null) {
+        throw new Error("Blob is not certified");
+    }
+    console.log(`Deletable blob certified at epoch ${status.initialCertifiedEpoch}`);
+}
 ```
 
 ### 2. Extend Storage (Renewal)
-To prevent expiration, you must renew the storage *before* it expires. Use `executeExtendBlob` to add more epochs:
+To prevent expiration, you must renew the storage *before* it expires. Use `executeExtendBlobTransaction` to add more epochs:
 
 ```typescript
 // Extend blob storage by 5 additional epochs
-const { digest } = await client.executeExtendBlob({ 
+const { digest } = await client.executeExtendBlobTransaction({ 
     blobObjectId: 'YOUR_BLOB_OBJECT_ID',
     epochs: 5,  // Add 5 more epochs
     signer: keypair,
 });
 
 // Or extend to a specific end epoch
-const { digest: digest2 } = await client.executeExtendBlob({ 
+const { digest: digest2 } = await client.executeExtendBlobTransaction({ 
     blobObjectId: 'YOUR_BLOB_OBJECT_ID',
     endEpoch: 150,  // Extend until epoch 150
     signer: keypair,
@@ -113,7 +123,7 @@ Sometimes a "valid" blob might appear invalid if the client thinks the current e
 ## Key Takeaways
 
 - **Storage has a finite lifetime**: Walrus storage is purchased for specific epochs; expired data can be deleted by nodes.
-- **Check expiration proactively**: Use `getVerifiedBlobStatus()` to check `endEpoch` before critical operations.
-- **Extend storage before expiration**: Use `extendBlob()` to add epochs; you cannot recover data after it expires.
+- **Check expiration proactively**: Use `getVerifiedBlobStatus()` to check `endEpoch` (for permanent blobs) before critical operations.
+- **Extend storage before expiration**: Use `executeExtendBlobTransaction()` to add epochs; you cannot recover data after it expires.
 - **Renewal costs WAL tokens**: The cost scales with blob size and number of epochs added.
 - **Communicate expiration to users**: Display clear messages when data has expired and clean up stale references.
