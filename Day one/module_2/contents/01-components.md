@@ -113,11 +113,7 @@ The endpoint:
 3. Calls `client.write_blob()` which handles encoding, distribution, and on-chain registration
 4. Returns the blob store result with blob ID
 
-```admonish info title="Publisher Authentication"
-Publishers can be configured to require authentication (JWT tokens) for uploads,
-allowing fine-grained control over storage parameters like maximum blob size and
-storage duration.
-```
+> ℹ️ **Publisher Authentication:** Publishers can be configured to require authentication (JWT tokens) for uploads, allowing fine-grained control over storage parameters like maximum blob size and storage duration.
 
 📖 **Setup guide:** [Authenticated Publisher guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/auth-publisher.md)
 
@@ -175,9 +171,7 @@ The endpoint:
 3. Calls `client.read_blob()` which handles fetching slivers, reconstruction, and verification
 4. Returns the reconstructed blob data with appropriate headers
 
-```admonish tip title="Aggregators as CDNs"
-Aggregators can act as CDNs, splitting the cost of blob reconstruction over many requests, providing better connectivity, and reducing latency for end users.
-```
+> 💡 **Aggregators as CDNs:** Aggregators can act as CDNs, splitting the cost of blob reconstruction over many requests, providing better connectivity, and reducing latency for end users.
 
 📖 **Operator guide:** [Aggregator Operator Guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/aggregator.md)
 

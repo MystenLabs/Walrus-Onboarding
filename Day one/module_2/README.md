@@ -17,23 +17,23 @@ Walrus is a decentralized storage system built on Sui that provides verifiable, 
 module_2/
 ├── README.md (this file)
 ├── contents/
-│   ├── index.md           # Module overview and curriculum flow
-│   ├── components.md     # System components (Storage Nodes, Publishers, Aggregators)
-│   ├── chunk-creation.md  # Encoding process and erasure coding
-│   ├── data-flow.md       # Upload and retrieval flows
-│   ├── hands-on.md        # Practical walkthrough
-│   └── instructor-guide.md # Teaching guide for instructors
-├── images/                # SVG diagrams
-└── assets/                # Excalidraw source files for diagrams
+│   ├── index.md              # Module overview and curriculum flow
+│   ├── 01-components.md      # System components (Storage Nodes, Publishers, Aggregators)
+│   ├── 02-chunk-creation.md  # Encoding process and erasure coding
+│   ├── 03-data-flow.md       # Upload and retrieval flows
+│   ├── 04-hands-on.md        # Practical walkthrough
+│   └── instructor-guide.md   # Teaching guide for instructors
+├── images/                   # SVG diagrams
+└── assets/                   # Excalidraw source files for diagrams
 ```
 
 ## Getting Started
 
 1. **Start with the [Module Index](./contents/index.md)** - Overview and learning path
-2. **Read [System Components](./contents/components.md)** - Understand the building blocks
-3. **Learn [Chunk Creation and Encoding](./contents/chunk-creation.md)** - How data is transformed
-4. **Study [Data Flow](./contents/data-flow.md)** - See how everything works together
-5. **Complete [Hands-On Walkthrough](./contents/hands-on.md)** - Practice what you've learned
+2. **Read [System Components](./contents/01-components.md)** - Understand the building blocks
+3. **Learn [Chunk Creation and Encoding](./contents/02-chunk-creation.md)** - How data is transformed
+4. **Study [Data Flow](./contents/03-data-flow.md)** - See how everything works together
+5. **Complete [Hands-On Walkthrough](./contents/04-hands-on.md)** - Practice what you've learned
 
 ## Learning Path
 
@@ -45,7 +45,7 @@ Learn about the three main components:
 - **Publishers**: Optional HTTP interfaces for blob uploads
 - **Aggregators**: Optional HTTP interfaces for blob retrieval
 
-[→ Read Components Guide](./contents/components.md)
+[→ Read Components Guide](./contents/01-components.md)
 
 ### 2. Chunk Creation and Encoding
 
@@ -56,7 +56,7 @@ Understand how blobs are encoded:
 - Blob ID computation
 - Encoding properties and consistency checks
 
-[→ Read Encoding Guide](./contents/chunk-creation.md)
+[→ Read Encoding Guide](./contents/02-chunk-creation.md)
 
 ### 3. Data Flow
 
@@ -65,7 +65,7 @@ Trace data through the system:
 - **Upload Flow**: Client → Publisher → Encoding → Sui → Storage Nodes → Certificates
 - **Retrieval Flow**: Client → Aggregator → Sui → Storage Nodes → Reconstruction
 
-[→ Read Data Flow Guide](./contents/data-flow.md)
+[→ Read Data Flow Guide](./contents/03-data-flow.md)
 
 ### 4. Hands-On Walkthrough
 
@@ -76,7 +76,7 @@ Practice with real examples:
 - Retrieve and reconstruct blobs
 - Monitor the process
 
-[→ Start Hands-On Exercise](./contents/hands-on.md)
+[→ Start Hands-On Exercise](./contents/04-hands-on.md)
 
 ## Key Concepts
 

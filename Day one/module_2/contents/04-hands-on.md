@@ -29,12 +29,10 @@ SUI_WALLET_PATH=~/.sui/sui_config make cli
 # Inside the container, all commands work identically on Mac/Linux/Windows
 ```
 
-```admonish tip title="Docker Benefits"
-Docker provides:
-- Identical environment across all operating systems
-- Pre-installed Walrus CLI with correct configuration
-- All required Unix tools (curl, jq, etc.)
-```
+> 💡 **Docker Benefits:**
+> - Identical environment across all operating systems
+> - Pre-installed Walrus CLI with correct configuration
+> - All required Unix tools (curl, jq, etc.)
 
 ## Scenario: Uploading a File
 
@@ -81,11 +79,7 @@ This command:
 4. Registers on Sui
 5. Returns the blob ID
 
-```admonish info title="Blob Size Limits"
-Walrus currently supports blobs up to a maximum size.
-Check `walrus info` for the current limit.
-Larger blobs can be split into smaller chunks before storage.
-```
+> ℹ️ **Blob Size Limits:** Walrus currently supports blobs up to a maximum size. Check `walrus info` for the current limit. Larger blobs can be split into smaller chunks before storage.
 
 For detailed CLI command reference, see the [Client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/usage/client-cli.md).
 

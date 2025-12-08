@@ -69,13 +69,10 @@ Walrus provides multiple consistency check mechanisms:
 - **Strict check**: Re-encodes the blob and verifies the blob ID matches
 - **Storage node checks**: Storage nodes can detect encoding inconsistencies and mark blobs as invalid
 
-```admonish note title="Consistency Check Default Changed in v1.37"
-Starting with Walrus CLI v1.37, the default consistency check is the more performant
-"default check" described above. Prior versions used the strict consistency check by default.
-
-- The strict check can still be enabled with `--strict-consistency-check`
-- For trusted blob writers, consistency checks can be disabled with `--skip-consistency-check`
-```
+> 📝 **Consistency Check Default Changed in v1.37:** Starting with Walrus CLI v1.37, the default consistency check is the more performant "default check" described above. Prior versions used the strict consistency check by default.
+>
+> - The strict check can still be enabled with `--strict-consistency-check`
+> - For trusted blob writers, consistency checks can be disabled with `--skip-consistency-check`
 
 
 ## Related Sections

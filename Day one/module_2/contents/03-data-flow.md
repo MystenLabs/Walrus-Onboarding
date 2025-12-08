@@ -26,11 +26,7 @@ A client wants to store a blob. The client can either:
 
 For this walkthrough, we'll follow the publisher path as it's more common.
 
-```admonish info title="Blob Size Limits"
-Walrus currently supports blobs up to a maximum size.
-Check `walrus info` for the current limit.
-Larger blobs can be split into smaller chunks before storage.
-```
+> ℹ️ **Blob Size Limits:** Walrus currently supports blobs up to a maximum size. Check `walrus info` for the current limit. Larger blobs can be split into smaller chunks before storage.
 
 ### Step 2: Publisher Receives Blob
 
@@ -242,10 +238,7 @@ The aggregator:
    - **Strict check** (optional): Re-encodes and verifies blob ID matches
 3. **Returns blob**: Serves the reconstructed blob to the client
 
-```admonish note title="Default Changed in v1.37"
-Starting with v1.37, the CLI and aggregator use the default (performant) consistency check.
-Use `--strict-consistency-check` for the strict check when needed.
-```
+> 📝 **Default Changed in v1.37:** Starting with v1.37, the CLI and aggregator use the default (performant) consistency check. Use `--strict-consistency-check` for the strict check when needed.
 
 #### Code: Blob Reconstruction
 
