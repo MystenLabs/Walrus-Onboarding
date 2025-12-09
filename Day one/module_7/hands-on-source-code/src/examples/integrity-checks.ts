@@ -134,9 +134,8 @@ async function main() {
   }
 }
 
-// Run if executed directly (not when imported as a module)
-const isDirectRun = process.argv[1]?.includes('integrity-checks');
-if (isDirectRun) {
+// Run if executed directly
+if (import.meta.url.endsWith(process.argv[1] || '') || import.meta.url.includes('integrity-checks.ts')) {
   main().catch(console.error);
 }
 

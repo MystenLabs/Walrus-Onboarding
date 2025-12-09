@@ -89,9 +89,11 @@ async function main() {
   }
 }
 
-// Run if executed directly (not when imported as a module)
-const isDirectRun = process.argv[1]?.includes('hands-on-lab');
-if (isDirectRun) {
+// Run if executed directly
+const isMainModule = import.meta.url === `file://${process.argv[1]}` || 
+                     import.meta.url.includes('hands-on-lab.ts') ||
+                     process.argv[1]?.endsWith('hands-on-lab.ts');
+if (isMainModule) {
   main().catch(console.error);
 }
 
