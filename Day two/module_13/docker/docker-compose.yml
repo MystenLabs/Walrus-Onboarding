@@ -1,0 +1,10 @@
+services:
+  performance-lab:
+    build:
+      context: ../hands-on-source-code
+      dockerfile: ../docker/Dockerfile
+    container_name: walrus-performance-lab
+    environment:
+      - PASSPHRASE=${PASSPHRASE:-}
+    stdin_open: true
+    tty: true
