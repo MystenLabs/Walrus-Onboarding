@@ -32,3 +32,14 @@ A user wants to download a file and cryptographically prove it hasn't been tampe
 
 *See the Instructor Guide for solutions.*
 
+## Key Takeaways
+
+- Each scenario maps to a specific transaction type and set of Move functions.
+- Use blob object IDs for mutations (extend/delete/share), blob IDs for content addressing.
+- Certified reads combine off-chain download with an on-chain `BlobCertified` check.
+- Quilts suit large sets of small files; SharedBlob enables community-funded persistence.
+
+## Next Steps
+
+Review solutions in the [Instructor Guide](./instructor-guide.md) and then apply the patterns to your own use case or proceed to the production guidance.
+

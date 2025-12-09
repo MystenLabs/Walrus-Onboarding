@@ -69,3 +69,14 @@ const client = new SuiClient({
 );
 ```
 
+## Key Takeaways
+
+- Use the strategy matrix to choose Standard, Quilt, SharedBlob, or Deletable based on size, volume, and funding.
+- Buy and recycle storage intelligently; burn expired blob objects to reclaim SUI storage rebates.
+- Bundle operations in PTBs (reserve + register) and upload shards in parallel to cut latency.
+- Monitor `end_epoch` and handle certification retries; storage reuse and deletable blobs can lower WAL spend.
+
+## Next Steps
+
+Apply the strategy in the [Hands-On: Transaction Classification](./hands-on.md) or revisit earlier sections to map patterns to your workload.
+

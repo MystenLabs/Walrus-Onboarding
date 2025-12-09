@@ -108,3 +108,14 @@ walrus store ./my-file.txt --epochs 5
 # Output will show the Blob ID and the Sui Object ID
 ```
 
+## Key Takeaways
+
+- Upload is a four-step flow: reserve → register → off-chain upload → certify.
+- Data bytes stay off-chain with storage nodes; on-chain holds commitments, events, and costs.
+- Registration tells nodes to expect shards; certification with quorum signatures guarantees availability until `end_epoch`.
+- Storage size is based on encoded size; under-sizing will fail certification.
+- Bundle `reserve_space` + `register_blob` in one PTB to cut latency and gas.
+
+## Next Steps
+
+Proceed to [Extension Transactions](./02-extension.md) to learn how to keep blobs alive past their initial expiry.

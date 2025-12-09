@@ -72,3 +72,14 @@ async function retrieve() {
 walrus read <BLOB_ID> --out output-file.txt
 ```
 
+## Key Takeaways
+
+- Retrieval is off-chain and free; you download shards from storage nodes and verify the hash.
+- Certified read adds an on-chain check of `BlobCertified` and `end_epoch` for stronger assurance.
+- Read-only RPC calls can fetch metadata (blob object fields, epoch) without transactions.
+- Integrity comes from the blob ID (content hash) and the certification event.
+
+## Next Steps
+
+Proceed to [Quilt Operations](./04-quilt.md) to learn how batching many small files changes retrieval and lifecycle.
+

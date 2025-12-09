@@ -88,3 +88,15 @@ async function createQuilt() {
 walrus store-quilt --paths ./user-data/ --epochs 5
 ```
 
+## Key Takeaways
+
+- Quilts batch many small files into one on-chain blob, amortizing gas and storage overhead.
+- QuiltPatchIds depend on the quilt composition and change if the quilt changes.
+- Lifecycle actions (extend/delete/share) apply to the entire quilt; individual patches are not independent.
+- Retrieval can target specific identifiers or QuiltPatchIds without downloading the whole quilt.
+- Use quilts for high-volume small assets; prefer standard blobs for large or differing lifecycles.
+
+## Next Steps
+
+Proceed to [Guidance for Real Product Use](./05-production.md) to choose the right strategy in production scenarios.
+

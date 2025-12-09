@@ -222,3 +222,15 @@ Students read 5 scenarios and must identify:
 Students should now be ready for:
 - **Module 11 (Quilts Deep Dive)**: If they haven't done it, this module sets the stage for the *transactional* benefit.
 - **Module 12 (Failure Handling)**: Understanding the multi-step upload process helps explain *where* failures can occur (e.g., reserved but failed to upload).
+
+## Key Takeaways
+
+- Emphasize the on-chain/off-chain split: reserve/register/certify on Sui, data bytes off-chain.
+- Only certification guarantees availability; extensions must occur before `end_epoch`.
+- Quilts are atomic for lifecycle; SharedBlob is permanent and fundable by anyone.
+- Retrieval is free/off-chain; certified reads add an on-chain `BlobCertified` check.
+- PTBs and batching reduce latency/cost; use the scenarios to surface misconceptions early.
+
+## Next Steps
+
+Assign Module 11 (Quilts Deep Dive) or Module 12 (Failure Handling) based on cohort needs, and reuse the transaction classification exercise for quick refreshers.

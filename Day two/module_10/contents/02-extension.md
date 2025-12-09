@@ -81,3 +81,14 @@ walrus extend --blob-obj-id <BLOB_OBJ_ID> --epochs 10
 walrus extend --blob-obj-id <BLOB_OBJ_ID> --epochs 10 --shared
 ```
 
+## Key Takeaways
+
+- Extensions must happen before `end_epoch`; expired blobs cannot be recovered.
+- Two paths: pay (`extend_blob`) or merge a same-size, later-expiring `Storage` (`extend_blob_with_resource`).
+- SharedBlob funds let anyone extend a wrapped blob without owning it.
+- Extension calls need the Blob object ID (Sui object), not just the content hash.
+
+## Next Steps
+
+Proceed to [Retrieval Operations](./03-retrieval.md) to see how data is read and verified.
+
