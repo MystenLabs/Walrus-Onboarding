@@ -46,10 +46,7 @@ The following table demonstrates the dramatic cost savings quilts provide when s
 |     500KB |            6.825 WAL |          0.267 WAL |            26x |
 |       1MB |            7.035 WAL |          0.535 WAL |            13x |
 
-```admonish info
-These costs are illustrative and from Testnet. Actual costs vary based on network parameters, but the relative savings remain substantial.
-
-```
+> ℹ️ **Note:** These costs are illustrative and from Testnet. Actual costs vary based on network parameters, but the relative savings remain substantial.
 You can verify these costs on your current network using the [verification script](./hands-on-source-code/verify_costs.sh).
 
 ## Key Insight

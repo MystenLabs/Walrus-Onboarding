@@ -30,14 +30,6 @@ Before starting, ensure you have:
 - ✅ Network connectivity to Walrus testnet
 - ✅ Completed previous CLI or SDK curriculum modules
 
-**Note**: Full source code for the TypeScript SDK approach is available in the `hands-on-source-code/` directory. You can run it using Docker:
-
-```bash
-cd hands-on-source-code
-make build
-make test
-```
-
 Verify your setup:
 
 ```sh
@@ -51,9 +43,38 @@ Or for TypeScript:
 npm list @mysten/walrus
 ```
 
+## Running in Docker (Recommended for Consistent Results)
+
+For a consistent environment across all operating systems, we provide Docker setups:
+
+### Option 1: CLI Exercises
+
+```sh
+# From the quilts module directory
+cd docker
+make build
+SUI_WALLET_PATH=~/.sui/sui_config make run
+
+# Create test files
+make create-test-files
+```
+
+### Option 2: TypeScript SDK Exercises
+
+```sh
+# From the quilts module directory
+cd hands-on-source-code
+make build
+PASSPHRASE='your testnet passphrase' make test
+```
+
+> 💡 **Docker for Windows Users:** Docker provides the most reliable experience for Windows users, as all Unix-specific commands work identically inside the container.
+
 ## Part 1: Prepare Test Files
 
 ### Step 1.1: Create a Project Directory
+
+**Mac/Linux:**
 
 ```sh
 mkdir -p walrus-quilt-lab
@@ -61,9 +82,27 @@ cd walrus-quilt-lab
 mkdir test-files
 ```
 
+**Windows (Command Prompt):**
+
+```cmd
+mkdir walrus-quilt-lab
+cd walrus-quilt-lab
+mkdir test-files
+```
+
+**Windows (PowerShell):**
+
+```powershell
+New-Item -ItemType Directory -Force -Path walrus-quilt-lab
+Set-Location walrus-quilt-lab
+New-Item -ItemType Directory -Force -Path test-files
+```
+
 ### Step 1.2: Create Test Files
 
 Create several test files of different types:
+
+**Mac/Linux:**
 
 ```sh
 # Create a text document
@@ -113,18 +152,82 @@ Placeholder for logo.png
 EOF
 ```
 
+**Windows (PowerShell):**
+
+```powershell
+# Create a text document
+@"
+Welcome to Walrus Quilts!
+
+This is a sample document stored in a quilt.
+Quilts allow efficient batch storage of small files.
+"@ | Out-File -Encoding utf8 test-files/introduction.txt
+
+# Create a JSON configuration
+@"
+{
+  "version": "1.0",
+  "feature": "quilts",
+  "enabled": true,
+  "max_files": 666
+}
+"@ | Out-File -Encoding utf8 test-files/config.json
+
+# Create a small HTML file
+@"
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Walrus Quilt Demo</title>
+</head>
+<body>
+    <h1>Hello from Walrus!</h1>
+    <p>This page is stored in a quilt.</p>
+</body>
+</html>
+"@ | Out-File -Encoding utf8 test-files/index.html
+
+# Create a data file
+@"
+id,name,value
+1,item1,100
+2,item2,200
+3,item3,300
+"@ | Out-File -Encoding utf8 test-files/data.csv
+
+# Create an image (placeholder text file for demo)
+@"
+[This would be an actual image file in production]
+Placeholder for logo.png
+"@ | Out-File -Encoding utf8 test-files/logo.txt
+```
+
 ### Step 1.3: Verify Files
+
+**Mac/Linux:**
 
 ```sh
 ls -lh test-files/
-
-# Expected output:
-# config.json
-# data.csv
-# index.html
-# introduction.txt
-# logo.txt
 ```
+
+**Windows (Command Prompt):**
+
+```cmd
+dir test-files
+```
+
+**Windows (PowerShell):**
+
+```powershell
+Get-ChildItem test-files
+```
+
+**Expected output (files listed):**
+- config.json
+- data.csv
+- index.html
+- introduction.txt
+- logo.txt
 
 ## Part 2: Create the Quilt
 
@@ -158,10 +261,28 @@ Gas cost: 0.003 SUI
 
 #### Step 2A.2: Save the Quilt ID
 
+**Mac/Linux:**
+
 ```sh
 # Save for later use
 QUILT_ID="GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc"  # Replace with your actual ID
 echo "QUILT_ID=$QUILT_ID" > quilt-info.sh
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Save for later use (replace with your actual ID)
+set QUILT_ID=GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc
+echo QUILT_ID=%QUILT_ID% > quilt-info.txt
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Save for later use (replace with your actual ID)
+$QUILT_ID = "GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc"
+"QUILT_ID=$QUILT_ID" | Out-File quilt-info.txt
 ```
 
 ### Option B: TypeScript SDK Approach
@@ -353,12 +474,28 @@ walrus read-quilt --out downloads/by-identifier/ \
 
 ### Step 4.2: Verify the Content
 
+**Mac/Linux:**
+
 ```sh
 # Compare with original
 diff test-files/introduction.txt downloads/by-identifier/intro
 
 # Should show no differences
 echo "Verification: $?"  # 0 means identical
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+fc test-files\introduction.txt downloads\by-identifier\intro
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Compare with original
+Compare-Object (Get-Content test-files/introduction.txt) (Get-Content downloads/by-identifier/intro)
+# No output means files are identical
 ```
 
 ### Step 4.3: Retrieve Multiple Files
@@ -371,6 +508,8 @@ walrus read-quilt --out downloads/by-identifier/ \
 
 ### Step 4.4: Verify All Downloads
 
+**Mac/Linux:**
+
 ```sh
 # Check what was downloaded
 ls -lh downloads/by-identifier/
@@ -380,6 +519,30 @@ diff test-files/config.json downloads/by-identifier/config
 diff test-files/index.html downloads/by-identifier/homepage
 
 echo "All files match original: Success!"
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+dir downloads\by-identifier
+
+fc test-files\config.json downloads\by-identifier\config
+fc test-files\index.html downloads\by-identifier\homepage
+
+echo All files match original: Success!
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Check what was downloaded
+Get-ChildItem downloads/by-identifier
+
+# Compare each file
+Compare-Object (Get-Content test-files/config.json) (Get-Content downloads/by-identifier/config)
+Compare-Object (Get-Content test-files/index.html) (Get-Content downloads/by-identifier/homepage)
+
+Write-Output "All files match original: Success!"
 ```
 
 ## Part 5: Retrieve Blobs by Tag
@@ -419,6 +582,8 @@ walrus read-quilt --out downloads/by-category/ \
 
 ### Step 5.4: Verify Tag-Based Retrieval
 
+**Mac/Linux:**
+
 ```sh
 # Count files in each directory
 echo "Documents: $(ls downloads/by-tag-documents/ | wc -l)"  # Should be 2
@@ -426,18 +591,42 @@ echo "JSON files: $(ls downloads/by-tag-json/ | wc -l)"      # Should be 1
 echo "Config files: $(ls downloads/by-category/ | wc -l)"    # Should be 1
 ```
 
+**Windows (PowerShell):**
+
+```powershell
+# Count files in each directory
+Write-Output "Documents: $((Get-ChildItem downloads/by-tag-documents).Count)"    # Should be 2
+Write-Output "JSON files: $((Get-ChildItem downloads/by-tag-json).Count)"        # Should be 1
+Write-Output "Config files: $((Get-ChildItem downloads/by-category).Count)"      # Should be 1
+```
+
 ## Part 6: Retrieve Blobs by QuiltPatchId
 
 ### Step 6.1: Get QuiltPatchIds
+
+**Mac/Linux:**
 
 ```sh
 # List patches and extract IDs
 walrus list-patches-in-quilt $QUILT_ID --json > patches.json
 
-# Extract specific patch ID (e.g., for 'intro')
+# Extract specific patch ID (e.g., for 'intro') - requires jq
 INTRO_PATCH_ID=$(jq -r '.patches[] | select(.identifier == "intro") | .patch_id' patches.json)
 
 echo "Intro Patch ID: $INTRO_PATCH_ID"
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# List patches and extract IDs
+walrus list-patches-in-quilt $QUILT_ID --json | Out-File patches.json
+
+# Extract specific patch ID (e.g., for 'intro')
+$patches = Get-Content patches.json | ConvertFrom-Json
+$INTRO_PATCH_ID = ($patches.patches | Where-Object { $_.identifier -eq "intro" }).patch_id
+
+Write-Output "Intro Patch ID: $INTRO_PATCH_ID"
 ```
 
 ### Step 6.2: Retrieve by Patch ID
@@ -450,18 +639,47 @@ walrus read-quilt --out downloads/by-patch-id/ \
 
 ### Step 6.3: Verify
 
+**Mac/Linux:**
+
 ```sh
 diff test-files/introduction.txt downloads/by-patch-id/intro
 echo "Patch ID retrieval: Success!"
 ```
 
+**Windows (Command Prompt):**
+
+```cmd
+fc test-files\introduction.txt downloads\by-patch-id\intro
+echo Patch ID retrieval: Success!
+```
+
+**Windows (PowerShell):**
+
+```powershell
+Compare-Object (Get-Content test-files/introduction.txt) (Get-Content downloads/by-patch-id/intro)
+Write-Output "Patch ID retrieval: Success!"
+```
+
 ### Step 6.4: Retrieve Multiple Patches by ID
+
+**Mac/Linux:**
 
 ```sh
 CONFIG_PATCH_ID=$(jq -r '.patches[] | select(.identifier == "config") | .patch_id' patches.json)
 HOMEPAGE_PATCH_ID=$(jq -r '.patches[] | select(.identifier == "homepage") | .patch_id' patches.json)
 
 walrus read-quilt --out downloads/by-patch-id/ \
+  --quilt-patch-ids $CONFIG_PATCH_ID $HOMEPAGE_PATCH_ID
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$patches = Get-Content patches.json | ConvertFrom-Json
+$CONFIG_PATCH_ID = ($patches.patches | Where-Object { $_.identifier -eq "config" }).patch_id
+$HOMEPAGE_PATCH_ID = ($patches.patches | Where-Object { $_.identifier -eq "homepage" }).patch_id
+
+walrus read-quilt --out downloads/by-patch-id/ `
   --quilt-patch-ids $CONFIG_PATCH_ID $HOMEPAGE_PATCH_ID
 ```
 
@@ -477,6 +695,8 @@ walrus read-quilt --out downloads/full-quilt/ \
 
 ### Step 7.2: Verify All Files
 
+**Mac/Linux:**
+
 ```sh
 # Check all files were downloaded
 ls -lh downloads/full-quilt/
@@ -488,6 +708,28 @@ for file in intro config homepage sample-data logo; do
 done
 
 echo "Total files downloaded: $(ls downloads/full-quilt/ | wc -l)"  # Should be 5
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+dir downloads\full-quilt
+
+echo Total files downloaded: (count manually from dir output)
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Check all files were downloaded
+Get-ChildItem downloads/full-quilt
+
+# Verify each file
+@("intro", "config", "homepage", "sample-data", "logo") | ForEach-Object {
+  Write-Output "Checking $_..."
+}
+
+Write-Output "Total files downloaded: $((Get-ChildItem downloads/full-quilt).Count)"  # Should be 5
 ```
 
 ## Part 8: TypeScript SDK Retrieval (Optional)
@@ -623,12 +865,30 @@ chmod +x verify-lab.sh
 
 If you want to clean up after the lab:
 
+**Mac/Linux:**
+
 ```sh
 # Delete the quilt (if deletable)
 walrus delete --blob-id $QUILT_ID
 
 # Remove local files
 rm -rf walrus-quilt-lab/
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+walrus delete --blob-id %QUILT_ID%
+
+rmdir /s /q walrus-quilt-lab
+```
+
+**Windows (PowerShell):**
+
+```powershell
+walrus delete --blob-id $QUILT_ID
+
+Remove-Item -Recurse -Force walrus-quilt-lab
 ```
 
 ## Lab Completion Checklist

@@ -30,7 +30,7 @@
       "locked": false,
       "text": "Regular Blob:",
       "fontSize": 20,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 18
@@ -90,7 +90,7 @@
       "locked": false,
       "text": "my-file.pdf",
       "fontSize": 16,
-      "fontFamily": 3,
+      "fontFamily": 2,
       "textAlign": "center",
       "verticalAlign": "middle",
       "baseline": 14
@@ -159,7 +159,7 @@
       "locked": false,
       "text": "BlobId: ABC123...",
       "fontSize": 16,
-      "fontFamily": 3,
+      "fontFamily": 2,
       "textAlign": "center",
       "verticalAlign": "top",
       "baseline": 14
@@ -191,7 +191,7 @@
       "locked": false,
       "text": "(always the same for this content)",
       "fontSize": 14,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "textAlign": "center",
       "verticalAlign": "top",
       "baseline": 13
@@ -223,7 +223,7 @@
       "locked": false,
       "text": "Same File in Quilt A:",
       "fontSize": 20,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 18
@@ -283,7 +283,7 @@
       "locked": false,
       "text": "Quilt A",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 14
@@ -343,7 +343,7 @@
       "locked": false,
       "text": "my-file.pdf",
       "fontSize": 16,
-      "fontFamily": 3,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 14
@@ -375,7 +375,7 @@
       "locked": false,
       "text": "other-file.txt",
       "fontSize": 16,
-      "fontFamily": 3,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 14
@@ -444,7 +444,7 @@
       "locked": false,
       "text": "QuiltPatchId: ABC123...XYZ",
       "fontSize": 16,
-      "fontFamily": 3,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "middle",
       "baseline": 14
@@ -476,7 +476,7 @@
       "locked": false,
       "text": "Same File in Quilt B:",
       "fontSize": 20,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 18
@@ -536,7 +536,7 @@
       "locked": false,
       "text": "Quilt B",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 14
@@ -596,7 +596,7 @@
       "locked": false,
       "text": "my-file.pdf",
       "fontSize": 16,
-      "fontFamily": 3,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 14
@@ -628,7 +628,7 @@
       "locked": false,
       "text": "another-file.doc",
       "fontSize": 16,
-      "fontFamily": 3,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 14
@@ -697,7 +697,7 @@
       "locked": false,
       "text": "QuiltPatchId: DEF456...UVW",
       "fontSize": 16,
-      "fontFamily": 3,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "middle",
       "baseline": 14
@@ -729,7 +729,7 @@
       "locked": false,
       "text": "(DIFFERENT from Quilt A!)",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "textAlign": "left",
       "verticalAlign": "top",
       "baseline": 14
