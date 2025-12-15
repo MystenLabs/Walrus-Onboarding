@@ -10,17 +10,17 @@ The download tests expect a valid blob ID. Run the upload test first, copy the p
 pass it to the download command:
 
 ```bash
-cd hands-on-source-code
-
-# Docker workflow
+# Local Node.js workflow
+cd docker
 make build
-PASSPHRASE="your passphrase here" make test-upload   # produces a blobId
+PASSPHRASE="your passphrase here" make test-upload # produces a blobId
 PASSPHRASE="your passphrase here" make test-download BLOB_ID=<copied id>
 
 # Local Node.js workflow
-npm install
-PASSPHRASE="your passphrase here" npm run test:basic-upload
-PASSPHRASE="your passphrase here" npm run test:basic-download <blob-id>
+cd hands-on-source-code
+# assuming you have already installed the node.js dependencies and included the passphrase in the .env file
+npm run test:basic-upload
+npm run test:basic-download <blob-id>
 ```
 
 The download script does not mint new blobs—it simply reuses the identifier you provide so you can

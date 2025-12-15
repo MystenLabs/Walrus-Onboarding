@@ -10,19 +10,17 @@ All upload samples can be executed without editing this page—just run the veri
 ships with the repo:
 
 ```bash
-cd hands-on-source-code
-
-# Set a passphrase for keypair derivation
-cp .env.example .env
-echo 'PASSPHRASE="your passphrase here"' >> .env
-
 # Build & run inside Docker (recommended)
+cd docker
 make build
 PASSPHRASE="your passphrase here" make test-upload
 
 # …or run locally with Node.js 20+
+cd hands-on-source-code
+cp .env.example .env
+echo 'PASSPHRASE="your passphrase here"' >> .env
 npm install
-PASSPHRASE="your passphrase here" npm run test:basic-upload
+npm run test:basic-upload
 ```
 
 The `test-upload` target runs the direct and relay uploads back-to-back so you can inspect logs,
