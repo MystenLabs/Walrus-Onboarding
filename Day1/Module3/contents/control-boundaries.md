@@ -8,6 +8,7 @@ Walrus provides two main ways to interact with the system programmatically:
 
 1. **Walrus CLI**: Command-line tool for high-level operations with sensible defaults
 2. **Walrus SDK (`walrus-sdk` Rust crate)**: Low-level library for building custom applications with fine-grained control
+ 3. Walrus SDK (TypeScript): Official SDK for building custom applications (@mysten/walrus)
 
 ---
 
