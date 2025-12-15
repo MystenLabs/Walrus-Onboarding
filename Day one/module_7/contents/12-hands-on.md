@@ -19,7 +19,7 @@ flowchart LR
     C --> F{🔍 Compare Content}
     F -->|Match| G[✅ Success]
     F -->|Mismatch| H[❌ Integrity Fail]
-    
+
     style A fill:#e1f5ff
     style B fill:#fff4e1
     style C fill:#e8f5e9
@@ -30,11 +30,11 @@ flowchart LR
 
 ## Running in Docker (Recommended for Consistent Results)
 
-For a consistent environment across all operating systems, use the Docker setup in `hands_on_code/`:
+For a consistent environment across all operating systems, use the Docker setup in `hands-on-source-code/`:
 
 ```sh
 # From the sdk_upload_relay module directory
-cd hands_on_code
+cd hands-on-source-code
 make build
 PASSPHRASE='your testnet passphrase' make test-hands-on
 
@@ -46,6 +46,7 @@ make shell
 ```
 
 > 💡 **Docker Benefits:**
+>
 > - Identical Node.js version across all systems
 > - Pre-installed SDK dependencies
 > - Consistent test results
@@ -68,84 +69,86 @@ If you're inside `sdk_upload_relay_verification`, change the helper import to
 `../utils/getFundedKeypair.js`; otherwise swap it for your own loader.
 
 ```typescript
-import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
-import { walrus, RetryableWalrusClientError } from '@mysten/walrus';
-import { getFundedKeypair } from './utils/getFundedKeypair.js';
+import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
+import { walrus, RetryableWalrusClientError } from "@mysten/walrus";
+import { getFundedKeypair } from "./utils/getFundedKeypair.js";
 // Replace the helper path with your own loader as needed.
 
 // TODO: Initialize the client with uploadRelay config
 const client = new SuiClient({
-    url: getFullnodeUrl('testnet'),
-    network: 'testnet',
+  url: getFullnodeUrl("testnet"),
+  network: "testnet",
 }).$extend(
-    walrus({
-        uploadRelay: {
-            host: 'https://upload-relay.testnet.walrus.space',
-            sendTip: {
-                max: 1_000, // optional but matches relay requirements in verification repo
-            },
-        },
-    }),
+  walrus({
+    uploadRelay: {
+      host: "https://upload-relay.testnet.walrus.space",
+      sendTip: {
+        max: 1_000, // optional but matches relay requirements in verification repo
+      },
+    },
+  })
 );
 
 async function main() {
-    const signer = await getFundedKeypair();
-    const content = "Hands On Lab Content - " + Date.now();
-    const file = new TextEncoder().encode(content);
+  const signer = await getFundedKeypair();
+  const content = "Hands On Lab Content - " + Date.now();
+  const file = new TextEncoder().encode(content);
 
-    console.log("Starting upload...");
+  console.log("Starting upload...");
 
-    let blobId: string;
-    let blobObject: any;
+  let blobId: string;
+  let blobObject: any;
 
-    // TODO: Wrap this in a capped retry loop to handle RetryableWalrusClientError
-    const maxRetries = 3;
-    let attempt = 0;
+  // TODO: Wrap this in a capped retry loop to handle RetryableWalrusClientError
+  const maxRetries = 3;
+  let attempt = 0;
 
-    while (attempt < maxRetries) {
-        try {
-            const result = await client.walrus.writeBlob({
-                blob: file,
-                deletable: true,
-                epochs: 1,
-                signer,
-            });
-            blobId = result.blobId;
-            blobObject = result.blobObject;
-            break;
-        } catch (e) {
-            attempt += 1;
-            const error = e as Error;
+  while (attempt < maxRetries) {
+    try {
+      const result = await client.walrus.writeBlob({
+        blob: file,
+        deletable: true,
+        epochs: 1,
+        signer,
+      });
+      blobId = result.blobId;
+      blobObject = result.blobObject;
+      break;
+    } catch (e) {
+      attempt += 1;
+      const error = e as Error;
 
-            if (error instanceof RetryableWalrusClientError && attempt < maxRetries) {
-                console.log(`Upload failed (attempt ${attempt}/${maxRetries}), retrying...`);
-                await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
-                continue;
-            }
+      if (error instanceof RetryableWalrusClientError && attempt < maxRetries) {
+        console.log(
+          `Upload failed (attempt ${attempt}/${maxRetries}), retrying...`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+        continue;
+      }
 
-            throw e;
-        }
+      throw e;
     }
+  }
 
-    if (!blobId) {
-        throw new Error('Upload failed after retries');
-    }
+  if (!blobId) {
+    throw new Error("Upload failed after retries");
+  }
 
-    console.log(`Uploaded: ${blobId}`);
+  console.log(`Uploaded: ${blobId}`);
 
-    // TODO: Verification
-    // 1. Read the blob back using client.walrus.readBlob
-    // 2. Decode it to string
-    // 3. Compare with original `content`
-    
-    const downloadedBytes = await client.walrus.readBlob({ blobId });
-    const downloadedContent = new TextDecoder().decode(downloadedBytes);
+  // TODO: Verification
+  // 1. Read the blob back using client.walrus.readBlob
+  // 2. Decode it to string
+  // 3. Compare with original `content`
 
-    if (downloadedContent === content) {
-        console.log("SUCCESS: Integrity verified!");
-    } else {
-        console.error("FAILURE: Content mismatch!");
-    }
+  const downloadedBytes = await client.walrus.readBlob({ blobId });
+  const downloadedContent = new TextDecoder().decode(downloadedBytes);
+
+  if (downloadedContent === content) {
+    console.log("SUCCESS: Integrity verified!");
+  } else {
+    console.error("FAILURE: Content mismatch!");
+  }
 }
 
 main().catch(console.error);

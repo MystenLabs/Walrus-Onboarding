@@ -9,12 +9,14 @@
 **Hands-on Components:** Yes - Verification harness with runnable TypeScript examples
 
 **Materials Needed:**
+
 - Access to Walrus Testnet
 - Node.js 20+ or Docker installed
 - Funded Sui Testnet wallet (SUI + WAL tokens)
 - Whiteboard for drawing upload/relay flow diagrams
 
 **Key Takeaways:**
+
 - Direct uploads use WASM encoding locally; relay uploads compute metadata only and stream raw bytes
 - Upload relay simplifies browser/mobile workloads by handling fan-out, retries, and certificate aggregation
 - Clients must verify blob IDs and on-chain state regardless of upload path
@@ -58,17 +60,17 @@
 
 ## Instructor Cheat Sheet
 
-| # | Section | Time | Key Focus |
-|---|---------|------|-----------|
-| 1 | Chunk Creation | 12-15 min | WASM encoding, metadata, slivers |
-| 2 | Publisher/Aggregator | 15-18 min | Node communication, confirmation flow, quorum |
-| 3 | Relay Batching | 12-15 min | Fan-out, certificate generation, tips |
-| 4 | When to Use Relay | 10-12 min | Browser/mobile vs. backend trade-offs |
-| 5 | Upload/Download Examples | 15-18 min | Live coding, verification harness |
-| 6 | Integrity Checks | 10-12 min | Root hash, blob ID, certificate verification |
-| 7 | Retry & Partial Failures | 15-18 min | Error classification, backoff, quorum failures |
-| 8 | Error Handling | 10-12 min | Error hierarchy, user-friendly messages |
-| 9 | Hands-On Lab | 25-30 min | Build upload script with retries + verification |
+| #   | Section                  | Time      | Key Focus                                       |
+| --- | ------------------------ | --------- | ----------------------------------------------- |
+| 1   | Chunk Creation           | 12-15 min | WASM encoding, metadata, slivers                |
+| 2   | Publisher/Aggregator     | 15-18 min | Node communication, confirmation flow, quorum   |
+| 3   | Relay Batching           | 12-15 min | Fan-out, certificate generation, tips           |
+| 4   | When to Use Relay        | 10-12 min | Browser/mobile vs. backend trade-offs           |
+| 5   | Upload/Download Examples | 15-18 min | Live coding, verification harness               |
+| 6   | Integrity Checks         | 10-12 min | Root hash, blob ID, certificate verification    |
+| 7   | Retry & Partial Failures | 15-18 min | Error classification, backoff, quorum failures  |
+| 8   | Error Handling           | 10-12 min | Error hierarchy, user-friendly messages         |
+| 9   | Hands-On Lab             | 25-30 min | Build upload script with retries + verification |
 
 ---
 
@@ -297,6 +299,7 @@
 - Highlight the simplicity: same API, different config
 
 **Live Demo Flow:**
+
 1. Show client config without relay
 2. Run upload, note blob ID
 3. Show client config with relay
@@ -396,6 +399,7 @@
 - Show the flowchart of exponential backoff decision logic
 
 **Code to highlight:**
+
 ```typescript
 return retry(
   () => client.walrus.writeBlob({ ... }),
@@ -490,7 +494,7 @@ return retry(
 
 - Students build a complete upload script with relay, retries, and verification
 - Lab mirrors earlier sections to consolidate concepts
-- Canonical solution is in `hands_on_code/src/examples/hands-on-lab.ts`
+- Canonical solution is in `hands-on-source-code/src/examples/hands-on-lab.ts`
 
 💡 **Teaching Tips:**
 
@@ -500,6 +504,7 @@ return retry(
 - Walk through the flowchart first to set expectations
 
 **Lab Flow:**
+
 1. Configure client with relay
 2. Implement retry loop for `RetryableWalrusClientError`
 3. Upload content
@@ -542,12 +547,15 @@ return retry(
 Ask students to answer briefly:
 
 1. **What's the main difference between direct uploads and relay uploads?**
+
    - Expected: Direct = client encodes and distributes; Relay = client streams bytes, relay handles rest
 
 2. **Name three retryable errors and when you'd encounter them.**
+
    - Expected: `NotEnoughBlobConfirmationsError` (upload), `NotEnoughSliversReceivedError` (download), `BlobNotCertifiedError` (timing)
 
 3. **How do you verify an uploaded blob is correct?**
+
    - Expected: Compare blob IDs (deterministic), check on-chain registration, download and compare content
 
 4. **When would you use relay vs. direct uploads?**

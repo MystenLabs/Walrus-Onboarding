@@ -1,7 +1,7 @@
 # 6. Basic Upload Example
 
 This guide now mirrors the runnable code that lives in
-`hands_on_code/src/examples/basic-upload-example.ts`. Every snippet below is taken
+`hands-on-source-code/src/examples/basic-upload-example.ts`. Every snippet below is taken
 directly from that project so you can run, debug, and extend the exact code you see in the curriculum.
 
 ## Use the verification harness
@@ -10,7 +10,7 @@ All upload samples can be executed without editing this page—just run the veri
 ships with the repo:
 
 ```bash
-cd hands_on_code
+cd hands-on-source-code
 
 # Set a passphrase for keypair derivation
 cp .env.example .env
@@ -26,7 +26,7 @@ PASSPHRASE="your passphrase here" npm run test:basic-upload
 ```
 
 The `test-upload` target runs the direct and relay uploads back-to-back so you can inspect logs,
-blob IDs, and any failures. See `hands_on_code/README.md` for more detail (shell
+blob IDs, and any failures. See `hands-on-source-code/README.md` for more detail (shell
 access, make targets, troubleshooting, etc.).
 
 ## Simple blob upload (direct path)
@@ -36,13 +36,13 @@ The direct example creates a Walrus client without an upload relay, grabs a fund
 
 ```ts
 const client = new SuiClient({
-  url: getFullnodeUrl('testnet'),
-  network: 'testnet',
+  url: getFullnodeUrl("testnet"),
+  network: "testnet",
 }).$extend(walrus());
 
 const keypair = await getFundedKeypair();
 
-const data = new TextEncoder().encode('Hello, Walrus!');
+const data = new TextEncoder().encode("Hello, Walrus!");
 
 const { blobId, blobObject } = await client.walrus.writeBlob({
   blob: data,
@@ -63,20 +63,20 @@ certificate aggregation:
 
 ```ts
 const client = new SuiClient({
-  url: getFullnodeUrl('testnet'),
-  network: 'testnet',
+  url: getFullnodeUrl("testnet"),
+  network: "testnet",
 }).$extend(
   walrus({
     uploadRelay: {
-      host: 'https://upload-relay.testnet.walrus.space',
+      host: "https://upload-relay.testnet.walrus.space",
       sendTip: {
         max: 1_000,
       },
     },
-  }),
+  })
 );
 
-const data = new TextEncoder().encode('Hello, Walrus with Relay!');
+const data = new TextEncoder().encode("Hello, Walrus with Relay!");
 
 const { blobId, blobObject } = await client.walrus.writeBlob({
   blob: data,
@@ -95,13 +95,13 @@ The harness exports a `main()` wrapper that exercises both uploads and surfaces 
 failures. This is what `npm run test:basic-upload` invokes:
 
 ```ts
-console.log('=== Testing Simple Blob Upload ===');
+console.log("=== Testing Simple Blob Upload ===");
 await uploadBlob();
 
-console.log('\n=== Testing Upload with Relay ===');
+console.log("\n=== Testing Upload with Relay ===");
 await uploadWithRelay();
 
-console.log('\n✅ All upload examples completed successfully!');
+console.log("\n✅ All upload examples completed successfully!");
 ```
 
 Because the scripts run against live Walrus Testnet nodes, intermittent
@@ -152,7 +152,7 @@ for adapting into CI jobs or demos because it proves the entire round-trip.
 
 ## Key takeaways
 
-- Every code sample in this page is runnable from `hands_on_code`.
+- Every code sample in this page is runnable from `hands-on-source-code`.
 - `make test-upload` (Docker) or `npm run test:basic-upload` (Node) exercise both the direct and relay
   paths.
 - Reuse the generated blob IDs when testing downloads or integrity checks.
