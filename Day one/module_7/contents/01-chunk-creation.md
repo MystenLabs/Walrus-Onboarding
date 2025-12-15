@@ -71,10 +71,10 @@ It is returned—as shown in
     V1: {
       encoding_type: 'RS2';
       unencoded_length: number;
-    hashes: Array<{
+      hashes: Array<{
         primary_hash: { Digest: Uint8Array } | { Empty: null };
         secondary_hash: { Digest: Uint8Array } | { Empty: null };
-    }>;
+      }>;
     };
   };
 }
