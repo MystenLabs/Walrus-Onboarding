@@ -7,11 +7,23 @@
  */
 
 import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
-import { walrus, BlobNotCertifiedError, NotEnoughSliversReceivedError, BlobBlockedError } from '@mysten/walrus';
+import {
+  walrus,
+  BlobNotCertifiedError,
+  NotEnoughSliversReceivedError,
+  BlobBlockedError,
+  blobIdFromInt,
+} from '@mysten/walrus';
+import { validateTestnetConfig } from '../utils/validateTestnet.js';
+
+// Validate environment is testnet before creating client
+const network = 'testnet';
+const url = getFullnodeUrl(network);
+validateTestnetConfig(network, url);
 
 const client = new SuiClient({
-  url: getFullnodeUrl('testnet'),
-  network: 'testnet',
+  url,
+  network,
 }).$extend(walrus());
 
 // Simple Blob Download
@@ -51,10 +63,22 @@ async function downloadWithErrorHandling(blobId: string) {
 // Main execution
 async function main() {
   try {
-    // Use a test blob ID if provided, otherwise use a known test blob
-    const blobId = process.argv[2] || 'OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk';
-    
-    console.log(`=== Downloading blob: ${blobId} ===`);
+    // Accept either an on-chain numeric blob ID (decimal string) or the short Walrus blob ID.
+    // If you pass a decimal string, we convert it to the Walrus blobId string using blobIdFromInt().
+    // If you omit the argument, we fall back to the demo blob ID from the docs:
+    //   OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk
+    const arg = process.argv[2];
+    const isNumeric = !!(arg && /^\d+$/.test(arg));
+    const blobId: string =
+      isNumeric
+        ? blobIdFromInt(BigInt(arg))
+        : (arg || 'OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk');
+
+    console.log(
+      `=== Downloading blob (input format: ${
+        isNumeric ? 'on-chain numeric' : 'Walrus blobId'
+      }, normalized: ${blobId}): ${arg ?? 'OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk'} ===`,
+    );
     await downloadBlob(blobId);
     
     console.log('\n✅ Download example completed successfully!');

@@ -341,6 +341,7 @@ The SDK can automatically:
 
 ## Next Lecture
 
-Continue with [When to Use Relay](./04-when-to-use-relay.md) to see concrete scenarios and decision
-criteria for choosing the relay path over direct uploads.
+In the following chapters we will see concrete scenarios and decision criteria for when to choose the relay path or direct uploads.
+
+Continue with [When to Use Relay](./04-when-to-use-relay.md).
 

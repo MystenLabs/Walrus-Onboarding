@@ -19,8 +19,19 @@ PASSPHRASE="your passphrase here" make test-download BLOB_ID=<copied id>
 # Local Node.js workflow
 cd hands-on-source-code
 # assuming you have already installed the node.js dependencies and included the passphrase in the .env file
+
+
+# PASSPHRASE must be a valid 12- or 24-word BIP39 mnemonic
 npm run test:basic-upload
+# IMPORTANT: <blob-id> must be the blobId printed by the upload step above.
+# The download script does not mint a new blob; it only reads an existing one.
 npm run test:basic-download <blob-id>
+
+# For a quick one-off check, you can also rely on the built-in demo blob ID.
+# If you omit <blob-id>, the script falls back to:
+#   OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk
+# as defined in basic-download-example.ts.
+PASSPHRASE="your passphrase here" npm run test:basic-download
 ```
 
 The download script does not mint new blobs—it simply reuses the identifier you provide so you can
@@ -82,18 +93,30 @@ retry, alert users, or fall back to a different blob.
 ## Running the script end-to-end
 
 When you run `npm run test:basic-download <blob-id>`, the harness simply calls `downloadBlob()` and
-prints a success banner. Errors are bubbled up so your shell exits non-zero:
+prints a success banner. 
+
+The `<blob-id>` argument is expected to be the **on-chain numeric blob ID**
+in decimal form (the `blob_id` you see in the Sui object).
+
+If you omit `<blob-id>`, it uses the demo
+Walrus blob ID string `OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk` instead. Errors are bubbled up so your shell exits non-zero:
 
 ```ts
-const blobId = process.argv[2] || "OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk";
+const arg = process.argv[2];
+const isNumeric = !!(arg && /^\d+$/.test(arg));
+const blobId: string =
+  isNumeric
+    ? blobIdFromInt(BigInt(arg)) // convert on-chain numeric ID to Walrus blobId string
+    : (arg || 'OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk');
 
-console.log(`=== Downloading blob: ${blobId} ===`);
+console.log(
+  `=== Downloading blob (input format: ${
+    isNumeric ? 'on-chain numeric' : 'Walrus blobId'
+  }, normalized: ${blobId}): ${arg ?? 'OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk'} ===`,
+);
 await downloadBlob(blobId);
 
-console.log("\n✅ Download example completed successfully!");
-```
-
-Provide your own blob ID (recommended) or rely on the default constant if you simply want to make
+console.log('\n✅ Download example completed successfully!');
 sure the code path works.
 
 ## Key takeaways

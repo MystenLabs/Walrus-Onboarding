@@ -16,10 +16,15 @@ import {
   NoBlobMetadataReceivedError,
 } from '@mysten/walrus';
 import { getFundedKeypair } from '../utils/getFundedKeypair.js';
+import { validateTestnetConfig } from '../utils/validateTestnet.js';
+
+const network = 'testnet';
+const url = getFullnodeUrl(network);
+validateTestnetConfig(network, url);
 
 const client = new SuiClient({
-  url: getFullnodeUrl('testnet'),
-  network: 'testnet',
+  url,
+  network,
 }).$extend(walrus());
 
 // Simple retry utility

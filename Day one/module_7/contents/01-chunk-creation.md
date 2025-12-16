@@ -6,6 +6,8 @@ The Walrus SDK uses erasure coding to split data into chunks (called "slivers") 
 
 When you upload data using the SDK, it goes through an encoding process that creates the chunks:
 
+#### Step 1: Generate Slivers
+
 ```mermaid
 flowchart TD
     A[Raw Data Bytes] -->|Input| B[Reed-Solomon Encoder]
@@ -13,18 +15,32 @@ flowchart TD
     B -->|Generate| D[Secondary/Parity Slivers]
     C --> E[Sliver Pairs]
     D --> E
-    B -->|Generate| F[Blob Metadata]
+    
+    style A fill:#e1f5ff
+    style E fill:#fff4e1
+```
+
+#### Step 2: Generate Blob Metadata
+
+```mermaid
+flowchart TD
+    B[Reed-Solomon Encoder] -->|Generate| F[Blob Metadata]
     F --> G[Blob ID]
     F --> H[Root Hash]
     F --> I[Encoding Type & Hashes]
-    E -->|Organized by| J[Storage Nodes]
+    
+    style F fill:#e8f5e9
+```
+
+#### Step 3: Organize by Storage Nodes
+
+```mermaid
+flowchart TD
+    E[Sliver Pairs] -->|Organized by| J[Storage Nodes]
     J --> K[Node 1: Shards 0,1]
     J --> L[Node 2: Shards 2,3]
     J --> M[Node N: Shards...]
     
-    style A fill:#e1f5ff
-    style E fill:#fff4e1
-    style F fill:#e8f5e9
     style J fill:#f3e5f5
 ```
 

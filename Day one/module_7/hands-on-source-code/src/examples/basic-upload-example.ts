@@ -11,12 +11,17 @@ import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { walrus } from '@mysten/walrus';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { getFundedKeypair } from '../utils/getFundedKeypair.js';
+import { validateTestnetConfig } from '../utils/validateTestnet.js';
 
 // Simple Blob Upload
 async function uploadBlob() {
+  const network = 'testnet';
+  const url = getFullnodeUrl(network);
+  validateTestnetConfig(network, url);
+  
   const client = new SuiClient({
-    url: getFullnodeUrl('testnet'),
-    network: 'testnet',
+    url,
+    network,
   }).$extend(walrus());
 
   const keypair = await getFundedKeypair();
@@ -39,9 +44,13 @@ async function uploadBlob() {
 
 // Upload with Relay
 async function uploadWithRelay() {
+  const network = 'testnet';
+  const url = getFullnodeUrl(network);
+  validateTestnetConfig(network, url);
+  
   const client = new SuiClient({
-    url: getFullnodeUrl('testnet'),
-    network: 'testnet',
+    url,
+    network,
   }).$extend(
     walrus({
       uploadRelay: {

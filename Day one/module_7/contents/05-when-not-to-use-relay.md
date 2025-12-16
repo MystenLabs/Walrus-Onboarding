@@ -126,13 +126,6 @@ Don't use the relay when:
 - ❌ You need to implement specific upload strategies
 - ❌ You're building infrastructure or backend services
 
-## Trade-offs
-
-| Scenario | Advantages | Trade-offs |
-| --- | --- | --- |
-| Using relay | ✅ Simpler code; ✅ Automatic retries; ✅ Better for client-side | ❌ Less control; ❌ Additional tip costs; ❌ Less visibility |
-| Not using relay | ✅ Full control; ✅ No tip costs; ✅ Better observability | ❌ More complex code; ❌ Manual retry logic; ❌ More network requests |
-
 ## Key Takeaways
 
 - Don't use the relay for server-side applications
