@@ -10,7 +10,7 @@ The download tests expect a valid blob ID. Run the upload test first, copy the p
 pass it to the download command:
 
 ```bash
-# Local Node.js workflow
+# Docker workflow
 cd docker
 make build
 PASSPHRASE="your passphrase here" make test-upload # produces a blobId

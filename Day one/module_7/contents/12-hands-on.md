@@ -30,11 +30,11 @@ flowchart LR
 
 ## Running in Docker (Recommended for Consistent Results)
 
-For a consistent environment across all operating systems, use the Docker setup in `hands-on-source-code/`:
+For a consistent environment across all operating systems, use the Docker setup in `docker/`:
 
 ```sh
-# From the sdk_upload_relay module directory
-cd hands-on-source-code
+# From this module's root directory
+cd docker
 make build
 PASSPHRASE='your testnet passphrase' make test-hands-on
 
@@ -65,8 +65,9 @@ npm install @mysten/walrus @mysten/sui
 ### Step 1: Create the Script (`lab-upload.ts`)
 
 Copy the following template and fill in the TODOs.
-If you're inside `sdk_upload_relay_verification`, change the helper import to
-`../utils/getFundedKeypair.js`; otherwise swap it for your own loader.
+If you're inside this module's `hands-on-source-code` project, keep the helper import as
+`./utils/getFundedKeypair.js`; if you reuse this script in a different project, swap it for your own
+keypair loader.
 
 ```typescript
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
@@ -170,9 +171,11 @@ Working inside the verification harness? You can run the maintained solution wit
 
 ```bash
 # Docker path
+cd docker
 PASSPHRASE="your passphrase" make test-hands-on
 
 # Local Node path
+cd hands-on-source-code
 npm run test:hands-on
 ```
 
@@ -180,10 +183,12 @@ npm run test:hands-on
 
 ```powershell
 # Docker path (using environment variable)
+cd docker
 $env:PASSPHRASE = "your passphrase"
-docker-compose run --rm test-hands-on
+docker-compose run --rm -e PASSPHRASE="$env:PASSPHRASE" sdk-relay-lab npm run test:hands-on
 
 # Local Node path
+cd ..\hands-on-source-code
 npm run test:hands-on
 ```
 
@@ -191,15 +196,17 @@ npm run test:hands-on
 
 ```cmd
 :: Docker path
+cd docker
 set PASSPHRASE=your passphrase
-docker-compose run --rm test-hands-on
+docker-compose run --rm -e PASSPHRASE=%PASSPHRASE% sdk-relay-lab npm run test:hands-on
 
 :: Local Node path
+cd ..\hands-on-source-code
 npm run test:hands-on
 ```
 
 The canonical solution lives at
-`sdk_upload_relay_verification/src/examples/hands-on-lab.ts`.
+`hands-on-source-code/src/examples/hands-on-lab.ts`.
 Compare your script against that file to confirm your retry loop,
 tip configuration, and verification checks match the SDK guidance.
 

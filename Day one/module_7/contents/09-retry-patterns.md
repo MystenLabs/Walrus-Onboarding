@@ -1,25 +1,24 @@
 # 9. Retry Patterns
 
 This lesson now mirrors the runnable code in
-`sdk_upload_relay_verification/src/examples/retry-patterns.ts`. Every snippet below comes directly
+`hands-on-source-code/src/examples/retry-patterns.ts`. Every snippet below comes directly
 from that verification project (or the Walrus SDK itself), so you can execute the exact code you see
 here.
 
 ## Use the verification harness
 
-### Docker workflow
+### Docker workflow (this module)
 
 ```bash
-cd sdk_upload_relay_verification
+cd docker
 make build
-PASSPHRASE="your passphrase here" docker-compose run --rm \
-  -e PASSPHRASE="$PASSPHRASE" sdk-verification npm run test:retry
+PASSPHRASE="your passphrase here" make test-retry
 ```
 
-### Local Node.js workflow
+### Local Node.js workflow (this module)
 
 ```bash
-cd sdk_upload_relay_verification
+cd hands-on-source-code
 npm install
 PASSPHRASE="your passphrase here" npm run test:retry
 ```
@@ -187,13 +186,12 @@ return retry(
 
 ## Built-in helper inside the TS SDK
 
-When you need custom retry logic but still want to reuse the SDK’s semantics, you can import the
-lightweight helper from `ts-sdks/packages/walrus/src/utils/retry.ts`. It isn’t exposed through the
-package entry point, so the verification repo copies it verbatim:
+When you need custom retry logic but still want to reuse the SDK’s semantics, you can start from the
+lightweight helper in `ts-sdks/packages/walrus/src/utils/retry.ts`. It isn’t exposed through the
+package entry point, so the verification code in this module copies the implementation verbatim into
+`hands-on-source-code/src/examples/retry-patterns.ts`:
 
 ```ts
-import { retry } from '@mysten/walrus/utils'; // copied helper
-
 const result = await retry(
   () =>
     client.walrus.writeBlob({
@@ -237,7 +235,8 @@ Feel free to extend the script or import its helpers into your own applications.
 
 ## Key takeaways
 
-- The verification project (`sdk_upload_relay_verification`) exercises every snippet in this document.
+- The verification project for this module (`hands-on-source-code` plus the `docker/` harness)
+  exercises every snippet in this document.
 - Copy the SDK’s `retry` helper (or build on the version in `retry-patterns.ts`) to avoid
   reimplementing boilerplate.
 - Always distinguish retryable vs. permanent failures using the exported Walrus error classes.
