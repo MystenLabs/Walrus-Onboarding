@@ -8,7 +8,7 @@
 
 **Hands-on Components:** Yes - Epoch timeline exercises and extension race scenarios
 
-**Materials Needed:** Whiteboard for timeline diagrams, access to Sui explorer (optional)
+**Materials Needed:** Whiteboard for timeline diagrams, access to Sui Explorer (recommended)
 
 **Key Takeaways:**
 
@@ -22,9 +22,81 @@
 
 - Maximum storage duration is 53 epochs (~2 years on Mainnet)
 
+- **Sui Integration**: `Blob` and `Storage` are Sui Objects - students should understand this connection
+
+---
+
+## 🔄 Previous Day Recap: Sui ↔ Walrus Connection (5-10 min)
+
+**Purpose:** Bridge students' existing Sui knowledge to today's Walrus content.
+
+### Suggested Recap Script
+
+> "Before we dive into epochs, let's quickly connect what we learned about Sui to how Walrus works.
+> Remember Sui Objects? Walrus uses them extensively..."
+
+### Key Points to Recap
+
+| If students learned... | Connect it to... |
+|------------------------|------------------|
+| **Sui Objects & UID** | Walrus `Blob` and `Storage` are Sui Objects with unique IDs |
+| **Object ownership** | Users own their `Blob` objects on Sui |
+| **Move structs with `key`** | All Walrus on-chain types have `key` ability |
+| **Sui transactions** | Every Walrus operation is a Sui TX |
+| **Sui epochs** | ⚠️ Walrus epochs are DIFFERENT from Sui epochs! |
+
+### Visual: Sui ↔ Walrus Architecture
+
+Draw or display this relationship:
+
+```mermaid
+flowchart TB
+    subgraph Sui["🔷 SUI BLOCKCHAIN"]
+        direction LR
+        Blob["📦 Blob Object<br/>(owned)<br/>─────────<br/>• blob_id<br/>• storage<br/>• deletable"]
+        Storage["💾 Storage Object<br/>─────────<br/>• start_epoch<br/>• end_epoch<br/>• storage_size"]
+        System["⚙️ System State<br/>(shared)<br/>─────────<br/>• epoch<br/>• committee"]
+    end
+    
+    subgraph Walrus["🐘 WALRUS STORAGE NODES"]
+        Data["Off-chain: actual file data stored here"]
+    end
+    
+    Sui -->|"Proof of Storage<br/>(blob_id links to data)"| Walrus
+    
+    style Sui fill:#e7f5ff,stroke:#1971c2,color:#0c2d48
+    style Walrus fill:#ebfbee,stroke:#2f9e44,color:#0c3d14
+    style Blob fill:#a5d8ff,stroke:#1971c2,color:#0c2d48
+    style Storage fill:#a5d8ff,stroke:#1971c2,color:#0c2d48
+    style System fill:#ffc9c9,stroke:#f03e3e,color:#5c0011
+    style Data fill:#d3f9d8,stroke:#2f9e44,color:#0c3d14
+```
+
+### Discussion Starters
+
+- "Who can tell me what a Sui Object is?" (Has UID, can be owned/transferred)
+- "What does the `key` ability mean in Move?" (Can be stored as a top-level object)
+- "If I upload a file to Walrus, what shows up on Sui Explorer?" (A Blob object)
+
+### ⚠️ Common Confusion: Sui Epochs vs. Walrus Epochs
+
+**This is critical to clarify early!**
+
+| | Sui Epochs | Walrus Epochs |
+|---|------------|---------------|
+| **Duration** | ~24 hours | 2 weeks (Mainnet) / 1 day (Testnet) |
+| **Purpose** | Validator rotation, staking rewards | Storage pricing, committee rotation |
+| **Relationship** | Independent | Walrus tracks its own epochs |
+
+> "Walrus has its OWN epoch system. Don't confuse Sui epochs with Walrus epochs - they're independent!"
+
+---
+
 ## Prerequisites
 
 ### For Students
+
+- **Sui fundamentals**: Objects, ownership, transactions (from previous day/module)
 
 - Basic understanding of blockchain concepts (epochs, transactions)
 
@@ -42,7 +114,11 @@
 
 - Prepared examples of "off-by-one" errors in epoch calculations
 
-- Access to Sui explorer for demonstrating epoch changes (optional)
+- Access to Sui Explorer for demonstrating epoch changes and Object lookups
+
+- **Sui Explorer URLs ready**:
+  - Testnet: `https://testnet.suivision.xyz/`
+  - Mainnet: `https://suivision.xyz/`
 
 ## Classroom Setup
 
@@ -52,7 +128,10 @@
 
 - [ ] Queue up key terms: "exclusive end epoch," "extension race," "ring buffer"
 
-- [ ] Have the mermaid timeline diagram ready to display
+- [ ] Have the diagrams ready to display (PNG images in `../images/`):
+  - `Walrus_Epoch_lifecycle_flow.png` - Epoch Lifecycle Flow (Section 1)
+  - `Blob_Storage_timeline.png` - Blob Storage Timeline (Section 5)
+  - `Extension_race_condition.png` - Extension Race Condition (Section 6)
 
 - [ ] Prepare epoch calculation examples on cards or slides
 
@@ -152,6 +231,19 @@
 - Show the source code `reserve_space` to demonstrate the check `assert!(epochs_ahead <= max_epochs_ahead)`
 - Emphasize: "The maximum you can reserve is **53 epochs** - about 2 years on Mainnet"
 
+🔷 **Sui Object Connection:**
+
+Pause to reinforce the Sui connection:
+
+> "Notice the `Storage` struct has `key` and a `UID` field - this makes it a Sui Object.
+> When you reserve storage, you're creating an on-chain object that proves your reservation.
+> You could even look it up on Sui Explorer!"
+
+**Live Demo (optional):** If you have a Blob Object ID from a previous upload, show it on Sui Explorer:
+- Navigate to `https://testnet.suivision.xyz/object/<OBJECT_ID>`
+- Show the `storage` field with `start_epoch` and `end_epoch`
+- Point out: "This is proof-of-reservation living on the Sui blockchain"
+
 **Timeline Drawing Script:**
 
 ```
@@ -208,6 +300,17 @@ Blob A: [=============]
 - Write the check on the board: `current_epoch < end_epoch`
 - Discuss the cost implication: Is it cheaper to buy 100 epochs now or extend 1 epoch 100 times? (Upload cost is paid once, but gas fees add up for extensions)
 - Use the "gym membership" analogy: "You can only renew before your membership expires"
+
+🔷 **Sui Object Connection:**
+
+> "The `Blob` object you own has the `Storage` object embedded inside it. When you extend,
+> you're mutating your Sui Object's state - specifically updating the `end_epoch` field.
+> This is a Sui transaction that modifies on-chain state."
+
+**Key Sui Concepts in Play:**
+- **Object mutation**: `extend_blob` takes `&mut Blob` - it modifies the object
+- **Sui transactions**: The extension is atomic - it either succeeds or fails completely
+- **Gas fees**: Each extension is a Sui TX with gas costs (in SUI, not WAL)
 
 **Code Walkthrough:**
 
@@ -379,6 +482,9 @@ Ask students to answer briefly:
 4. **What's the recommended buffer for extending blobs?**
    - Expected: 2-3 epochs before expiry to avoid race conditions
 
+5. **🔷 Sui Connection: What type of Sui entity is a `Blob`?**
+   - Expected: A Sui Object (has `key` ability and `UID`); owned by the uploader
+
 ### Assessment Checklist
 
 Use this to gauge if the module was successful:
@@ -394,6 +500,10 @@ Use this to gauge if the module was successful:
 - [ ] Students know the safe buffer (2-3 epochs) for extensions
 
 - [ ] Students can calculate extension amounts (target - current end_epoch)
+
+- [ ] 🔷 Students understand that `Blob` and `Storage` are Sui Objects
+
+- [ ] 🔷 Students can explain that Walrus epochs ≠ Sui epochs
 
 ### Quick Poll
 
@@ -440,3 +550,20 @@ Students should now be ready for:
 - Extension buffer best practices (2-3 epochs minimum)
 - The `EResourceBounds` error and how to handle it
 - Difference between Mainnet and Testnet epoch durations for testing
+
+### 🔷 Sui Concepts to Build On
+
+The Sui ↔ Walrus connection introduced today will be important for:
+
+| Future Topic | Sui Connection |
+|--------------|----------------|
+| **Deletable Blobs** | Different object lifecycle; deletion burns the Sui Object |
+| **Programmatic Access** | Wrapping `Blob` objects in custom Move contracts |
+| **Access Control** | Using Sui's object ownership for permissioned storage |
+| **Event Monitoring** | Listening to Sui events for storage lifecycle |
+| **PTBs (Programmable Transaction Blocks)** | Composing Walrus operations with other Sui actions |
+
+**Suggested Recap for Next Module:**
+
+> "Yesterday we learned that Blobs and Storage are Sui Objects. Today we'll see how
+> you can use Sui's programmability to build smart contracts that manage storage..."
