@@ -26,7 +26,7 @@ We'll organize failures by **where** they occur in the system:
 4. **Transaction Layer**: Blockchain transaction failures
 5. **Application Layer**: Client-side errors
 
-'''mermaid
+```mermaid
 graph TB
     subgraph "Failure Layers"
         A[Application Layer<br/>Client-side errors, timeouts, invalid requests]
@@ -46,7 +46,7 @@ graph TB
     style E fill:#ffe1f5
     style S fill:#f5e1ff
     style N fill:#e1ffe1
-'''
+```
 
 ---
 
@@ -564,7 +564,7 @@ HTTP 404: Blob ID not registered
 
 The diagram below shows where failures can occur during a typical upload operation:
 
-'''mermaid
+```mermaid
 flowchart TD
     Start([Client initiates upload]) --> Network1{Network<br/>reachable?}
     Network1 -->|No| Fail1[❌ Network failure]
@@ -593,7 +593,7 @@ flowchart TD
     style Fail4 fill:#FFB6C1
     style Fail5 fill:#FFB6C1
     style Fail6 fill:#FFB6C1
-'''
+```
 
 ---
 

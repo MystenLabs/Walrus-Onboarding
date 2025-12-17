@@ -8,7 +8,7 @@ This section explains what Publishers, Aggregators, and Clients actually do when
 
 The diagram below shows how all components interact in the Walrus system using C4 Context diagram:
 
-'''mermaid
+```mermaid
 C4Context
     title Walrus Storage System - Container Architecture
 
@@ -36,7 +36,7 @@ C4Context
     Rel(client, blockchain, "Verifies on-chain state", "Sui RPC", $tags="verification")
 
     UpdateRelStyle(client, blockchain, $lineColor="green", $textColor="green")
-'''
+```
 
 **Key Architecture Points:**
 - **Client** (your application): Uses TypeScript SDK or CLI to interact with the system
@@ -244,7 +244,7 @@ Publisher → Client: HTTP 200 + blob ID
 
 The diagram below shows the internal components and data flow within a Publisher using C4 Component architecture:
 
-'''mermaid
+```mermaid
 C4Component
     title Publisher Service - Internal Components
 
@@ -268,7 +268,7 @@ C4Component
     Rel(chain, api, "Returns confirmation")
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
-'''
+```
 
 **Publisher Components:**
 - **HTTP API Handler**: Receives blob upload requests from clients
@@ -281,7 +281,7 @@ C4Component
 
 ### Publisher Lifecycle Flow
 
-'''mermaid
+```mermaid
 sequenceDiagram
     participant C as Client
     participant P as Publisher
@@ -299,7 +299,7 @@ sequenceDiagram
     P->>S: 7. Post certificate
     S-->>P: Certificate confirmed
     P->>C: 8. Return blob ID + metadata
-'''
+```
 
 ---
 
@@ -443,7 +443,7 @@ Aggregator → Client: HTTP 200 + blob data
 
 The diagram below shows the internal components and data flow within an Aggregator using C4 Component architecture:
 
-'''mermaid
+```mermaid
 C4Component
     title Aggregator Service - Internal Components
 
@@ -466,7 +466,7 @@ C4Component
     Rel(cache, api, "Returns blob data")
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
-'''
+```
 
 **Aggregator Components:**
 - **HTTP API Handler**: Receives blob read requests from clients
@@ -479,7 +479,7 @@ C4Component
 
 ### Aggregator Lifecycle Flow
 
-'''mermaid
+```mermaid
 sequenceDiagram
     participant C as Client
     participant A as Aggregator
@@ -497,7 +497,7 @@ sequenceDiagram
         A->>A: 6. Cache reconstructed blob
     end
     A->>C: 7. Return blob data (HTTP 200)
-'''
+```
 
 ---
 
@@ -635,7 +635,7 @@ sui client object <blob-object-id>
 
 The diagram below shows what a well-designed client application should implement using C4 Component architecture:
 
-'''mermaid
+```mermaid
 C4Component
     title Client Application - Components You Must Implement
 
@@ -662,7 +662,7 @@ C4Component
     Rel(verifier, appLogic, "Returns validated result")
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
-'''
+```
 
 **Client Application Components:**
 - **Application Logic**: Your business logic that needs to store/retrieve blobs
