@@ -45,28 +45,13 @@ This exercise walks you through a complete upload and download cycle.
 
 ### Step 1: Create a Test File
 
-Create a simple test file:
+Edit the provided test file:
 
-**Mac/Linux:**
+> **Instructor Note:** Provide users with an empty `test-file.txt` in their working directory. Ask users to open the file in their editor and add their own content.
 
-```sh
-echo "Hello, Walrus! This is a test file for the CLI curriculum." > test-file.txt
-cat test-file.txt
-```
-
-**Windows (Command Prompt):**
-
-```cmd
-echo Hello, Walrus! This is a test file for the CLI curriculum. > test-file.txt
-type test-file.txt
-```
-
-**Windows (PowerShell):**
-
-```powershell
-"Hello, Walrus! This is a test file for the CLI curriculum." | Out-File -Encoding utf8 test-file.txt
-Get-Content test-file.txt
-```
+1. Open `test-file.txt` in your editor
+2. Add your own content (e.g., "Hello, Walrus! This is my test file.")
+3. Save the file
 
 ### Step 2: Get the Blob ID
 
@@ -181,35 +166,16 @@ This exercise focuses on inspection and metadata commands.
 
 ### Step 1: Upload Multiple Files
 
-Create and upload multiple test files:
+Edit the provided test files and upload them:
 
-**Mac/Linux:**
+> **Instructor Note:** Provide users with three empty files (`file1.txt`, `file2.txt`, `file3.txt`) in their working directory. Ask users to open each file in their editor and add their own unique content before uploading.
+
+1. Open `file1.txt`, `file2.txt`, and `file3.txt` in your editor
+2. Add your own unique content to each file (e.g., your name, a message, or any text you'd like)
+3. Save all files
+4. Upload them to Walrus:
 
 ```sh
-echo "File 1 content" > file1.txt
-echo "File 2 content" > file2.txt
-echo "File 3 content" > file3.txt
-
-walrus store file1.txt file2.txt file3.txt --epochs 5
-```
-
-**Windows (Command Prompt):**
-
-```cmd
-echo File 1 content > file1.txt
-echo File 2 content > file2.txt
-echo File 3 content > file3.txt
-
-walrus store file1.txt file2.txt file3.txt --epochs 5
-```
-
-**Windows (PowerShell):**
-
-```powershell
-"File 1 content" | Out-File -Encoding utf8 file1.txt
-"File 2 content" | Out-File -Encoding utf8 file2.txt
-"File 3 content" | Out-File -Encoding utf8 file3.txt
-
 walrus store file1.txt file2.txt file3.txt --epochs 5
 ```
 
