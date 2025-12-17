@@ -10,16 +10,16 @@ This consolidated quiz covers Modules 8-14 from Day 2 of the Walrus Training Pro
 
 | Section | Topic | Questions |
 |---------|-------|-----------|
-| [Section 1](#section-1-publishers-and-aggregators) | Publishers and Aggregators | 1.1 – 1.10 |
-| [Section 2](#section-2-upload-transaction-lifecycle) | Upload Transaction Lifecycle | 2.1 – 2.10 |
+| [Section 1](#section-1-publishers-and-aggregators) | Publishers and Aggregators | 1.1 – 1.9 |
+| [Section 2](#section-2-upload-transaction-lifecycle) | Upload Transaction Lifecycle | 2.1 – 2.9 |
 | [Section 3](#section-3-transaction-types) | Transaction Types | 3.1 – 3.8 |
-| [Section 4](#section-4-quilts) | Quilts | 4.1 – 4.10 |
-| [Section 5](#section-5-failure-handling) | Failure Handling | 5.1 – 5.10 |
-| [Section 6](#section-6-performance-optimization) | Performance Optimization | 6.1 – 6.10 |
+| [Section 4](#section-4-quilts) | Quilts | 4.1 – 4.9 |
+| [Section 5](#section-5-failure-handling) | Failure Handling | 5.1 – 5.8 |
+| [Section 6](#section-6-performance-optimization) | Performance Optimization | 6.1 – 6.7 |
 | [Section 7](#section-7-applied-scenarios) | Applied Scenarios | 7.1 – 7.10 |
 | [Answer Key](#answer-key) | All Answers | — |
 
-**Total Questions:** 70 questions across 7 sections
+**Total Questions:** 60 questions across 7 sections
 
 **Estimated Time:** 60-90 minutes
 
@@ -77,18 +77,6 @@ D) All operations fail until the next epoch begins
 
 ### Question 1.5 (Select ONE)
 
-What is the default number of sub-wallets for a Publisher?
-
-A) 4
-
-B) 8
-
-C) 16
-
-D) 32
-
-### Question 1.6 (Select ONE)
-
 To increase Publisher concurrency, which parameter should you configure?
 
 A) `--max-threads`
@@ -99,7 +87,7 @@ C) `--concurrency`
 
 D) `--wallet-count`
 
-### Question 1.7 (Select TWO)
+### Question 1.6 (Select TWO)
 
 Which metrics should you monitor for Publishers in production? (Select TWO)
 
@@ -111,7 +99,7 @@ C) Upload latency (p50, p95, p99 percentiles)
 
 D) Aggregator cache hit ratio
 
-### Question 1.8 (Select ONE)
+### Question 1.7 (Select ONE)
 
 A Publisher starts returning HTTP 500 errors with logs showing "No space left on device". This is:
 
@@ -123,7 +111,7 @@ C) A network connectivity issue
 
 D) A rate limiting response from storage nodes
 
-### Question 1.9 (Select TWO)
+### Question 1.8 (Select TWO)
 
 After fixing a disk space issue on a Publisher, what validation checks should you perform? (Select TWO)
 
@@ -135,7 +123,7 @@ C) Run a small test upload and verify a valid BlobId is returned
 
 D) Wait for the next epoch transition
 
-### Question 1.10 (Select ONE)
+### Question 1.9 (Select ONE)
 
 Your Publisher logs errors about being "behind current epoch". What should happen automatically?
 
@@ -213,18 +201,6 @@ D) "Sealed"
 
 ### Question 2.6 (Select ONE)
 
-For a network with 1000 shards, how many primary and secondary slivers are created during encoding?
-
-A) 500 primary, 500 secondary
-
-B) 334 primary, 666 secondary
-
-C) 334 primary, 667 secondary
-
-D) 667 primary, 333 secondary
-
-### Question 2.7 (Select ONE)
-
 How many slivers are needed to reconstruct a blob on a 1000-shard network?
 
 A) 1000 (all slivers)
@@ -235,7 +211,7 @@ C) 500 (half of slivers)
 
 D) 334 (minimum threshold)
 
-### Question 2.8 (Select TWO)
+### Question 2.7 (Select TWO)
 
 What checks does a storage node perform before signing a storage confirmation? (Select TWO)
 
@@ -247,7 +223,7 @@ C) Validates the client's wallet balance
 
 D) Checks that all other storage nodes have received their slivers
 
-### Question 2.9 (Select ONE)
+### Question 2.8 (Select ONE)
 
 If only 650 storage nodes respond with signatures (instead of the required 667+), what happens?
 
@@ -259,7 +235,7 @@ C) The upload is automatically retried from the beginning
 
 D) Storage nodes redistribute the slivers
 
-### Question 2.10 (Select ONE)
+### Question 2.9 (Select ONE)
 
 After `certify_blob` is called, what happens to storage nodes that missed the upload?
 
@@ -473,18 +449,6 @@ D) 100 MB
 
 ### Question 4.9 (Select ONE)
 
-If 5,000 files cost 0.06 WAL each individually, and quilts reduce cost by ~100x, approximately how much WAL do you save?
-
-A) 150 WAL
-
-B) 200 WAL
-
-C) 297 WAL
-
-D) 350 WAL
-
-### Question 4.10 (Select ONE)
-
 You uploaded 500 JSON files into a quilt and discover one entry is invalid. What is the practical solution?
 
 A) Delete just that patch from the quilt
@@ -571,31 +535,7 @@ C) Writes are idempotent only for quilts
 
 D) Writes are idempotent only within one epoch
 
-### Question 5.7 (Select TWO)
-
-Why should jitter be added to exponential backoff? (Select TWO)
-
-A) Prevents thundering herd / synchronized retries
-
-B) Increases the base delay time
-
-C) Smooths load over time, improving success probability
-
-D) Reduces the total number of retry attempts
-
-### Question 5.8 (Select ONE)
-
-In the Circuit Breaker pattern, what happens in the "Open" state?
-
-A) Requests flow through normally
-
-B) Requests fail immediately without attempting
-
-C) One test request is allowed through
-
-D) All requests are queued for later
-
-### Question 5.9 (Select ONE)
+### Question 5.7 (Select ONE)
 
 After a blob expires, can it be recovered by paying storage fees?
 
@@ -607,7 +547,7 @@ C) No, storage nodes may have garbage collected the data
 
 D) No, but the BlobId can be reused for new content
 
-### Question 5.10 (Select ONE)
+### Question 5.8 (Select ONE)
 
 `BehindCurrentEpochError` is:
 
@@ -637,18 +577,6 @@ D) 500MB - 1GB
 
 ### Question 6.2 (Select ONE)
 
-Parallel chunking enables what level of throughput improvement for large uploads?
-
-A) 1.2-1.5x
-
-B) 2-4x
-
-C) 5-10x
-
-D) 10-20x
-
-### Question 6.3 (Select ONE)
-
 What does "intra-blob parallelism" refer to?
 
 A) Uploading multiple blobs simultaneously
@@ -659,7 +587,7 @@ C) Reading from multiple aggregators at once
 
 D) Parallel encoding across multiple CPUs
 
-### Question 6.4 (Select ONE)
+### Question 6.3 (Select ONE)
 
 Why are blob IDs ideal for caching?
 
@@ -671,19 +599,7 @@ C) They are short and easy to store
 
 D) They include version information
 
-### Question 6.5 (Select ONE)
-
-What HTTP response code indicates you're hitting storage node rate limits?
-
-A) 400
-
-B) 403
-
-C) 429
-
-D) 503
-
-### Question 6.6 (Select ONE)
+### Question 6.4 (Select ONE)
 
 What is a good Cache-Control header for Walrus content?
 
@@ -695,7 +611,7 @@ C) `public, max-age=31536000, immutable`
 
 D) `private, must-revalidate`
 
-### Question 6.7 (Select ONE)
+### Question 6.5 (Select ONE)
 
 In the cache layer hierarchy, which is closest to the user?
 
@@ -707,7 +623,7 @@ C) Application-level Redis cache
 
 D) Nginx cache in front of Aggregator
 
-### Question 6.8 (Select TWO)
+### Question 6.6 (Select TWO)
 
 When seeing HTTP 429 responses, what immediate actions should you take? (Select TWO)
 
@@ -719,19 +635,7 @@ C) Implement or increase backoff with jitter
 
 D) Switch to a different blob encoding
 
-### Question 6.9 (Select ONE)
-
-For a batch uploader processing 1,000 x 50MB files hourly, what `--n-clients` range is appropriate?
-
-A) 2-4
-
-B) 8-32
-
-C) 64-128
-
-D) 256-512
-
-### Question 6.10 (Select TWO)
+### Question 6.7 (Select TWO)
 
 To make a batch upload system resilient to partial failures, you should: (Select TWO)
 
@@ -879,12 +783,11 @@ D) No caching - acceptable for streaming platforms
 | 1.2 | C | Publishers are untrusted; clients verify via BlobIds |
 | 1.3 | B | Aggregators are read-only and don't require a wallet |
 | 1.4 | B | Brief delays (1-2 seconds) may occur during transitions |
-| 1.5 | B | Default is 8 sub-wallets |
-| 1.6 | B | `--n-clients` parameter controls concurrency |
-| 1.7 | A, C | Monitor request/error rates and latency percentiles |
-| 1.8 | B | Disk space is a permanent failure until resolved |
-| 1.9 | A, C | Check service status and run test upload |
-| 1.10 | B | Automatic epoch detection and committee refresh |
+| 1.5 | B | `--n-clients` parameter controls concurrency |
+| 1.6 | A, C | Monitor request/error rates and latency percentiles |
+| 1.7 | B | Disk space is a permanent failure until resolved |
+| 1.8 | A, C | Check service status and run test upload |
+| 1.9 | B | Automatic epoch detection and committee refresh |
 
 ### Section 2: Upload Transaction Lifecycle
 
@@ -895,11 +798,10 @@ D) No caching - acceptable for streaming platforms
 | 2.3 | C | `BlobCertified` event signals availability |
 | 2.4 | A, D | BlobId is derived from content and computable pre-transaction |
 | 2.5 | B | Initial status is "Registered" |
-| 2.6 | C | 334 primary + 667 secondary slivers |
-| 2.7 | D | Only 334 slivers needed for reconstruction |
-| 2.8 | A, B | Checks on-chain registration and local storage |
-| 2.9 | B | 667 signatures required; 650 fails quorum |
-| 2.10 | B | BlobCertified triggers peer recovery sync |
+| 2.6 | D | Only 334 slivers needed for reconstruction |
+| 2.7 | A, B | Checks on-chain registration and local storage |
+| 2.8 | B | 667 signatures required; 650 fails quorum |
+| 2.9 | B | BlobCertified triggers peer recovery sync |
 
 ### Section 3: Transaction Types
 
@@ -926,8 +828,7 @@ D) No caching - acceptable for streaming platforms
 | 4.6 | C | 64 KB identifier limit |
 | 4.7 | B | `walrus read-quilt` command |
 | 4.8 | B | Best for files < 1 MB |
-| 4.9 | C | 5000 × 0.06 = 300; 300 - 3 = 297 WAL saved |
-| 4.10 | C | Create new quilt with corrected data |
+| 4.9 | C | Create new quilt with corrected data |
 
 ### Section 5: Failure Handling
 
@@ -939,25 +840,20 @@ D) No caching - acceptable for streaming platforms
 | 5.4 | B | Rate limiting is temporary |
 | 5.5 | B | Exponential increase with random variation |
 | 5.6 | B | Same content always produces same BlobId |
-| 5.7 | A, C | Prevents thundering herd; smooths load |
-| 5.8 | B | Open state fails requests immediately |
-| 5.9 | C | Expired data may be garbage collected |
-| 5.10 | B | Automatically refreshes committee state |
+| 5.7 | C | Expired data may be garbage collected |
+| 5.8 | B | Automatically refreshes committee state |
 
 ### Section 6: Performance Optimization
 
 | Question | Answer(s) | Explanation |
 |----------|-----------|-------------|
 | 6.1 | B | 10MB - 100MB is recommended |
-| 6.2 | B | 2-4x throughput improvement |
-| 6.3 | B | Parallel sliver distribution within one blob |
-| 6.4 | B | Immutable = no cache invalidation needed |
-| 6.5 | C | HTTP 429 indicates rate limiting |
-| 6.6 | C | Long max-age with immutable flag |
-| 6.7 | B | Browser cache is closest to user |
-| 6.8 | A, C | Reduce concurrency and add backoff |
-| 6.9 | B | 8-32 clients for this workload |
-| 6.10 | A, C | Track status and enable resume |
+| 6.2 | B | Parallel sliver distribution within one blob |
+| 6.3 | B | Immutable = no cache invalidation needed |
+| 6.4 | C | Long max-age with immutable flag |
+| 6.5 | B | Browser cache is closest to user |
+| 6.6 | A, C | Reduce concurrency and add backoff |
+| 6.7 | A, C | Track status and enable resume |
 
 ### Section 7: Applied Scenarios
 
@@ -980,18 +876,18 @@ D) No caching - acceptable for streaming platforms
 
 | Section | Questions | Points per Question | Total Points |
 |---------|-----------|---------------------|--------------|
-| Section 1: Publishers and Aggregators | 10 | 2 | 20 |
-| Section 2: Upload Transaction Lifecycle | 10 | 2 | 20 |
+| Section 1: Publishers and Aggregators | 9 | 2 | 18 |
+| Section 2: Upload Transaction Lifecycle | 9 | 2 | 18 |
 | Section 3: Transaction Types | 8 | 2 | 16 |
-| Section 4: Quilts | 10 | 2 | 20 |
-| Section 5: Failure Handling | 10 | 2 | 20 |
-| Section 6: Performance Optimization | 10 | 2 | 20 |
+| Section 4: Quilts | 9 | 2 | 18 |
+| Section 5: Failure Handling | 8 | 2 | 16 |
+| Section 6: Performance Optimization | 7 | 2 | 14 |
 | Section 7: Applied Scenarios | 10 | 2 | 20 |
-| **Total** | **68** | — | **136** |
+| **Total** | **60** | — | **120** |
 
 **Scoring for "Select TWO" questions:**
 - Both correct: 2 points
 - One correct: 1 point
 - None correct: 0 points
 
-**Passing Score:** 95/136 (70%)
+**Passing Score:** 84/120 (70%)
