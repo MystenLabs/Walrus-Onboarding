@@ -141,19 +141,6 @@ Metadata Size per Shard = (Number of Shards × 64 bytes) + 32 bytes
 
 **Implementation:** [`metadata_length_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L250-L260)
 
-```rust
-pub fn metadata_length_for_n_shards(n_shards: NonZeroU16) -> u64 {
-    (
-        // The hashes: n_shards × 32 bytes × 2
-        usize::from(n_shards.get()) * DIGEST_LEN * 2
-        // The blob ID: 32 bytes
-        + BlobId::LENGTH
-    )
-        .try_into()
-        .expect("this always fits into a `u64`")
-}
-```
-
 **Note:** `DIGEST_LEN = 32` bytes, `BlobId::LENGTH = 32` bytes
 
 ---
@@ -172,28 +159,6 @@ Single Shard Slivers Size = (Primary Symbols + Secondary Symbols) × Symbol Size
 
 **Implementation:** [`encoded_slivers_length_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L301-L325)
 
-```rust
-pub fn encoded_slivers_length_for_n_shards(
-    n_shards: NonZeroU16,
-    unencoded_length: u64,
-    encoding_type: EncodingType,
-) -> Option<u64> {
-    let (source_symbols_primary, source_symbols_secondary) = source_symbols_for_n_shards(n_shards);
-    let single_shard_slivers_size = (u64::from(source_symbols_primary.get())
-        + u64::from(source_symbols_secondary.get()))
-        * u64::from(
-            utils::compute_symbol_size(
-                unencoded_length,
-                source_symbols_per_blob_for_n_shards(n_shards),
-                encoding_type.required_alignment(),
-            )
-            .ok()?
-            .get(),
-        );
-    Some(u64::from(n_shards.get()) * single_shard_slivers_size)
-}
-```
-
 ---
 
 #### Sub-Components for Slivers Calculation
@@ -209,13 +174,6 @@ Symbol Size = ceil(Unencoded Size / Total Source Symbols) rounded up to alignmen
 
 **Implementation:** [`utils::compute_symbol_size`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs)
 
-```rust
-utils::compute_symbol_size(
-    unencoded_length,                                    // Unencoded Size
-    source_symbols_per_blob_for_n_shards(n_shards),     // Total Source Symbols
-    encoding_type.required_alignment(),                  // Alignment (2 for RS2)
-)
-```
 
 **Note:** For RS2 encoding, symbol size must be a multiple of 2 bytes. If the calculated size is odd, it's rounded up to the next even number.
 
