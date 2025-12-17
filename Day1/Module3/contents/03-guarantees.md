@@ -302,40 +302,38 @@ openssl enc -d -aes-256-cbc -in retrieved.bin -out decrypted.txt
 
 Understanding where trust boundaries exist:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  TRUSTED (Cryptographically Guaranteed)                 │
-│                                                          │
-│  • Sui Blockchain (consensus, smart contracts)          │
-│  • Blob IDs (Merkle root, content-addressed)           │
-│  • Consistency Checks (hash verification)               │
-│  • Erasure Coding (mathematical guarantees)             │
-│  • Byzantine Tolerance (> 2/3 honest assumption)        │
-│                                                          │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph trusted["🔒 TRUSTED (Cryptographically Guaranteed)"]
+        direction TB
+        T1["✓ Sui Blockchain<br/>(consensus, smart contracts)"]
+        T2["✓ Blob IDs<br/>(Merkle root, content-addressed)"]
+        T3["✓ Consistency Checks<br/>(hash verification)"]
+        T4["✓ Erasure Coding<br/>(mathematical guarantees)"]
+        T5["✓ Byzantine Tolerance<br/>(> 2/3 honest assumption)"]
+    end
 
-┌─────────────────────────────────────────────────────────┐
-│  UNTRUSTED (Must Verify)                                │
-│                                                          │
-│  • Publishers (encode & distribute correctly?)          │
-│  • Aggregators (reconstruct correctly?)                 │
-│  • Storage Nodes (individually untrusted, but           │
-│    collectively trusted with Byzantine tolerance)       │
-│  • Network (reliable delivery?)                         │
-│                                                          │
-└─────────────────────────────────────────────────────────┘
+    subgraph untrusted["⚠️ UNTRUSTED (Must Verify)"]
+        direction TB
+        U1["? Publishers<br/>(encode & distribute correctly?)"]
+        U2["? Aggregators<br/>(reconstruct correctly?)"]
+        U3["? Storage Nodes<br/>(individually untrusted, but<br/>collectively trusted)"]
+        U4["? Network<br/>(reliable delivery?)"]
+    end
 
-┌─────────────────────────────────────────────────────────┐
-│  CLIENT RESPONSIBILITY                                   │
-│                                                          │
-│  • Verify blob IDs                                      │
-│  • Implement retry logic                                │
-│  • Encrypt sensitive data                               │
-│  • Manage wallets and gas                               │
-│  • Handle errors gracefully                             │
-│  • Check on-chain state                                 │
-│                                                          │
-└─────────────────────────────────────────────────────────┘
+    subgraph client["👤 CLIENT RESPONSIBILITY"]
+        direction TB
+        C1["☑ Verify blob IDs"]
+        C2["☑ Implement retry logic"]
+        C3["☑ Encrypt sensitive data"]
+        C4["☑ Manage wallets and gas"]
+        C5["☑ Handle errors gracefully"]
+        C6["☑ Check on-chain state"]
+    end
+
+    style trusted fill:#d4edda,stroke:#28a745,stroke-width:3px,color:#000
+    style untrusted fill:#fff3cd,stroke:#ffc107,stroke-width:3px,color:#000
+    style client fill:#cce5ff,stroke:#007bff,stroke-width:3px,color:#000
 ```
 
 ---
@@ -415,4 +413,4 @@ Understanding where trust boundaries exist:
 
 ## Next Steps
 
-Now that you understand system guarantees and client responsibilities, proceed to [Control Boundaries](./control-boundaries.md) to learn what the CLI vs. SDK controls.
+Now that you understand system guarantees and client responsibilities, proceed to [Control Boundaries](./04-control-boundaries.md) to learn what the CLI vs. SDKs control.

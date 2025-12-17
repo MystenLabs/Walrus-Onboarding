@@ -2,6 +2,56 @@
 
 This section explains what Publishers, Aggregators, and Clients actually do when operating in production. Understanding these responsibilities is critical for building reliable applications and troubleshooting issues.
 
+## System Architecture Overview
+
+> **About the diagrams**: This module uses **C4 architecture diagrams** (Context, Container, Component), which are the industry standard for documenting software architecture. They clearly show boundaries, relationships, and component responsibilities.
+
+The diagram below shows how all components interact in the Walrus system using C4 Context diagram:
+
+'''mermaid
+C4Context
+    title Walrus Storage System - Container Architecture
+
+    Person(client, "Client App", "TypeScript SDK or CLI")
+
+    Boundary(optional, "Optional Infrastructure (Untrusted)") {
+        System(publisher, "Publisher", "Encodes blobs, distributes slivers, manages certificates")
+        System(aggregator, "Aggregator", "Fetches slivers, reconstructs blobs, serves HTTP")
+    }
+
+    Boundary(core, "Core System (Trusted)") {
+        SystemDb(blockchain, "Sui Blockchain", "Blob registry, metadata, certificates (Source of Truth)")
+        SystemQueue(storage, "Storage Nodes", "Decentralized network storing erasure-coded slivers")
+    }
+
+    Rel(client, publisher, "Uploads blob", "HTTP PUT")
+    Rel(publisher, blockchain, "Registers blob, posts certificate", "Sui RPC")
+    Rel(publisher, storage, "Distributes slivers", "HTTP")
+    Rel(storage, publisher, "Returns signatures", "HTTP")
+
+    Rel(client, aggregator, "Reads blob", "HTTP GET")
+    Rel(aggregator, blockchain, "Queries metadata", "Sui RPC")
+    Rel(aggregator, storage, "Fetches slivers", "HTTP")
+
+    Rel(client, blockchain, "Verifies on-chain state", "Sui RPC", $tags="verification")
+
+    UpdateRelStyle(client, blockchain, $lineColor="green", $textColor="green")
+'''
+
+**Key Architecture Points:**
+- **Client** (your application): Uses TypeScript SDK or CLI to interact with the system
+- **Publisher** (optional, untrusted): Handles blob encoding and distribution to storage nodes
+- **Aggregator** (optional, untrusted): Reconstructs blobs by fetching slivers from storage nodes
+- **Sui Blockchain** (trusted): Stores blob metadata, certificates, and acts as source of truth
+- **Storage Nodes** (decentralized): Store erasure-coded slivers of blobs
+
+**Trust Model:**
+- ✅ **Trusted**: Sui blockchain, cryptographic verification (blob IDs, signatures)
+- ⚠️ **Untrusted**: Publishers and Aggregators (clients must verify their work)
+- 🔒 **Client's Job**: Verify blob IDs, check on-chain state, implement retry logic
+
+---
+
 ## Publisher Duties
 
 Publishers are **optional infrastructure** that make it easier for clients to store blobs. Remember: they're untrusted, so clients should verify their work.
@@ -59,13 +109,21 @@ Publisher: Check wallet → Estimate gas → Sign transaction
 - Sign Sui transactions
 - Handle gas price fluctuations
 - Retry failed transactions
+- Use sub-wallets for parallel request handling (since v1.4.0)
+
+**Sub-wallets (v1.4.0+):**
+- Publishers use multiple sub-wallets derived from the main wallet
+- Each sub-wallet handles a subset of concurrent upload requests
+- Prevents transaction conflicts and nonce issues when processing parallel requests
+- Significantly improves throughput for busy Publishers
+- Sub-wallets are automatically managed by the Publisher
 
 **What can go wrong:**
-- Insufficient SUI for gas
+- Insufficient SUI for gas (in main wallet or sub-wallets)
 - Insufficient WAL for storage fees
 - Gas price spike causes transaction failure
 - Wallet key management issues
-- Transaction conflicts (nonce issues)
+- Transaction conflicts (nonce issues) - mitigated by sub-wallets in v1.4.0+
 
 **Client consideration:** When using a publisher, you're relying on their wallet. For sensitive applications, use CLI/SDK directly with your own wallet.
 
@@ -175,12 +233,73 @@ Publisher → Client: HTTP 200 + blob ID
 |------|---------------|---------------------|
 | Receive upload | Auth, size limits, network | N/A |
 | Encode blob | Memory, encoding errors | Re-encode and compare blob ID |
-| Manage gas | Insufficient funds, tx failures | Check on-chain blob object |
+| Manage gas/wallets | Insufficient funds, tx failures, nonce conflicts (mitigated by sub-wallets v1.4.0+) | Check on-chain blob object |
 | Register on Sui | Transaction failures | Query blob object by ID |
 | Distribute slivers | Node unavailability | Perform read to verify availability |
 | Collect signatures | Quorum not reached | Check point of availability event |
 | Post certificate | Transaction failures | Check certificate on-chain |
 | Return result | Network timeout | Check on-chain state |
+
+### Publisher Internal Architecture
+
+The diagram below shows the internal components and data flow within a Publisher using C4 Component architecture:
+
+'''mermaid
+C4Component
+    title Publisher Service - Internal Components
+
+    Container_Boundary(publisher, "Publisher Service") {
+        Component(api, "HTTP API Handler", "REST API", "Receives blob upload requests")
+        Component(auth, "Auth & Validation", "Middleware", "Validates JWT, checks size limits")
+        Component(encoder, "Erasure Encoder", "Reed-Solomon", "Encodes blobs into slivers")
+        Component(wallet, "Wallet Manager", "Sui SDK", "Manages SUI/WAL, signs transactions")
+        Component(distributor, "Sliver Distributor", "HTTP Client", "Sends slivers to storage nodes in parallel")
+        Component(certAgg, "Certificate Aggregator", "Crypto", "Collects signatures, checks 2/3 quorum")
+        Component(chain, "Sui Chain Interface", "Sui RPC", "Registers blobs, posts certificates")
+    }
+
+    Rel(api, auth, "Validates request")
+    Rel(auth, encoder, "Encodes blob")
+    Rel(encoder, distributor, "Distributes slivers")
+    Rel(encoder, wallet, "Gets blob ID")
+    Rel(wallet, chain, "Signs transaction")
+    Rel(distributor, certAgg, "Collects signatures")
+    Rel(certAgg, chain, "Posts certificate")
+    Rel(chain, api, "Returns confirmation")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+'''
+
+**Publisher Components:**
+- **HTTP API Handler**: Receives blob upload requests from clients
+- **Authentication & Validation**: Validates JWT tokens, checks blob size limits
+- **Erasure Encoder**: Applies Reed-Solomon encoding to create slivers
+- **Wallet Manager**: Manages SUI/WAL funds, signs transactions (v1.4.0+ uses sub-wallets)
+- **Sliver Distributor**: Sends slivers to storage nodes in parallel
+- **Certificate Aggregator**: Collects signatures, checks quorum, aggregates certificates
+- **Sui Chain Interface**: Interacts with Sui blockchain (register blobs, post certificates)
+
+### Publisher Lifecycle Flow
+
+'''mermaid
+sequenceDiagram
+    participant C as Client
+    participant P as Publisher
+    participant S as Sui Blockchain
+    participant N as Storage Nodes
+
+    C->>P: 1. Upload blob (HTTP PUT)
+    P->>P: 2. Encode blob (erasure coding)
+    P->>P: 3. Manage wallet/gas
+    P->>S: 4. Register blob on-chain
+    S-->>P: Blob object created
+    P->>N: 5. Distribute slivers (parallel)
+    N-->>P: 6. Return signatures
+    P->>P: Check quorum (≥2/3)
+    P->>S: 7. Post certificate
+    S-->>P: Certificate confirmed
+    P->>C: 8. Return blob ID + metadata
+'''
 
 ---
 
@@ -320,6 +439,66 @@ Aggregator → Client: HTTP 200 + blob data
 | Cache (optional) | Cache inconsistency | Always verify blob ID |
 | Return blob | Network timeout | Verify blob ID matches |
 
+### Aggregator Internal Architecture
+
+The diagram below shows the internal components and data flow within an Aggregator using C4 Component architecture:
+
+'''mermaid
+C4Component
+    title Aggregator Service - Internal Components
+
+    Container_Boundary(aggregator, "Aggregator Service") {
+        Component(api, "HTTP API Handler", "REST API", "Receives blob read requests")
+        Component(validator, "Request Validator", "Middleware", "Validates blob ID format")
+        Component(chain, "Sui Chain Interface", "Sui RPC", "Queries blob metadata and status")
+        Component(fetcher, "Sliver Fetcher", "HTTP Client", "Fetches slivers from storage nodes (≥334 needed)")
+        Component(decoder, "Erasure Decoder", "Reed-Solomon", "Reconstructs blob from slivers")
+        Component(checker, "Consistency Checker", "Crypto", "Verifies blob integrity (default/strict)")
+        Component(cache, "Cache Manager", "In-Memory/Redis", "Optionally caches reconstructed blobs")
+    }
+
+    Rel(api, validator, "Validates blob ID")
+    Rel(validator, chain, "Queries metadata")
+    Rel(chain, fetcher, "Gets storage info")
+    Rel(fetcher, decoder, "Sends slivers")
+    Rel(decoder, checker, "Verifies blob")
+    Rel(checker, cache, "Caches if enabled")
+    Rel(cache, api, "Returns blob data")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+'''
+
+**Aggregator Components:**
+- **HTTP API Handler**: Receives blob read requests from clients
+- **Request Validator**: Validates blob ID format and request parameters
+- **Sui Chain Interface**: Queries Sui for blob metadata and status
+- **Sliver Fetcher**: Fetches slivers from storage nodes in parallel (need 334 minimum)
+- **Erasure Decoder**: Reconstructs original blob from slivers using erasure decoding
+- **Consistency Checker**: Verifies blob integrity (default or strict mode)
+- **Cache Manager**: Optionally caches reconstructed blobs for faster serving
+
+### Aggregator Lifecycle Flow
+
+'''mermaid
+sequenceDiagram
+    participant C as Client
+    participant A as Aggregator
+    participant S as Sui Blockchain
+    participant N as Storage Nodes
+
+    C->>A: 1. Request blob (HTTP GET /blob-id)
+    A->>S: 2. Query blob metadata
+    S-->>A: Blob status + encoding info
+    A->>N: 3. Fetch slivers (parallel, need 334)
+    N-->>A: Return slivers
+    A->>A: 4. Reconstruct blob (erasure decode)
+    A->>A: 5. Consistency check
+    opt Caching enabled
+        A->>A: 6. Cache reconstructed blob
+    end
+    A->>C: 7. Return blob data (HTTP 200)
+'''
+
 ---
 
 ## Client Responsibilities
@@ -338,11 +517,38 @@ Clients (your application code) have important responsibilities, whether using P
 **Why it matters:** Publishers and Aggregators are untrusted. Blob ID verification ensures data integrity.
 
 **How to verify:**
-```bash
-# CLI example
-walrus store my-file.txt  # Returns blob ID
-walrus read <blob-id> > retrieved-file.txt
-walrus store retrieved-file.txt  # Should return same blob ID
+```typescript
+import { SuiClient } from '@mysten/sui/client';
+import { walrus } from '@mysten/walrus';
+import type { Keypair } from '@mysten/sui/cryptography';
+
+async function verifyBlobId(client: SuiClient, signer: Keypair) {
+  const data = new TextEncoder().encode('my file content');
+
+  // Upload and get blob ID
+  const { blobId } = await client.walrus.writeBlob({
+    blob: data,
+    epochs: 5,
+    signer
+  });
+
+  // Retrieve the blob
+  const retrieved = await client.walrus.readBlob({ blobId });
+
+  // Re-upload to verify blob ID matches
+  const { blobId: verifyId } = await client.walrus.writeBlob({
+    blob: retrieved,
+    epochs: 5,
+    signer
+  });
+
+  if (blobId === verifyId) {
+    console.log('✓ Blob ID verified - data integrity confirmed');
+    return true;
+  }
+
+  return false;
+}
 ```
 
 #### 2. Implement Retry Logic
@@ -425,13 +631,62 @@ sui client object <blob-object-id>
 | Manage wallet (direct use) | Control funds | Monitor balance, estimate gas |
 | Choose consistency level | Security vs. performance | Strict for critical, default otherwise |
 
+### Client Application Architecture
+
+The diagram below shows what a well-designed client application should implement using C4 Component architecture:
+
+'''mermaid
+C4Component
+    title Client Application - Components You Must Implement
+
+    Person(user, "End User", "Uses your application")
+
+    Container_Boundary(clientApp, "Client Application") {
+        Component(appLogic, "Application Logic", "TypeScript/JavaScript", "Your business logic for storing/retrieving blobs")
+        Component(sdk, "Walrus SDK", "@mysten/walrus", "TypeScript SDK or CLI wrapper")
+        Component(retry, "Retry Handler", "Custom Logic", "Exponential backoff for transient failures")
+        Component(verifier, "Blob ID Verifier", "Custom Logic", "Re-encodes blobs to verify integrity")
+        Component(errorHandler, "Error Handler", "Custom Logic", "Parses errors, distinguishes retryable vs fatal")
+        Component(wallet, "Wallet Manager", "Sui Keypair", "Manages keypairs, signs transactions")
+        Component(onChainValidator, "On-Chain Validator", "Sui RPC", "Queries Sui to verify blob registration")
+    }
+
+    Rel(user, appLogic, "Uploads/reads blobs")
+    Rel(appLogic, sdk, "Calls Walrus API")
+    Rel(sdk, retry, "On failure")
+    Rel(retry, sdk, "Retries operation")
+    Rel(sdk, verifier, "On success")
+    Rel(verifier, onChainValidator, "Verifies on-chain")
+    Rel(sdk, errorHandler, "On error")
+    Rel(wallet, sdk, "Signs transactions")
+    Rel(verifier, appLogic, "Returns validated result")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+'''
+
+**Client Application Components:**
+- **Application Logic**: Your business logic that needs to store/retrieve blobs
+- **Walrus SDK**: TypeScript SDK or CLI for interacting with Walrus
+- **Retry Handler**: Implements exponential backoff for transient failures
+- **Blob ID Verifier**: Re-encodes blobs to verify data integrity
+- **Error Handler**: Parses errors, distinguishes retryable vs non-retryable
+- **Wallet Manager**: Manages keypairs, signs transactions (when not using Publisher)
+- **On-Chain Validator**: Queries Sui to verify blob registration and certificates
+
+**Key Client Responsibilities:**
+1. ✅ **Verify**: Always verify blob IDs match expectations
+2. 🔄 **Retry**: Implement retry logic with exponential backoff
+3. 🔍 **Check**: Verify on-chain state after uploads
+4. ⚠️ **Handle**: Parse and handle errors appropriately
+5. 🔑 **Manage**: Secure wallet management (if not using Publisher)
+
 ---
 
 ## Key Points
 
 ### Publisher Duties
 - Encode blobs and distribute slivers to storage nodes
-- Manage gas and wallets for on-chain transactions
+- Manage gas and wallets for on-chain transactions (sub-wallets since v1.4.0 for parallel request handling)
 - Collect signatures and post certificates
 - Handle retries and timeouts
 - **Untrusted**: Clients should verify their work
@@ -460,4 +715,4 @@ sui client object <blob-object-id>
 
 ## Next Steps
 
-Now that you understand operational duties, proceed to [Failure Modes](./failure-modes.md) to learn where things can go wrong and how to handle failures.
+Now that you understand operational duties, proceed to [Failure Modes](./02-failure-modes.md) to learn where things can go wrong and how to handle failures.

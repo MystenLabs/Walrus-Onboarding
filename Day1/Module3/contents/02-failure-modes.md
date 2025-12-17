@@ -26,6 +26,28 @@ We'll organize failures by **where** they occur in the system:
 4. **Transaction Layer**: Blockchain transaction failures
 5. **Application Layer**: Client-side errors
 
+'''mermaid
+graph TB
+    subgraph "Failure Layers"
+        A[Application Layer<br/>Client-side errors, timeouts, invalid requests]
+        T[Transaction Layer<br/>Gas issues, tx failures, nonce conflicts]
+        E[Encoding Layer<br/>Memory errors, encoding failures, hash issues]
+        S[Storage Node Layer<br/>Node offline, data loss, corruption]
+        N[Network Layer<br/>Connectivity failures, timeouts, DNS issues]
+    end
+
+    A --> T
+    T --> E
+    E --> S
+    S --> N
+
+    style A fill:#e1f5ff
+    style T fill:#fff4e1
+    style E fill:#ffe1f5
+    style S fill:#f5e1ff
+    style N fill:#e1ffe1
+'''
+
 ---
 
 ## 1. Network Layer Failures
@@ -55,14 +77,37 @@ Error: DNS resolution failed
 - Fall back to direct CLI/SDK interaction with Sui and storage nodes
 - Set reasonable timeouts (e.g., 30 seconds for upload, 10 seconds for read)
 
-**Example using CLI with retry (bash script):**
-```bash
-# Retry logic in bash
-for i in {1..3}; do
-  curl -X PUT http://publisher.example.com:31416/ --data-binary @file.txt && break
-  echo "Attempt $i failed, retrying..."
-  sleep $((2**i))  # Exponential backoff: 2s, 4s, 8s
-done
+**Example using TypeScript SDK with retry:**
+```typescript
+import { SuiClient } from '@mysten/sui/client';
+import type { Keypair } from '@mysten/sui/cryptography';
+
+// Retry logic with exponential backoff
+async function uploadWithRetry(
+  client: SuiClient,
+  data: Uint8Array,
+  signer: Keypair,
+  maxRetries = 3
+) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await client.walrus.writeBlob({
+        blob: data,
+        epochs: 5,
+        signer
+      });
+      return result;
+    } catch (error) {
+      if (attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+        console.log(`Attempt ${attempt} failed, retrying in ${delay/1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw error;
+      }
+    }
+  }
+}
 ```
 
 ### Failure: Publisher Cannot Reach Storage Nodes
@@ -515,6 +560,43 @@ HTTP 404: Blob ID not registered
 
 ---
 
+## Upload Flow with Potential Failure Points
+
+The diagram below shows where failures can occur during a typical upload operation:
+
+'''mermaid
+flowchart TD
+    Start([Client initiates upload]) --> Network1{Network<br/>reachable?}
+    Network1 -->|No| Fail1[❌ Network failure]
+    Network1 -->|Yes| Encode{Encoding<br/>successful?}
+
+    Encode -->|No| Fail2[❌ Encoding failure<br/>Memory/size issues]
+    Encode -->|Yes| Wallet{Sufficient<br/>gas/WAL?}
+
+    Wallet -->|No| Fail3[❌ Transaction failure<br/>Insufficient funds]
+    Wallet -->|Yes| RegisterTx{Register tx<br/>confirmed?}
+
+    RegisterTx -->|No| Fail4[❌ Transaction timeout/failure]
+    RegisterTx -->|Yes| Distribute{Distribute<br/>slivers}
+
+    Distribute --> Nodes{≥2/3 nodes<br/>respond?}
+    Nodes -->|No| Fail5[❌ Quorum not reached<br/>Too many nodes offline]
+    Nodes -->|Yes| Certificate{Post<br/>certificate?}
+
+    Certificate -->|No| Fail6[❌ Certificate tx failure]
+    Certificate -->|Yes| Success([✓ Upload successful<br/>Blob available])
+
+    style Success fill:#90EE90
+    style Fail1 fill:#FFB6C1
+    style Fail2 fill:#FFB6C1
+    style Fail3 fill:#FFB6C1
+    style Fail4 fill:#FFB6C1
+    style Fail5 fill:#FFB6C1
+    style Fail6 fill:#FFB6C1
+'''
+
+---
+
 ## Failure Response Cheatsheet
 
 | Failure Type | Retryable? | Check On-Chain? | Mitigation |
@@ -535,33 +617,73 @@ HTTP 404: Blob ID not registered
 
 ### 1. Always Verify Critical Operations
 
-```bash
-# After upload, verify on-chain
-BLOB_ID=$(walrus store myfile.txt | grep "blob ID" | awk '{print $3}')
+```typescript
+import { SuiClient } from '@mysten/sui/client';
+import { walrus } from '@mysten/walrus';
+import type { Keypair } from '@mysten/sui/cryptography';
 
-# Verify retrieval works
-walrus read "$BLOB_ID" > retrieved.txt
+async function verifyBlobIntegrity(client: SuiClient, signer: Keypair) {
+  // After upload, verify blob ID by re-encoding
+  const data = new TextEncoder().encode('my content');
 
-# Verify blob ID matches (re-encode)
-VERIFY_ID=$(walrus store retrieved.txt | grep "blob ID" | awk '{print $3}')
-if [ "$BLOB_ID" != "$VERIFY_ID" ]; then
-  echo "Error: Blob ID mismatch!"
-fi
+  // Upload and get blob ID
+  const { blobId } = await client.walrus.writeBlob({
+    blob: data,
+    epochs: 5,
+    signer
+  });
+
+  // Retrieve the blob
+  const retrieved = await client.walrus.readBlob({ blobId });
+
+  // Verify blob ID matches (re-encode)
+  const { blobId: verifyId } = await client.walrus.writeBlob({
+    blob: retrieved,
+    epochs: 5,
+    signer
+  });
+
+  if (blobId !== verifyId) {
+    throw new Error('Blob ID mismatch! Data integrity issue.');
+  }
+
+  console.log('✓ Blob integrity verified');
+  return blobId;
+}
 ```
 
-### 2. Implement Exponential Backoff (Conceptual)
+### 2. Implement Exponential Backoff
 
-```
-# Pseudocode for retry logic in your application
-function retry_with_backoff(operation, max_retries=5):
-    for attempt in 1 to max_retries:
-        try:
-            return operation()
-        catch RetryableError:
-            if attempt < max_retries:
-                sleep(2^attempt seconds)  # 2s, 4s, 8s, 16s, 32s
-            else:
-                raise error
+```typescript
+// Generic retry function with exponential backoff
+async function retryWithBackoff<T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 5
+): Promise<T> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isRetryable = errorMessage.includes('timeout') ||
+                          errorMessage.includes('network');
+
+      if (isRetryable && attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s, 16s, 32s
+        console.log(`Retry attempt ${attempt}/${maxRetries} after ${delay}ms`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
+// Usage example:
+// const result = await retryWithBackoff(() =>
+//   client.walrus.writeBlob({ blob: data, epochs: 5, signer })
+// );
 ```
 
 ### 3. Check On-Chain State After Timeouts
@@ -627,4 +749,4 @@ grep "Error" upload.log | sort | uniq -c
 
 ## Next Steps
 
-Now that you understand failure modes, proceed to [System Guarantees vs. Client Responsibilities](./guarantees.md) to learn what the system guarantees and what you must verify yourself.
+Now that you understand failure modes, proceed to [System Guarantees vs. Client Responsibilities](./03-guarantees.md) to learn what the system guarantees and what you must verify yourself.

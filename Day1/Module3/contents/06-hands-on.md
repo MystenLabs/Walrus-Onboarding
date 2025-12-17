@@ -6,11 +6,12 @@ This hands-on exercise teaches you to inspect logs from Walrus components to ide
 
 By the end of this exercise, you will be able to:
 
-- Inspect publisher logs to identify encoding, distribution, and certificate posting events
-- Inspect aggregator logs to identify metadata queries, sliver fetching, and reconstruction events
-- Identify error conditions and failure scenarios in logs
-- Trace a complete upload or retrieval flow through log entries
-- Diagnose common issues using log analysis
+- Analyze Publisher daemon logs to identify HTTP requests, sub-wallet selection, distribution, and certificate posting
+- Analyze Aggregator daemon logs to identify cache behavior, sliver fetching, and reconstruction
+- Inspect client (CLI/SDK) logs to trace encoding, distribution, signatures, and certificate events
+- Identify error conditions and failure scenarios in logs from all three perspectives
+- Trace complete upload or retrieval flows through log entries across components
+- Diagnose common issues using log analysis and performance metrics
 
 ## Prerequisites
 
@@ -142,7 +143,173 @@ Map the log entries to the upload flow phases:
 
 ---
 
-## Part 3: Analyzing Failure Scenarios
+## Part 3: Analyzing Publisher Daemon Logs
+
+Publishers run as HTTP daemons accepting blob uploads from clients. Understanding publisher logs is essential for operators.
+
+### Sample Publisher Daemon Log
+
+```
+[2025-01-15T10:30:00.100Z INFO  walrus_publisher] HTTP server started on 0.0.0.0:31416
+[2025-01-15T10:30:00.105Z INFO  walrus_publisher] Loaded 5 sub-wallets for parallel request handling
+[2025-01-15T10:30:00.110Z INFO  walrus_publisher] Main wallet: 0x123abc... (balance: 100 SUI, 500 WAL)
+...
+[2025-01-15T10:30:15.200Z INFO  walrus_publisher::http] PUT / from 192.168.1.50 (1048576 bytes)
+[2025-01-15T10:30:15.205Z DEBUG walrus_publisher::auth] JWT validation: Valid (user: alice@example.com)
+[2025-01-15T10:30:15.210Z INFO  walrus_publisher::handler] Request params: epochs=5, deletable=false
+[2025-01-15T10:30:15.215Z DEBUG walrus_publisher::wallet] Selected sub-wallet 3 (0x456def...) for this request
+[2025-01-15T10:30:15.220Z INFO  walrus_publisher::encoding] Encoding blob (1048576 bytes)...
+[2025-01-15T10:30:15.340Z INFO  walrus_publisher::encoding] Blob ID: 0xabc123def456...
+[2025-01-15T10:30:15.345Z INFO  walrus_publisher::sui] Registering blob on Sui (wallet: 0x456def...)
+[2025-01-15T10:30:16.100Z INFO  walrus_publisher::sui] Blob registered, object ID: 0x789abc...
+[2025-01-15T10:30:16.105Z INFO  walrus_publisher::distribution] Distributing 1000 slivers to storage nodes
+[2025-01-15T10:30:16.110Z DEBUG walrus_publisher::distribution] Parallel distribution: 50 concurrent connections
+[2025-01-15T10:30:16.500Z INFO  walrus_publisher::distribution] Progress: 250/1000 slivers sent
+[2025-01-15T10:30:17.000Z INFO  walrus_publisher::distribution] Progress: 500/1000 slivers sent
+[2025-01-15T10:30:17.500Z INFO  walrus_publisher::distribution] Progress: 750/1000 slivers sent
+[2025-01-15T10:30:18.000Z INFO  walrus_publisher::distribution] Distribution complete: 1000/1000 slivers sent
+[2025-01-15T10:30:18.100Z INFO  walrus_publisher::signatures] Collecting signatures from storage nodes...
+[2025-01-15T10:30:18.500Z INFO  walrus_publisher::signatures] Collected 350/1000 signatures
+[2025-01-15T10:30:19.000Z INFO  walrus_publisher::signatures] Collected 680/1000 signatures (quorum reached!)
+[2025-01-15T10:30:19.100Z INFO  walrus_publisher::certificate] Aggregating 680 signatures into certificate
+[2025-01-15T10:30:19.200Z INFO  walrus_publisher::sui] Posting certificate to Sui (wallet: 0x456def...)
+[2025-01-15T10:30:20.100Z INFO  walrus_publisher::sui] Certificate posted, tx: 0xdef456...
+[2025-01-15T10:30:20.105Z INFO  walrus_publisher::http] Responding to client: 200 OK (blob ID: 0xabc123def456...)
+[2025-01-15T10:30:20.110Z INFO  walrus_publisher::http] Request completed in 4.91s
+```
+
+### Exercise 3.1: Analyze Publisher Logs
+
+**Question 1:** How many sub-wallets does this publisher have configured?
+
+<details>
+<summary>Answer</summary>
+5 sub-wallets for parallel request handling
+</details>
+
+**Question 2:** Which sub-wallet was selected for this request?
+
+<details>
+<summary>Answer</summary>
+Sub-wallet 3 (0x456def...)
+</details>
+
+**Question 3:** Was JWT authentication enabled? Was the request authenticated?
+
+<details>
+<summary>Answer</summary>
+Yes, JWT authentication is enabled. The request was authenticated successfully (user: alice@example.com).
+</details>
+
+**Question 4:** How long did sliver distribution take?
+
+<details>
+<summary>Answer</summary>
+Approximately 1.9 seconds (from 10:30:16.105Z to 10:30:18.000Z)
+</details>
+
+**Question 5:** What was the quorum threshold and how many signatures were collected?
+
+<details>
+<summary>Answer</summary>
+Quorum: 667 signatures (2/3 of 1000). Collected: 680 signatures (quorum reached).
+</details>
+
+### Sample Publisher Log: Sub-wallet Preventing Nonce Conflict
+
+```
+[2025-01-15T14:00:00.100Z INFO  walrus_publisher::http] PUT / from 192.168.1.51 (500000 bytes)
+[2025-01-15T14:00:00.105Z INFO  walrus_publisher::http] PUT / from 192.168.1.52 (750000 bytes)
+[2025-01-15T14:00:00.110Z INFO  walrus_publisher::http] PUT / from 192.168.1.53 (1000000 bytes)
+[2025-01-15T14:00:00.115Z DEBUG walrus_publisher::wallet] Request 1: Selected sub-wallet 0 (0x111...)
+[2025-01-15T14:00:00.116Z DEBUG walrus_publisher::wallet] Request 2: Selected sub-wallet 1 (0x222...)
+[2025-01-15T14:00:00.117Z DEBUG walrus_publisher::wallet] Request 3: Selected sub-wallet 2 (0x333...)
+[2025-01-15T14:00:00.120Z INFO  walrus_publisher] Processing 3 concurrent uploads with different sub-wallets
+```
+
+**What this shows:** Three simultaneous requests use different sub-wallets to avoid transaction nonce conflicts.
+
+---
+
+## Part 4: Analyzing Aggregator Daemon Logs
+
+Aggregators run as HTTP daemons serving blob read requests. They fetch slivers and reconstruct blobs.
+
+### Sample Aggregator Daemon Log (Cache Miss)
+
+```
+[2025-01-15T12:00:00.100Z INFO  walrus_aggregator] HTTP server started on 0.0.0.0:31415
+[2025-01-15T12:00:00.105Z INFO  walrus_aggregator] Cache enabled: max 10 GB, TTL 1 hour
+...
+[2025-01-15T12:05:10.200Z INFO  walrus_aggregator::http] GET /v1/0xabc123def456... from 192.168.1.60
+[2025-01-15T12:05:10.205Z DEBUG walrus_aggregator::cache] Cache lookup: 0xabc123def456... → MISS
+[2025-01-15T12:05:10.210Z INFO  walrus_aggregator::sui] Querying Sui for blob metadata...
+[2025-01-15T12:05:10.350Z INFO  walrus_aggregator::sui] Blob found: size 1048576 bytes, epoch 100, status: Certified
+[2025-01-15T12:05:10.355Z INFO  walrus_aggregator::fetch] Fetching 334 primary slivers from storage nodes
+[2025-01-15T12:05:10.360Z DEBUG walrus_aggregator::fetch] Parallel fetch: 20 concurrent connections
+[2025-01-15T12:05:10.800Z INFO  walrus_aggregator::fetch] Progress: 100/334 slivers fetched
+[2025-01-15T12:05:11.200Z INFO  walrus_aggregator::fetch] Progress: 200/334 slivers fetched
+[2025-01-15T12:05:11.600Z INFO  walrus_aggregator::fetch] Fetched 334/334 slivers successfully
+[2025-01-15T12:05:11.605Z INFO  walrus_aggregator::reconstruct] Reconstructing blob (1048576 bytes)...
+[2025-01-15T12:05:11.800Z DEBUG walrus_aggregator::reconstruct] Erasure decoding complete
+[2025-01-15T12:05:11.805Z INFO  walrus_aggregator::verify] Performing consistency check (default)...
+[2025-01-15T12:05:11.900Z INFO  walrus_aggregator::verify] Consistency check passed
+[2025-01-15T12:05:11.905Z DEBUG walrus_aggregator::cache] Storing in cache: 0xabc123def456... (1048576 bytes)
+[2025-01-15T12:05:11.910Z INFO  walrus_aggregator::http] Responding: 200 OK (1048576 bytes)
+[2025-01-15T12:05:11.915Z INFO  walrus_aggregator::http] Request completed in 1.71s
+```
+
+### Sample Aggregator Daemon Log (Cache Hit)
+
+```
+[2025-01-15T12:10:20.100Z INFO  walrus_aggregator::http] GET /v1/0xabc123def456... from 192.168.1.61
+[2025-01-15T12:10:20.105Z DEBUG walrus_aggregator::cache] Cache lookup: 0xabc123def456... → HIT
+[2025-01-15T12:10:20.110Z INFO  walrus_aggregator::http] Responding from cache: 200 OK (1048576 bytes)
+[2025-01-15T12:10:20.115Z INFO  walrus_aggregator::http] Request completed in 0.015s (cache hit)
+```
+
+### Exercise 4.1: Analyze Aggregator Logs
+
+**Question 1:** What was the result of the cache lookup in the first request?
+
+<details>
+<summary>Answer</summary>
+Cache MISS - blob was not in cache, had to be fetched from storage nodes
+</details>
+
+**Question 2:** How much faster was the second request (cache hit) compared to the first?
+
+<details>
+<summary>Answer</summary>
+First request: 1.71s (cache miss)
+Second request: 0.015s (cache hit)
+Speedup: ~114x faster with cache hit!
+</details>
+
+**Question 3:** What consistency check level was used?
+
+<details>
+<summary>Answer</summary>
+Default consistency check (verifies first 334 primary sliver hashes)
+</details>
+
+**Question 4:** How long did sliver fetching take?
+
+<details>
+<summary>Answer</summary>
+Approximately 1.25 seconds (from 10:05:10.355Z to 10:05:11.600Z)
+</details>
+
+**Question 5:** Did the aggregator cache the blob after reconstruction?
+
+<details>
+<summary>Answer</summary>
+Yes, the blob was stored in cache after successful reconstruction (visible in the cache miss log).
+</details>
+
+---
+
+## Part 5: Analyzing Client Failure Scenarios
 
 ### Sample Failed Upload Log
 
@@ -224,7 +391,7 @@ Retry the upload. Different nodes may be online, or network conditions may impro
 
 ---
 
-## Part 4: Analyzing Retrieval Logs
+## Part 6: Analyzing Client Retrieval Logs
 
 ### Sample Retrieval Log
 
@@ -248,7 +415,7 @@ Retry the upload. Different nodes may be online, or network conditions may impro
 [2025-01-15T12:00:02.805Z INFO  walrus] Blob retrieved successfully
 ```
 
-### Exercise 4.1: Trace Retrieval Flow
+### Exercise 6.1: Trace Retrieval Flow
 
 **Question 1:** What was the blob status on Sui?
 
@@ -280,9 +447,9 @@ Approximately 2.7 seconds (12:00:00.100Z to 12:00:02.805Z)
 
 ---
 
-## Part 5: Real-World Exercise
+## Part 7: Real-World Exercise
 
-### Exercise 5.1: Generate and Analyze Your Own Logs
+### Exercise 7.1: Generate and Analyze Your Own Logs
 
 **Task:** Perform an upload and retrieval with verbose logging, then analyze the logs.
 
@@ -316,7 +483,7 @@ Approximately 2.7 seconds (12:00:00.100Z to 12:00:02.805Z)
    - Identify consistency check level and result
    - Note total retrieval time
 
-### Exercise 5.2: Simulate a Failure
+### Exercise 7.2: Simulate a Failure
 
 **Task:** Try to upload a file that will fail and analyze the error.
 
@@ -340,7 +507,41 @@ RUST_LOG=debug walrus store test-file.txt 2>&1 | tee failure-insufficient-funds.
 
 ## Key Events to Look For
 
-### Upload Logs
+### Publisher Daemon Logs
+
+| Event | Log Indicator | Phase |
+|-------|---------------|-------|
+| Server started | "HTTP server started on" | Initialization |
+| Sub-wallets loaded | "Loaded N sub-wallets" | Initialization |
+| HTTP PUT received | "PUT / from" | Request received |
+| JWT validation | "JWT validation" | Authentication |
+| Sub-wallet selected | "Selected sub-wallet" | Wallet management |
+| Encoding | "Encoding blob" | Encoding |
+| Blob registered | "Blob registered, object ID" | On-chain |
+| Sliver distribution | "Distributing N slivers" | Distribution |
+| Progress updates | "Progress: X/Y slivers sent" | Distribution |
+| Quorum reached | "quorum reached" | Signature collection |
+| Certificate posted | "Certificate posted" | On-chain |
+| Response sent | "Responding to client: 200 OK" | Complete |
+
+### Aggregator Daemon Logs
+
+| Event | Log Indicator | Phase |
+|-------|---------------|-------|
+| Server started | "HTTP server started on" | Initialization |
+| Cache configured | "Cache enabled" | Initialization |
+| HTTP GET received | "GET /v1/" | Request received |
+| Cache lookup | "Cache lookup: ... → HIT/MISS" | Caching |
+| Sui query | "Querying Sui for blob metadata" | Metadata |
+| Blob found | "Blob found: size" | Metadata |
+| Sliver fetch start | "Fetching N primary slivers" | Fetching |
+| Progress updates | "Progress: X/Y slivers fetched" | Fetching |
+| Reconstruction | "Reconstructing blob" | Reconstruction |
+| Consistency check | "Performing consistency check" | Verification |
+| Cache store | "Storing in cache" | Caching |
+| Response sent | "Responding: 200 OK" | Complete |
+
+### Client Upload Logs (CLI/SDK)
 
 | Event | Log Indicator | Phase |
 |-------|---------------|-------|
@@ -355,7 +556,7 @@ RUST_LOG=debug walrus store test-file.txt 2>&1 | tee failure-insufficient-funds.
 | Certificate posted | "Certificate posted" | On-chain |
 | Point of availability | "Blob available at point of availability" | Complete |
 
-### Retrieval Logs
+### Client Retrieval Logs (CLI/SDK)
 
 | Event | Log Indicator | Phase |
 |-------|---------------|-------|
@@ -387,10 +588,12 @@ RUST_LOG=debug walrus store test-file.txt 2>&1 | tee failure-insufficient-funds.
 You've now learned to:
 
 - ✅ Enable verbose logging for Walrus operations
-- ✅ Identify key events in upload logs (encoding, distribution, signatures, certificate)
-- ✅ Identify key events in retrieval logs (metadata query, fetching, reconstruction)
+- ✅ Analyze Publisher daemon logs (HTTP requests, sub-wallet selection, distribution, certificates)
+- ✅ Analyze Aggregator daemon logs (cache hits/misses, sliver fetching, reconstruction)
+- ✅ Identify key events in client upload logs (encoding, distribution, signatures, certificate)
+- ✅ Identify key events in client retrieval logs (metadata query, fetching, reconstruction)
 - ✅ Diagnose failure scenarios from error messages
-- ✅ Trace complete upload/retrieval flows through logs
+- ✅ Trace complete upload/retrieval flows through logs from multiple perspectives
 - ✅ Generate and analyze your own logs
 
 **Next steps:**
@@ -401,14 +604,16 @@ You've now learned to:
 ## Key Points
 
 - **Enable verbose logging**: `RUST_LOG=debug` or `RUST_LOG=trace`
-- **Key upload events**: Encoding → Registration → Distribution → Signatures → Certificate
-- **Key retrieval events**: Metadata query → Sliver fetching → Reconstruction → Consistency check
+- **Three perspectives**: Publisher daemon logs, Aggregator daemon logs, Client (CLI/SDK) logs
+- **Publisher logs show**: HTTP requests, JWT auth, sub-wallet selection, distribution progress, quorum
+- **Aggregator logs show**: Cache hits/misses, sliver fetching, reconstruction, performance (114x faster with cache!)
+- **Client logs show**: Encoding → Registration → Distribution → Signatures → Certificate (upload); Metadata query → Sliver fetching → Reconstruction → Consistency check (retrieval)
 - **Error diagnosis**: Look for ERROR and WARN log levels, identify phase where error occurred
 - **Timing analysis**: Use timestamps to calculate duration of each phase
 - **Troubleshooting**: Logs are essential for diagnosing production issues
 
 ## Related Sections
 
-- [Component Duties](./component-duties.md) - Understand what each component is responsible for
-- [Failure Modes](./failure-modes.md) - Learn about common failure scenarios
-- [System Guarantees](./guarantees.md) - Know what to verify in logs
+- [Component Duties](./01-component-duties.md) - Understand what each component is responsible for
+- [Failure Modes](./02-failure-modes.md) - Learn about common failure scenarios
+- [System Guarantees](./03-guarantees.md) - Know what to verify in logs

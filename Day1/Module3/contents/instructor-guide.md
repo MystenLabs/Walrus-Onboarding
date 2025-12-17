@@ -11,8 +11,10 @@
 - Publishers, Aggregators, and Clients have distinct operational responsibilities
 - Failures occur at network, storage, encoding, transaction, and application layers
 - System guarantees Byzantine tolerance and data integrity; clients must verify blob IDs
-- CLI provides high-level workflows; SDK (Rust) provides fine-grained control
+- Two main tools for this audience: CLI (high-level, scripts) and TypeScript SDK (web/Node.js applications)
 - Practical constraints include blob size limits (13.3 GiB), storage costs (WAL tokens), and memory requirements
+
+**Note**: This module focuses on CLI and TypeScript SDK as the target audience is fullstack/frontend developers. Rust SDK exists for low-level use cases but is out of scope.
 
 ## Prerequisites
 
@@ -45,10 +47,10 @@
 
 ## Instructor Cheat Sheet
 
-1. **Component Duties (15-20 min):** Publishers encode/distribute | Aggregators fetch/reconstruct | Clients verify
-2. **Failure Modes (15-20 min):** Network | Storage nodes | Encoding | Transactions | Application | Use failure taxonomy
+1. **Component Duties (15-20 min):** Publishers encode/distribute | Aggregators fetch/reconstruct | Clients verify | **Review 7 diagrams**: System Overview (C4 Context), Publisher Internal (C4 Component), Aggregator Internal (C4 Component), Client App (C4 Component), plus 2 sequence diagrams, plus failure diagrams
+2. **Failure Modes (15-20 min):** Network | Storage nodes | Encoding | Transactions | Application | **Use 2 diagrams**: Failure taxonomy (graph) and upload flow with failure points (flowchart)
 3. **System Guarantees (10-15 min):** What's guaranteed vs. what clients must check | Trust boundaries critical
-4. **Control Boundaries (10-15 min):** CLI = high-level | SDK = low-level | When to use each
+4. **Control Boundaries (10-15 min):** CLI = high-level | TypeScript SDK = web/Node.js | When to use each (Focus on TypeScript, not Rust for this audience)
 5. **Practical Constraints (10-15 min):** Blob size, costs, epochs, memory | Real-world design implications
 6. **Hands-On Logs (20-30 min):** Walk through sample logs first | Then students analyze their own
 
@@ -57,7 +59,7 @@
 ## Section-by-Section Guidance
 
 ### Component Duties (15-20 min)
-**Student Material:** component-duties.md
+**Student Material:** 01-component-duties.md
 
 ⏱️ **Duration:** 15-20 minutes
 
@@ -68,10 +70,16 @@
 - **Untrusted infrastructure**: Publishers and Aggregators are untrusted - clients must verify
 
 💡 **Teaching Tips:**
-- Use a table to show "What Can Fail" for each component's duties
+- **Start with the System Architecture Overview diagram (C4 Context)** - shows all components and how they connect using industry-standard C4 architecture format
+- Walk through the **Publisher Internal Architecture (C4 Component)** and **Aggregator Internal Architecture (C4 Component)** diagrams - these use C4 format which is specifically designed for software architecture
+- Use the **Client Application Architecture (C4 Component)** diagram to show what students need to implement
+- **Sequence diagrams** show the lifecycle flows step-by-step
+- Use tables to show "What Can Fail" for each component's duties
 - Emphasize the "trust but verify" model - Publishers/Aggregators are convenient but untrusted
 - Connect to Module 2: Refresh the upload/retrieval flows, then map duties to each step
 - Real-world example: "When you use a Publisher, you're trusting them to encode correctly. How do you verify? Re-encode and compare blob IDs."
+- **Use the diagrams actively**: Point to specific components during discussion
+- **Note**: C4 diagrams (Context, Container, Component) are the industry standard for architectural documentation
 
 ⚠️ **Common Misconceptions:**
 - Students may think Publishers/Aggregators are part of the "core" system - clarify they're optional infrastructure
@@ -95,7 +103,7 @@
 ---
 
 ### Failure Modes (15-20 min)
-**Student Material:** failure-modes.md
+**Student Material:** 02-failure-modes.md
 
 ⏱️ **Duration:** 15-20 minutes (most content-heavy section)
 
@@ -142,7 +150,7 @@
 ---
 
 ### System Guarantees vs. Client Responsibilities (10-15 min)
-**Student Material:** guarantees.md
+**Student Material:** 03-guarantees.md
 
 ⏱️ **Duration:** 10-15 minutes
 
@@ -186,44 +194,55 @@
 
 ---
 
-### Control Boundaries: CLI vs SDK (10-15 min)
-**Student Material:** control-boundaries.md
+### Control Boundaries: CLI vs SDKs (10-15 min)
+**Student Material:** 04-control-boundaries.md
 
 ⏱️ **Duration:** 10-15 minutes
 
 🎯 **Key Points to Emphasize:**
 - **CLI**: High-level, complete workflows, sensible defaults, easy to use
-- **SDK (Rust crate)**: Low-level, fine-grained control, more responsibility
+- **CLI upload relay** (v1.29+): `--upload-relay` flag for limited bandwidth clients (4.5x bandwidth savings)
+- **SDK (Rust crate)**: Low-level, fine-grained control, more responsibility, direct node access
+- **SDK (TypeScript)**: Mid-level, HTTP API wrapper for web/Node.js, requires Publisher/Aggregator
 - **What CLI controls**: Entire upload/retrieval workflow automatically
-- **What SDK exposes**: Building blocks - you implement retry logic, error handling, parallelism
-- **When to use each**: CLI for scripts/testing, SDK for production applications with custom logic
+- **What SDKs expose**: Rust = building blocks | TypeScript = HTTP API wrapper
+- **When to use each**: CLI for scripts/testing/limited bandwidth, Rust SDK for low-level control, TypeScript SDK for web apps
 
 💡 **Teaching Tips:**
-- Use the comparison table (CLI vs SDK) - project on screen or draw on whiteboard
-- Show the decision tree: "Do you need custom logic? → SDK. Are defaults sufficient? → CLI."
+- Use the comparison table (CLI vs TypeScript SDK) - project on screen or draw on whiteboard
+- Show the decision tree: "Building web app? → TypeScript SDK. Limited bandwidth? → CLI with --upload-relay. Scripts? → CLI."
 - Demonstrate CLI command with `RUST_LOG=debug` to show what it's doing automatically
-- Emphasize: SDK is Rust only - no Python/JS SDK currently exists
-- Real example: "If you need to upload 1000 blobs efficiently with custom retry logic, SDK. If you're backing up a few files, CLI."
+- **Demo upload relay**: Show bandwidth savings example (1 GB file: standard = 4.5 GB upload, with --upload-relay = 1 GB upload)
+- Emphasize: TypeScript SDK = via Publisher/Aggregator (HTTP API), CLI --upload-relay = bandwidth efficient
+- Real example: "React app uploading user files → TypeScript SDK. Bash backup script → CLI. Mobile client with limited bandwidth → CLI with --upload-relay."
+- **Note**: Mention that a Rust SDK exists for low-level systems programming, but it's outside the scope for this fullstack/FE audience
 
 ⚠️ **Common Misconceptions:**
-- Students may think there's a Python or JavaScript SDK - only Rust currently
-- May assume CLI can do everything SDK can - CLI has limitations (no custom retry logic, parallelism, etc.)
+- Students may think TypeScript SDK has same capabilities as Rust SDK - it doesn't (no direct node access, requires Publisher/Aggregator)
+- May assume CLI can do everything SDKs can - CLI has limitations (no custom retry logic, parallelism, etc.)
 - Might think SDK is always better - no, CLI is better for simple use cases (easier, less code)
-- May not realize SDK requires implementing significant logic (wallet management, retries, error handling)
+- May not realize Rust SDK requires implementing significant logic (wallet management, retries, error handling)
+- Could think TypeScript SDK works offline - requires Publisher/Aggregator infrastructure
 
 💬 **Discussion Points:**
-- "When would you choose CLI over SDK even for a production application?"
-  - **Answer:** If shell scripting is sufficient, defaults are fine, or you're not using Rust. Can wrap CLI in other languages.
-- "What are the main disadvantages of using SDK?"
-  - **Answer:** More code to write, more responsibility (wallet, gas, retries), Rust only, higher learning curve.
-- "Can you use both CLI and SDK in the same application?"
-  - **Answer:** Yes - CLI for simple operations, SDK for complex ones. Or CLI in scripts, SDK in main application.
+- "When would you use CLI with --upload-relay instead of standard upload?"
+  - **Answer:** Limited bandwidth (mobile, slow connections), large files, client has limited computational resources, want to save bandwidth (4.5x reduction).
+- "When would you use TypeScript SDK instead of CLI?"
+  - **Answer:** Building web applications, need programmatic integration, using JavaScript/TypeScript, want custom error handling and retry logic.
+- "What are the trade-offs of using TypeScript SDK?"
+  - **Answer:** Requires Publisher/Aggregator (dependency), must trust infrastructure (verify blob IDs), easier integration for web apps but less control than direct CLI usage.
+- "What's the trade-off of using --upload-relay?"
+  - **Answer:** Bandwidth savings (4.5x) but must trust relay/Publisher to encode correctly, adds dependency, may incur relay fees.
+- "Can you use multiple tools in the same application?"
+  - **Answer:** Yes - CLI for scripts and testing, TypeScript SDK for frontend/backend. Mix as needed.
 
 ✅ **Quick Check:**
-- "I need to upload 10,000 blobs with custom retry logic and progress tracking. CLI or SDK?" (SDK)
-- "I'm writing a bash backup script. CLI or SDK?" (CLI)
-- "True or False: SDK gives you more control but more responsibility" (True)
-- "What language is the Walrus SDK written in?" (Rust)
+- "I'm building a React app for file uploads. Which tool?" (TypeScript SDK)
+- "I'm writing a bash backup script. Which tool?" (CLI)
+- "I have a mobile client with limited bandwidth uploading large files. Which tool?" (CLI with --upload-relay)
+- "True or False: TypeScript SDK requires Publisher/Aggregator infrastructure" (True)
+- "How much bandwidth does --upload-relay save?" (4.5x - only sends raw file instead of encoded slivers)
+- "What's the main difference between CLI and TypeScript SDK?" (CLI = complete workflows with defaults, TypeScript SDK = programmatic integration for web apps)
 
 **Transition to Next Section:**
 "Whether you use CLI or SDK, you'll hit practical constraints. Let's talk about blob size limits, costs, and other real-world limitations."
@@ -231,7 +250,7 @@
 ---
 
 ### Practical Constraints (10-15 min)
-**Student Material:** practical-constraints.md
+**Student Material:** 05-practical-constraints.md
 
 ⏱️ **Duration:** 10-15 minutes
 
@@ -280,7 +299,7 @@
 ---
 
 ### Hands-On: Log Inspection (20-30 min)
-**Student Material:** hands-on.md
+**Student Material:** 06-hands-on.md
 
 ⏱️ **Duration:** 20-30 minutes
 
@@ -360,8 +379,8 @@ Ask students to answer briefly:
    - Expected: Retryable: network timeout | Non-retryable: blob too large
 3. **What does the system guarantee? What must clients verify?**
    - Expected: System: data integrity, Byzantine tolerance | Clients: blob IDs, on-chain state
-4. **When would you use CLI vs. SDK?**
-   - Expected: CLI: scripts, testing, defaults fine | SDK: production apps, custom logic, Rust
+4. **When would you use CLI vs. TypeScript SDK?**
+   - Expected: CLI: scripts, testing, defaults fine | TypeScript SDK: web apps, programmatic integration, custom logic
 
 ### Assessment Checklist
 
@@ -370,15 +389,16 @@ Use this to gauge if the module was successful:
 - [ ] Students can explain operational duties of Publishers, Aggregators, and Clients
 - [ ] Students can identify failure types (network, storage node, encoding, transaction, application)
 - [ ] Students understand what the system guarantees vs. what clients must verify
-- [ ] Students know when to use CLI vs. SDK
+- [ ] Students know when to use CLI vs. TypeScript SDK
 - [ ] Students are aware of practical constraints (blob size, costs, epochs, memory)
 - [ ] Students can inspect logs to identify key events and diagnose issues
+- [ ] Students understand the lifecycle flows (Publisher and Aggregator diagrams)
 
 ### Quick Poll
 
 - "Raise your hand if you can identify the blob ID in an upload log"
 - "Thumbs up if you understand why Publishers are untrusted"
-- "Show of hands: Who can explain the difference between CLI and SDK?"
+- "Show of hands: Who can explain the difference between CLI and TypeScript SDK?"
 
 ---
 

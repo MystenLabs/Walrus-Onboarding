@@ -85,6 +85,47 @@ Total cost: 1 × 10 × X = 10X WAL tokens
 - Delete or let expire unused blobs
 - Use shorter epoch durations for temporary data
 
+### Quilts for Cost Optimization (Small Blobs)
+
+**Constraint:** Storing many small blobs individually can be expensive (each blob incurs per-epoch storage cost and transaction gas cost).
+
+**Solution: Quilts**
+- Quilts batch multiple small blobs together into a single larger blob
+- Significantly reduces cost per individual item (amortized gas and storage costs)
+- Reduces transaction overhead (one transaction for many blobs vs. many individual transactions)
+
+**When to use Quilts:**
+- Storing many small files (e.g., JSON metadata, thumbnails, configuration files)
+- Cost optimization is critical for your use case
+- Small blobs are logically related or frequently accessed together
+- Individual blob sizes are much smaller than 13.3 GiB limit
+
+**Example cost comparison:**
+```
+Without Quilts:
+- 1000 small JSON files (1 KB each = ~1 MB total)
+- 1000 separate store operations
+- Cost: 1000 × gas cost + 1000 × (storage cost for 1 KB)
+
+With Quilts:
+- 1000 small JSON files batched into 1 Quilt (~1 MB total)
+- 1 store operation
+- Cost: 1 × gas cost + storage cost for 1 MB blob
+- Savings: ~999 transaction fees + simplified management
+```
+
+**Trade-offs:**
+- Must retrieve entire Quilt to access individual blobs (unless using indexing/manifest)
+- More complex to manage than individual blobs
+- Need to implement batching logic in your application
+- May require custom tooling to create, manage, and extract from Quilts
+
+**Application design:**
+- Use Quilts for collections of small, related files
+- Use individual blobs for large files or frequently updated items
+- Consider access patterns (if you need random individual access frequently, Quilts may add overhead)
+- Implement manifest/index for efficient Quilt management
+
 ---
 
 ## Storage Epochs and Expiration
@@ -386,6 +427,7 @@ Error: Insufficient gas budget
 - **Storage costs**: WAL tokens per epoch per GiB
 - **Gas costs**: SUI for transactions
 - **No retrieval fees**: After upload, retrieval is free
+- **Quilts**: Batch small blobs together for significant cost reduction (saves gas and simplifies management)
 
 ### Time Limits
 - **Storage epochs**: Blobs expire after N epochs (extend before expiration)
@@ -404,9 +446,10 @@ Error: Insufficient gas budget
 - **Chunk large files**: Don't exceed 13.3 GiB limit
 - **Track expiration**: Monitor and extend epochs before blobs expire
 - **Budget costs**: Plan for WAL and SUI costs
+- **Use Quilts for small blobs**: Batch many small files together to reduce costs
 - **Implement retries**: Handle transient failures gracefully
 - **Sufficient resources**: Ensure adequate RAM and bandwidth
 
 ## Next Steps
 
-Now that you understand practical constraints, proceed to the [Hands-On Exercise](./hands-on.md) to practice inspecting logs and identifying operational events.
+Now that you understand practical constraints, proceed to the [Hands-On Exercise](./06-hands-on.md) to practice inspecting logs and identifying operational events.
