@@ -19,7 +19,6 @@ PASSPHRASE="your passphrase here" make test-retry
 
 ```bash
 cd hands-on-source-code
-npm install
 npm run test:retry
 ```
 
