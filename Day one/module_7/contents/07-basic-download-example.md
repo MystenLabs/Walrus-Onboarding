@@ -20,22 +20,19 @@ PASSPHRASE="your passphrase here" make test-download BLOB_ID=<copied id>
 cd hands-on-source-code
 # assuming you have already installed the node.js dependencies and included the passphrase in the .env file
 
-
-# PASSPHRASE must be a valid 12- or 24-word BIP39 mnemonic
 npm run test:basic-upload
 # IMPORTANT: <blob-id> must be the blobId printed by the upload step above.
 # The download script does not mint a new blob; it only reads an existing one.
 npm run test:basic-download <blob-id>
 
-# For a quick one-off check, you can also rely on the built-in demo blob ID.
-# If you omit <blob-id>, the script falls back to:
-#   OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk
-# as defined in basic-download-example.ts.
-PASSPHRASE="your passphrase here" npm run test:basic-download
+# For a quick one-off check, you can run without a blob ID.
+# If you omit <blob-id>, the script will upload a test blob first
+# and then download it to verify the round-trip.
+npm run test:basic-download
 ```
 
-The download script does not mint new blobs—it simply reuses the identifier you provide so you can
-verify round-trips across different machines.
+When no blob ID is provided, the script uploads a test blob first and then downloads it to verify
+the round-trip, including content verification.
 
 ## Simple blob download
 
@@ -73,14 +70,15 @@ async function downloadWithErrorHandling(blobId: string) {
     const blobBytes = await client.walrus.readBlob({ blobId });
     return blobBytes;
   } catch (error: any) {
-    if (error.name === "BlobNotCertifiedError") {
-      console.error("Blob is not certified or does not exist");
-    } else if (error.name === "NotEnoughSliversReceivedError") {
-      console.error("Could not retrieve enough slivers to reconstruct blob");
-    } else if (error.name === "BlobBlockedError") {
-      console.error("Blob is blocked by storage nodes");
+    if (error instanceof BlobNotCertifiedError) {
+      console.error('Blob is not certified or does not exist');
+    } else if (error instanceof NotEnoughSliversReceivedError) {
+      console.error('Could not retrieve enough slivers to reconstruct blob');
+      // Retry logic here
+    } else if (error instanceof BlobBlockedError) {
+      console.error('Blob is blocked by storage nodes');
     } else {
-      console.error("Unexpected error:", error);
+      console.error('Unexpected error:', error);
     }
     throw error;
   }
@@ -92,32 +90,60 @@ retry, alert users, or fall back to a different blob.
 
 ## Running the script end-to-end
 
-When you run `npm run test:basic-download <blob-id>`, the harness simply calls `downloadBlob()` and
+When you run `npm run test:basic-download <blob-id>`, the harness calls `downloadBlob()` and
 prints a success banner. 
 
 The `<blob-id>` argument is expected to be the **on-chain numeric blob ID**
-in decimal form (the `blob_id` you see in the Sui object).
+in decimal form (the `blob_id` you see in the Sui object), or the short Walrus blob ID string.
 
-If you omit `<blob-id>`, it uses the demo
-Walrus blob ID string `OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk` instead. Errors are bubbled up so your shell exits non-zero:
+If you omit `<blob-id>`, the script will **upload a test blob first** and then download it to verify
+the round-trip. This makes it easy to test the download flow without needing an existing blob ID:
 
 ```ts
+// Accept either an on-chain numeric blob ID (decimal string) or the short Walrus blob ID.
+// If you pass a decimal string, we convert it to the Walrus blobId string using blobIdFromInt().
+// If you omit the argument, we upload a test blob first and then download it.
 const arg = process.argv[2];
-const isNumeric = !!(arg && /^\d+$/.test(arg));
-const blobId: string =
-  isNumeric
-    ? blobIdFromInt(BigInt(arg)) // convert on-chain numeric ID to Walrus blobId string
-    : (arg || 'OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk');
 
-console.log(
-  `=== Downloading blob (input format: ${
-    isNumeric ? 'on-chain numeric' : 'Walrus blobId'
-  }, normalized: ${blobId}): ${arg ?? 'OFrKO0ofGc4inX8roHHaAB-pDHuUiIA08PW4N2B2gFk'} ===`,
-);
-await downloadBlob(blobId);
+let blobId: string;
+let expectedContent: string | undefined;
+
+if (arg) {
+  // User provided a blob ID
+  const isNumeric = /^\d+$/.test(arg);
+  blobId = isNumeric ? blobIdFromInt(BigInt(arg)) : arg;
+
+  console.log(
+    `=== Downloading blob (input format: ${
+      isNumeric ? 'on-chain numeric' : 'Walrus blobId'
+    }, normalized: ${blobId}) ===`,
+  );
+} else {
+  // No blob ID provided - upload first
+  const uploadResult = await uploadTestBlob();
+  blobId = uploadResult.blobId;
+  expectedContent = uploadResult.content;
+
+  console.log(`=== Downloading the uploaded blob: ${blobId} ===`);
+}
+
+const downloadedBytes = await downloadBlob(blobId);
+
+// Verify content if we uploaded it ourselves
+if (expectedContent) {
+  const downloadedContent = new TextDecoder().decode(downloadedBytes);
+  if (downloadedContent === expectedContent) {
+    console.log('\n✅ Content verification successful! Downloaded content matches uploaded content.');
+  } else {
+    console.error('\n❌ Content mismatch!');
+    console.error(`Expected: ${expectedContent}`);
+    console.error(`Got: ${downloadedContent}`);
+    throw new Error('Content verification failed');
+  }
+}
 
 console.log('\n✅ Download example completed successfully!');
-sure the code path works.
+```
 
 ## Key takeaways
 

@@ -40,7 +40,7 @@ const client = new SuiClient({
 
 const keypair = await getFundedKeypair();
 
-const data = new TextEncoder().encode("Hello, Walrus!");
+const data = new TextEncoder().encode("Hello, Walrus!" + Date.now());
 
 const { blobId, blobObject } = await client.walrus.writeBlob({
   blob: data,
@@ -74,7 +74,7 @@ const client = new SuiClient({
   })
 );
 
-const data = new TextEncoder().encode("Hello, Walrus with Relay!");
+const data = new TextEncoder().encode("Hello, Walrus with Relay!" + Date.now());
 
 const { blobId, blobObject } = await client.walrus.writeBlob({
   blob: data,
@@ -84,7 +84,7 @@ const { blobId, blobObject } = await client.walrus.writeBlob({
 });
 ```
 
-To run just this path, execute `PASSPHRASE="…" npm run test:basic-upload -- relay`, or simply inspect
+To run just this path, execute `npm run test:basic-upload -- relay`, or simply inspect
 the `uploadWithRelay()` logs in the default test run.
 
 ## Running both paths together
@@ -145,7 +145,7 @@ const downloadedBytes = await client.walrus.readBlob({ blobId });
 const downloadedContent = new TextDecoder().decode(downloadedBytes);
 ```
 
-Run it with `PASSPHRASE="…" npm run test:hands-on` (or `make test-hands-on`). This script is ideal
+Run it with `npm run test:hands-on` (or `make test-hands-on`). This script is ideal
 for adapting into CI jobs or demos because it proves the entire round-trip.
 
 ## Key takeaways

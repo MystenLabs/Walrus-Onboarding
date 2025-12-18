@@ -195,18 +195,18 @@ async function verifyBlobIntegrity(blobId: string, expectedData: Uint8Array) {
     if (!match) {
       throw new Error('Blob content mismatch');
     }
-  }
-  
-  // For larger blobs, compute and compare hashes
-  const downloadedHash = await crypto.subtle.digest('SHA-256', downloadedData);
-  const expectedHash = await crypto.subtle.digest('SHA-256', expectedData);
-  
-  const match = new Uint8Array(downloadedHash).every(
-    (byte, i) => byte === new Uint8Array(expectedHash)[i]
-  );
-  
-  if (!match) {
-    throw new Error('Blob hash mismatch');
+  } else {
+    // For larger blobs, compute and compare hashes
+    const downloadedHash = await crypto.subtle.digest('SHA-256', downloadedData);
+    const expectedHash = await crypto.subtle.digest('SHA-256', expectedData);
+    
+    const match = new Uint8Array(downloadedHash).every(
+      (byte, i) => byte === new Uint8Array(expectedHash)[i]
+    );
+    
+    if (!match) {
+      throw new Error('Blob hash mismatch');
+    }
   }
   
   return true;

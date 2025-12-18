@@ -20,7 +20,7 @@ PASSPHRASE="your passphrase here" make test-retry
 ```bash
 cd hands-on-source-code
 npm install
-PASSPHRASE="your passphrase here" npm run test:retry
+npm run test:retry
 ```
 
 The `test:retry` script uploads a small blob multiple times, exercising the basic and conditional

@@ -72,7 +72,7 @@ keypair loader.
 ```typescript
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { walrus, RetryableWalrusClientError } from "@mysten/walrus";
-import { getFundedKeypair } from "./utils/getFundedKeypair.js";
+import { getFundedKeypair } from "../utils/getFundedKeypair.js";
 // Replace the helper path with your own loader as needed.
 
 // TODO: Initialize the client with uploadRelay config
@@ -97,7 +97,7 @@ async function main() {
 
   console.log("Starting upload...");
 
-  let blobId: string;
+  let blobId: string | undefined;;
   let blobObject: any;
 
   // TODO: Wrap this in a capped retry loop to handle RetryableWalrusClientError
@@ -116,7 +116,7 @@ async function main() {
       blobObject = result.blobObject;
       break;
     } catch (e) {
-      attempt += 1;
+      attempt++;
       const error = e as Error;
 
       if (error instanceof RetryableWalrusClientError && attempt < maxRetries) {
@@ -148,7 +148,8 @@ async function main() {
   if (downloadedContent === content) {
     console.log("SUCCESS: Integrity verified!");
   } else {
-    console.error("FAILURE: Content mismatch!");
+    console.error(`Original length: ${content.length}, Downloaded length: ${downloadedContent.length}`);
+    throw new Error('Content verification failed');
   }
 }
 
