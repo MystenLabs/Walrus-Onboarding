@@ -6,31 +6,30 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "tsx src/run-lab.ts",
     "create-simple": "tsx 03-creation-process/ts/03-create-simple.ts",
     "create-flow": "tsx 03-creation-process/ts/03-create-flow.ts",
     "create-walrus-file": "tsx 03-creation-process/ts/03-create-walrus-file.ts",
-    "create-unique": "tsx 03-creation-process/ts/03-unique-ids.ts",
-    "create-error": "tsx 03-creation-process/ts/03-error-handling.ts",
     "retrieve-identifiers": "tsx 04-retrieval-process/ts/01-get-files-identifiers.ts",
     "retrieve-tags": "tsx 04-retrieval-process/ts/02-query-by-tag.ts",
     "retrieve-patch-ids": "tsx 04-retrieval-process/ts/03-retrieve-by-patch-id.ts",
     "retrieve-all": "tsx 04-retrieval-process/ts/04-get-all-patches.ts",
     "retrieve-patterns": "tsx 04-retrieval-process/ts/05-patterns.ts",
+    "example-game-assets": "tsx 05-real-example/game-assets.ts",
     "example-website-deploy": "tsx 05-real-example/website-deploy.ts",
-    "example-website-retrieve": "tsx 05-real-example/website-retrieve.ts",
-    "example-game-assets": "tsx 05-real-example/game-assets.ts"
+    "example-website-retrieve": "tsx 05-real-example/website-retrieve.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@mysten/sui": "^1.45.0",
-    "@mysten/walrus": "^0.8.4"
+    "@mysten/walrus": "^0.8.4",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "dotenv": "^16.4.5"
   }
 }

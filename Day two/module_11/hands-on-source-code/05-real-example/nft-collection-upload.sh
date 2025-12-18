@@ -1,7 +1,7 @@
 #!/bin/bash
 # nft-collection-upload.sh
 
-QUILT_EPOCHS=50
+QUILT_EPOCHS=1
 QUILT_BLOBS=""
 
 # Create directories and dummy files if they don't exist
@@ -30,4 +30,4 @@ done
 
 # Store as quilt
 echo "Running command: walrus store-quilt --epochs \"$QUILT_EPOCHS\" --blobs $QUILT_BLOBS"
-eval walrus store-quilt --epochs "$QUILT_EPOCHS" --blobs $QUILT_BLOBS
+eval walrus --context testnet store-quilt --epochs "$QUILT_EPOCHS" --blobs $QUILT_BLOBS

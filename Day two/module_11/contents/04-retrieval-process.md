@@ -42,7 +42,7 @@ The most common approach is retrieving patches by their identifier.
 
 ### CLI: `read-quilt --identifiers`
 
-[Source Code: 01-retrieve-by-identifier.sh](hands-on-source-code/04-retrieval-process/cli/01-retrieve-by-identifier.sh)
+[Source Code: 01-retrieve-by-identifier.sh](../hands-on-source-code/04-retrieval-process/cli/01-retrieve-by-identifier.sh)
 
 **How it works**:
 
@@ -52,15 +52,15 @@ The most common approach is retrieving patches by their identifier.
 4. Download only those slivers
 5. Decode and save the patches
 
-**Source Reference**: [`crates/walrus-service/src/client/cli/runner.rs:636-644`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/cli/runner.rs#L636-L644)
+**Source Reference**: [`crates/walrus-service/src/client/cli/runner.rs:611-657`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/cli/runner.rs#L611-L657)
 
 ### TypeScript SDK: `getFiles()` with Identifiers
 
-[Source Code: 01-get-files-identifiers.ts](hands-on-source-code/04-retrieval-process/ts/01-get-files-identifiers.ts)
+[Source Code: 01-get-files-identifiers.ts](../hands-on-source-code/04-retrieval-process/ts/01-get-files-identifiers.ts)
 
 ### HTTP API: Get Patch by Identifier
 
-[Source Code: 07-http-api-examples.sh](hands-on-source-code/04-retrieval-process/cli/07-http-api-examples.sh)
+[Source Code: 07-http-api-examples.sh](../hands-on-source-code/04-retrieval-process/cli/07-http-api-examples.sh)
 
 **Response**:
 - **Body**: The patch data (file contents)
@@ -69,7 +69,7 @@ The most common approach is retrieving patches by their identifier.
   - `Content-Length`: Size of the patch
   - `Content-Type`: MIME type (if detectable)
 
-**Source Reference**: [`crates/walrus-service/src/client/daemon/routes.rs:688-732`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs#L688-L732)
+**Source Reference**: [`crates/walrus-service/src/client/daemon/routes.rs:688-732`](https://github.com/search?q=repo%3AMystenLabs%2Fwalrus%20get_patch_by_quilt_id_and_identifier&type=code)
 
 ## Method 2: Retrieve by Tag
 
@@ -77,7 +77,7 @@ Retrieve all patches that have a specific tag key-value pair.
 
 ### CLI: `read-quilt --tag`
 
-[Source Code: 02-retrieve-by-tag.sh](hands-on-source-code/04-retrieval-process/cli/02-retrieve-by-tag.sh)
+[Source Code: 02-retrieve-by-tag.sh](../hands-on-source-code/04-retrieval-process/cli/02-retrieve-by-tag.sh)
 
 **Use cases**:
 - Retrieve all images of a certain type: `--tag format png`
@@ -88,7 +88,7 @@ Retrieve all patches that have a specific tag key-value pair.
 
 ### TypeScript SDK: Query by Tag
 
-[Source Code: 02-query-by-tag.ts](hands-on-source-code/04-retrieval-process/ts/02-query-by-tag.ts)
+[Source Code: 02-query-by-tag.ts](../hands-on-source-code/04-retrieval-process/ts/02-query-by-tag.ts)
 
 ### HTTP API: Get Patches by Tag
 
@@ -103,25 +103,25 @@ Each patch has a unique QuiltPatchId that can be used for direct retrieval.
 
 First, get the list of patches and their IDs:
 
-[Source Code: 03-list-patches.sh](hands-on-source-code/04-retrieval-process/cli/03-list-patches.sh)
+[Source Code: 03-list-patches.sh](../hands-on-source-code/04-retrieval-process/cli/03-list-patches.sh)
 
-**Source Reference**: [`crates/walrus-service/src/client/cli/runner.rs:669-711`](../../../../crates/walrus-service/src/client/cli/runner.rs)
+**Source Reference**: [`crates/walrus-service/src/client/cli/runner.rs:669-711`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/cli/runner.rs#L669-L711)
 
 ### Step 2: Retrieve by Patch ID
 
-[Source Code: 04-retrieve-by-patch-id.sh](hands-on-source-code/04-retrieval-process/cli/04-retrieve-by-patch-id.sh)
+[Source Code: 04-retrieve-by-patch-id.sh](../hands-on-source-code/04-retrieval-process/cli/04-retrieve-by-patch-id.sh)
 
 **Source Reference**: [`crates/walrus-service/src/client/cli/runner.rs:654-656`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/cli/runner.rs#L654-L656)
 
 ### TypeScript SDK: Retrieve by Patch ID
 
-[Source Code: 03-retrieve-by-patch-id.ts](hands-on-source-code/04-retrieval-process/ts/03-retrieve-by-patch-id.ts)
+[Source Code: 03-retrieve-by-patch-id.ts](../hands-on-source-code/04-retrieval-process/ts/03-retrieve-by-patch-id.ts)
 
-**Source Reference**: [`ts-sdks/packages/walrus/examples/quilt/read-quilt.ts`](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/examples/quilt/read-quilt.ts)
+**Source Reference**: [`@mysten/walrus`](https://github.com/MystenLabs/ts-sdks/tree/main/packages/walrus)
 
 ### HTTP API: Get Patch by Patch ID
 
-[Source Code: 07-http-api-examples.sh](hands-on-source-code/04-retrieval-process/cli/07-http-api-examples.sh)
+[Source Code: 07-http-api-examples.sh](../hands-on-source-code/04-retrieval-process/cli/07-http-api-examples.sh)
 
 **Source Reference**: [`crates/walrus-service/src/client/daemon/routes.rs:556-609`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs#L556-L609)
 
@@ -131,7 +131,7 @@ Retrieve every patch in the quilt at once.
 
 ### CLI: `read-quilt` without filters
 
-[Source Code: 05-retrieve-all.sh](hands-on-source-code/04-retrieval-process/cli/05-retrieve-all.sh)
+[Source Code: 05-retrieve-all.sh](../hands-on-source-code/04-retrieval-process/cli/05-retrieve-all.sh)
 
 **When to use**:
 - Downloading an entire collection
@@ -142,7 +142,7 @@ Retrieve every patch in the quilt at once.
 
 ### TypeScript SDK: Get All Patches
 
-[Source Code: 04-get-all-patches.ts](hands-on-source-code/04-retrieval-process/ts/04-get-all-patches.ts)
+[Source Code: 04-get-all-patches.ts](../hands-on-source-code/04-retrieval-process/ts/04-get-all-patches.ts)
 
 **Source Reference**: [`ts-sdks/packages/walrus/src/files/blob.ts:29-63`](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/files/blob.ts#L29-L63)
 
@@ -152,15 +152,15 @@ Sometimes you just want to see what's in a quilt without downloading data.
 
 ### CLI: `list-patches-in-quilt`
 
-[Source Code: 03-list-patches.sh](hands-on-source-code/04-retrieval-process/cli/03-list-patches.sh)
+[Source Code: 03-list-patches.sh](../hands-on-source-code/04-retrieval-process/cli/03-list-patches.sh)
 
 **Alias**: `resolve-quilt` (same command)
 
-**Source Reference**: [`crates/walrus-service/src/client/cli/runner.rs:669-711`](../../../../crates/walrus-service/src/client/cli/runner.rs)
+**Source Reference**: [`crates/walrus-service/src/client/cli/runner.rs:669-711`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/cli/runner.rs#L669-L711)
 
 ### HTTP API: List Patches
 
-[Source Code: 07-http-api-examples.sh](hands-on-source-code/04-retrieval-process/cli/07-http-api-examples.sh)
+[Source Code: 07-http-api-examples.sh](../hands-on-source-code/04-retrieval-process/cli/07-http-api-examples.sh)
 
 **Source Reference**: [`crates/walrus-service/src/client/daemon/routes.rs:748-808`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/daemon/routes.rs#L748-L808)
 
@@ -201,26 +201,26 @@ Retrieve all 100 files:
 
 ### Pattern 1: Selective Download by Category
 
-[Source Code: 06-common-patterns.sh](hands-on-source-code/04-retrieval-process/cli/06-common-patterns.sh)
+[Source Code: 06-common-patterns.sh](../hands-on-source-code/04-retrieval-process/cli/06-common-patterns.sh)
 
 ### Pattern 2: Download by List of Identifiers
 
-[Source Code: 06-common-patterns.sh](hands-on-source-code/04-retrieval-process/cli/06-common-patterns.sh)
+[Source Code: 06-common-patterns.sh](../hands-on-source-code/04-retrieval-process/cli/06-common-patterns.sh)
 
 ### Pattern 3: Incremental Download with Tracking
 
-[Source Code: 05-patterns.ts](hands-on-source-code/04-retrieval-process/ts/05-patterns.ts)
+[Source Code: 05-patterns.ts](../hands-on-source-code/04-retrieval-process/ts/05-patterns.ts)
 
 ### Pattern 4: On-Demand Lazy Loading
 
-[Source Code: 05-patterns.ts](hands-on-source-code/04-retrieval-process/ts/05-patterns.ts)
+[Source Code: 05-patterns.ts](../hands-on-source-code/04-retrieval-process/ts/05-patterns.ts)
 
 ## Error Handling
 
 ### Patch Not Found
 
 ```sh
-walrus read-quilt --out ./downloads/ \
+walrus --context testnet read-quilt --out ./downloads/ \
   --quilt-id <QUILT_ID> \
   --identifiers nonexistent-file.txt
 
@@ -232,7 +232,7 @@ walrus read-quilt --out ./downloads/ \
 ### Invalid QuiltPatchId
 
 ```sh
-walrus read-quilt --out ./downloads/ \
+walrus --context testnet read-quilt --out ./downloads/ \
   --quilt-patch-ids INVALID_ID
 
 # Error: Invalid QuiltPatchId format
@@ -243,12 +243,12 @@ walrus read-quilt --out ./downloads/ \
 ### Quilt Not Available
 
 ```sh
-walrus read-quilt --out ./downloads/ --quilt-id <EXPIRED_QUILT_ID>
+walrus --context testnet read-quilt --out ./downloads/ --quilt-id <EXPIRED_QUILT_ID>
 
 # Error: Blob not available (may be expired or not yet certified)
 ```
 
-**Fix**: Check quilt status with `walrus blob-status --blob-id <QUILT_ID>`.
+**Fix**: Check quilt status with `walrus --context testnet blob-status --blob-id <QUILT_ID>`.
 
 ## Best Practices
 
@@ -257,7 +257,7 @@ walrus read-quilt --out ./downloads/ --quilt-id <EXPIRED_QUILT_ID>
 Always list patches first to understand structure:
 
 ```sh
-walrus list-patches-in-quilt <QUILT_ID>
+walrus --context testnet list-patches-in-quilt <QUILT_ID>
 # Review the output, then retrieve specific patches
 ```
 
@@ -267,10 +267,10 @@ Identifiers are more readable and maintainable than QuiltPatchIds:
 
 ```sh
 # Preferred
-walrus read-quilt --quilt-id <ID> --identifiers config.json
+walrus --context testnet read-quilt --quilt-id <ID> --identifiers config.json
 
 # Avoid (unless necessary)
-walrus read-quilt --quilt-patch-ids <LONG_PATCH_ID>
+walrus --context testnet read-quilt --quilt-patch-ids <LONG_PATCH_ID>
 ```
 
 ### 3. Use Tags for Bulk Operations
@@ -279,7 +279,7 @@ Design your tag schema for efficient bulk queries:
 
 ```sh
 # Download all production configs
-walrus read-quilt --quilt-id <ID> --tag environment production
+walrus --context testnet read-quilt --quilt-id <ID> --tag environment production
 ```
 
 ### 4. Cache Metadata Locally

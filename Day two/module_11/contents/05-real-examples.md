@@ -8,30 +8,29 @@ Store and manage a collection of NFT images with metadata.
 
 ### Scenario
 
-You have a collection of 100 profile picture NFTs, each with metadata about rarity, attributes, etc.
+You have a collection of NFT profile pictures, each with metadata about rarity, attributes, etc.
 
 ### Directory Structure
 
 ```text
-nft-collection/
-├── images/
-│   ├── nft-001.png
-│   ├── nft-002.png
-│   └── ...
-└── metadata/
-    ├── nft-001.json
-    ├── nft-002.json
-    └── ...
+images/
+├── nft-001.png
+├── nft-002.png
+└── ...
+metadata/
+├── nft-001.json
+├── nft-002.json
+└── ...
 ```
 
 ### Step 1: Create the Quilt with Custom Metadata
 
 ```sh
-walrus store-quilt --epochs 50 \
+walrus --context testnet store-quilt --epochs 1 \
   --blobs '{"path":"images/nft-001.png","identifier":"nft-001-image","tags":{"rarity":"legendary","type":"image"}}' \
           '{"path":"metadata/nft-001.json","identifier":"nft-001-meta","tags":{"rarity":"legendary","type":"metadata"}}' \
-          '{"path":"images/nft-002.png","identifier":"nft-002-image","tags":{"rarity":"common","type":"image"}}' \
-          '{"path":"metadata/nft-002.json","identifier":"nft-002-meta","tags":{"rarity":"common","type":"metadata"}}'
+          '{"path":"images/nft-002.png","identifier":"nft-002-image","tags":{"rarity":"rare","type":"image"}}' \
+          '{"path":"metadata/nft-002.json","identifier":"nft-002-meta","tags":{"rarity":"rare","type":"metadata"}}'
 ```
 
 
@@ -41,7 +40,7 @@ walrus store-quilt --epochs 50 \
 Successfully stored quilt!
 Quilt ID: GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc
 Blob object ID: 0x1a2b3c...
-End epoch: 150
+End epoch: 101
 Patches: 4
 Storage cost: 0.012 WAL
 ```
@@ -49,14 +48,14 @@ Storage cost: 0.012 WAL
 ### Step 2: List All NFTs in the Collection
 
 ```sh
-walrus list-patches-in-quilt GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc
+walrus --context testnet list-patches-in-quilt GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc
 ```
 
 ### Step 3: Retrieve Only Legendary NFTs
 
 ```sh
 # Get all legendary NFT images
-walrus read-quilt --out ./legendary/ \
+walrus --context testnet read-quilt --out ./legendary/ \
   --quilt-id GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc \
   --tag rarity legendary
 ```
@@ -65,14 +64,14 @@ walrus read-quilt --out ./legendary/ \
 
 ```sh
 # Get specific NFT by identifier
-walrus read-quilt --out ./nft-001/ \
+walrus --context testnet read-quilt --out ./nft-001/ \
   --quilt-id GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc \
   --identifiers nft-001-image nft-001-meta
 ```
 
 **Shell Script for Automation**:
 
-[View full source code](./hands-on-source-code/05-real-example/nft-collection-upload.sh)
+[View full source code](../hands-on-source-code/05-real-example/nft-collection-upload.sh)
 
 ## Example 2: Static Website Hosting (TypeScript SDK)
 
@@ -84,13 +83,13 @@ Deploy a documentation website with HTML, CSS, JavaScript, and image files.
 
 ### Complete Code
 
-[View full source code](./hands-on-source-code/05-real-example/website-deploy.ts)
+[View full source code](../hands-on-source-code/05-real-example/website-deploy.ts)
 
-**Source Reference**: Based on [`ts-sdks/packages/walrus/examples/quilt/write-flow.ts`](../../../../ts-sdks/packages/walrus/examples/quilt/write-flow.ts)
+**Source Reference**: Based on [`ts-sdks/packages/walrus/examples/quilt/write-flow.ts`](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/examples/quilt/write-flow.ts)
 
 ### Retrieving the Website
 
-[View full source code](./hands-on-source-code/05-real-example/website-retrieve.ts)
+[View full source code](../hands-on-source-code/05-real-example/website-retrieve.ts)
 
 ## Example 3: Game Asset Management (TypeScript)
 
@@ -102,7 +101,7 @@ A game needs to load textures, sounds, and configuration files for each level.
 
 ### Code
 
-[View full source code](./hands-on-source-code/05-real-example/game-assets.ts)
+[View full source code](../hands-on-source-code/05-real-example/game-assets.ts)
 
 ## Example 4: Batch Processing Output (CLI + Script)
 
@@ -114,11 +113,11 @@ A data pipeline processes 1000 files and stores results as a quilt for analysis.
 
 ### Shell Script
 
-[View full source code](./hands-on-source-code/05-real-example/process-and-store.sh)
+[View full source code](../hands-on-source-code/05-real-example/process-and-store.sh)
 
 ### Retrieval Script
 
-[View full source code](./hands-on-source-code/05-real-example/retrieve-batch-results.sh)
+[View full source code](../hands-on-source-code/05-real-example/retrieve-batch-results.sh)
 
 ## Key Takeaways
 

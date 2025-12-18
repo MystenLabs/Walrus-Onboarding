@@ -1,0 +1,10 @@
+{
+  "name": "Service Contract v2",
+  "version": "2.0.0",
+  "description": "Updated contract with new terms",
+  "terms": {
+    "duration": "24 months",
+    "value": 85000
+  }
+}
+

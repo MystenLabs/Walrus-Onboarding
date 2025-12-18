@@ -34,7 +34,7 @@ Verify your setup:
 
 ```sh
 walrus --version
-walrus info
+walrus --context testnet info
 ```
 
 Or for TypeScript:
@@ -42,33 +42,6 @@ Or for TypeScript:
 ```sh
 npm list @mysten/walrus
 ```
-
-## Running in Docker (Recommended for Consistent Results)
-
-For a consistent environment across all operating systems, we provide Docker setups:
-
-### Option 1: CLI Exercises
-
-```sh
-# From the quilts module directory
-cd docker
-make build
-SUI_WALLET_PATH=~/.sui/sui_config make run
-
-# Create test files
-make create-test-files
-```
-
-### Option 2: TypeScript SDK Exercises
-
-```sh
-# From the quilts module directory
-cd hands-on-source-code
-make build
-PASSPHRASE='your testnet passphrase' make test
-```
-
-> 💡 **Docker for Windows Users:** Docker provides the most reliable experience for Windows users, as all Unix-specific commands work identically inside the container.
 
 ## Part 1: Prepare Test Files
 
@@ -238,7 +211,7 @@ You can complete this lab using either CLI or TypeScript SDK.
 #### Step 2A.1: Create Quilt with Metadata
 
 ```sh
-walrus store-quilt --epochs 10 \
+walrus --context testnet store-quilt --epochs 10 \
   --blobs \
     '{"path":"test-files/introduction.txt","identifier":"intro","tags":{"type":"document","format":"text","category":"documentation"}}' \
     '{"path":"test-files/config.json","identifier":"config","tags":{"type":"config","format":"json","category":"configuration"}}' \
@@ -294,7 +267,7 @@ Create `create-quilt.ts`:
 ```typescript
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { walrus, WalrusFile } from '@mysten/walrus';
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { getFundedKeypair } from './get-keypair'; // Your keypair helper
 
 async function createQuilt() {
@@ -397,7 +370,7 @@ npx tsx create-quilt.ts
 ### Step 3.1: List All Patches (CLI)
 
 ```sh
-walrus list-patches-in-quilt $QUILT_ID
+walrus --context testnet list-patches-in-quilt $QUILT_ID
 ```
 
 **Expected output**:
@@ -467,7 +440,7 @@ Total patches: 5
 
 ```sh
 mkdir -p downloads/by-identifier
-walrus read-quilt --out downloads/by-identifier/ \
+walrus --context testnet read-quilt --out downloads/by-identifier/ \
   --quilt-id $QUILT_ID \
   --identifiers intro
 ```
@@ -501,7 +474,7 @@ Compare-Object (Get-Content test-files/introduction.txt) (Get-Content downloads/
 ### Step 4.3: Retrieve Multiple Files
 
 ```sh
-walrus read-quilt --out downloads/by-identifier/ \
+walrus --context testnet read-quilt --out downloads/by-identifier/ \
   --quilt-id $QUILT_ID \
   --identifiers config homepage
 ```
@@ -551,7 +524,7 @@ Write-Output "All files match original: Success!"
 
 ```sh
 mkdir -p downloads/by-tag-documents
-walrus read-quilt --out downloads/by-tag-documents/ \
+walrus --context testnet read-quilt --out downloads/by-tag-documents/ \
   --quilt-id $QUILT_ID \
   --tag type document
 ```
@@ -562,7 +535,7 @@ walrus read-quilt --out downloads/by-tag-documents/ \
 
 ```sh
 mkdir -p downloads/by-tag-json
-walrus read-quilt --out downloads/by-tag-json/ \
+walrus --context testnet read-quilt --out downloads/by-tag-json/ \
   --quilt-id $QUILT_ID \
   --tag format json
 ```
@@ -573,7 +546,7 @@ walrus read-quilt --out downloads/by-tag-json/ \
 
 ```sh
 mkdir -p downloads/by-category
-walrus read-quilt --out downloads/by-category/ \
+walrus --context testnet read-quilt --out downloads/by-category/ \
   --quilt-id $QUILT_ID \
   --tag category configuration
 ```
@@ -608,7 +581,7 @@ Write-Output "Config files: $((Get-ChildItem downloads/by-category).Count)"     
 
 ```sh
 # List patches and extract IDs
-walrus list-patches-in-quilt $QUILT_ID --json > patches.json
+walrus --context testnet list-patches-in-quilt $QUILT_ID --json > patches.json
 
 # Extract specific patch ID (e.g., for 'intro') - requires jq
 INTRO_PATCH_ID=$(jq -r '.patches[] | select(.identifier == "intro") | .patch_id' patches.json)
@@ -620,7 +593,7 @@ echo "Intro Patch ID: $INTRO_PATCH_ID"
 
 ```powershell
 # List patches and extract IDs
-walrus list-patches-in-quilt $QUILT_ID --json | Out-File patches.json
+walrus --context testnet list-patches-in-quilt $QUILT_ID --json | Out-File patches.json
 
 # Extract specific patch ID (e.g., for 'intro')
 $patches = Get-Content patches.json | ConvertFrom-Json
@@ -633,7 +606,7 @@ Write-Output "Intro Patch ID: $INTRO_PATCH_ID"
 
 ```sh
 mkdir -p downloads/by-patch-id
-walrus read-quilt --out downloads/by-patch-id/ \
+walrus --context testnet read-quilt --out downloads/by-patch-id/ \
   --quilt-patch-ids $INTRO_PATCH_ID
 ```
 
@@ -668,7 +641,7 @@ Write-Output "Patch ID retrieval: Success!"
 CONFIG_PATCH_ID=$(jq -r '.patches[] | select(.identifier == "config") | .patch_id' patches.json)
 HOMEPAGE_PATCH_ID=$(jq -r '.patches[] | select(.identifier == "homepage") | .patch_id' patches.json)
 
-walrus read-quilt --out downloads/by-patch-id/ \
+walrus --context testnet read-quilt --out downloads/by-patch-id/ \
   --quilt-patch-ids $CONFIG_PATCH_ID $HOMEPAGE_PATCH_ID
 ```
 
@@ -679,7 +652,7 @@ $patches = Get-Content patches.json | ConvertFrom-Json
 $CONFIG_PATCH_ID = ($patches.patches | Where-Object { $_.identifier -eq "config" }).patch_id
 $HOMEPAGE_PATCH_ID = ($patches.patches | Where-Object { $_.identifier -eq "homepage" }).patch_id
 
-walrus read-quilt --out downloads/by-patch-id/ `
+walrus --context testnet read-quilt --out downloads/by-patch-id/ `
   --quilt-patch-ids $CONFIG_PATCH_ID $HOMEPAGE_PATCH_ID
 ```
 
@@ -689,7 +662,7 @@ walrus read-quilt --out downloads/by-patch-id/ `
 
 ```sh
 mkdir -p downloads/full-quilt
-walrus read-quilt --out downloads/full-quilt/ \
+walrus --context testnet read-quilt --out downloads/full-quilt/ \
   --quilt-id $QUILT_ID
 ```
 
@@ -814,13 +787,13 @@ echo ""
 
 # Test 1: List patches
 echo "[1/5] Listing patches..."
-PATCH_COUNT=$(walrus list-patches-in-quilt $QUILT_ID --json | jq '.patches | length')
+PATCH_COUNT=$(walrus --context testnet list-patches-in-quilt $QUILT_ID --json | jq '.patches | length')
 echo "  ✓ Found $PATCH_COUNT patches (expected: 5)"
 
 # Test 2: Retrieve by identifier
 echo "[2/5] Testing retrieval by identifier..."
 mkdir -p verify-downloads
-walrus read-quilt --out verify-downloads/ --quilt-id $QUILT_ID --identifiers intro > /dev/null 2>&1
+walrus --context testnet read-quilt --out verify-downloads/ --quilt-id $QUILT_ID --identifiers intro > /dev/null 2>&1
 if [ -f verify-downloads/intro ]; then
   echo "  ✓ Successfully retrieved by identifier"
 else
@@ -830,7 +803,7 @@ fi
 
 # Test 3: Retrieve by tag
 echo "[3/5] Testing retrieval by tag..."
-walrus read-quilt --out verify-downloads/ --quilt-id $QUILT_ID --tag type document > /dev/null 2>&1
+walrus --context testnet read-quilt --out verify-downloads/ --quilt-id $QUILT_ID --tag type document > /dev/null 2>&1
 DOC_COUNT=$(ls verify-downloads/ | grep -v intro | wc -l)
 echo "  ✓ Retrieved $DOC_COUNT documents by tag"
 
@@ -842,7 +815,7 @@ echo "  ✓ Content matches original"
 # Test 5: Retrieve all
 echo "[5/5] Testing full quilt retrieval..."
 rm -rf verify-downloads/*
-walrus read-quilt --out verify-downloads/ --quilt-id $QUILT_ID > /dev/null 2>&1
+walrus --context testnet read-quilt --out verify-downloads/ --quilt-id $QUILT_ID > /dev/null 2>&1
 TOTAL_FILES=$(ls verify-downloads/ | wc -l)
 echo "  ✓ Retrieved all $TOTAL_FILES files"
 
@@ -869,7 +842,7 @@ If you want to clean up after the lab:
 
 ```sh
 # Delete the quilt (if deletable)
-walrus delete --blob-id $QUILT_ID
+walrus --context testnet delete --blob-id $QUILT_ID
 
 # Remove local files
 rm -rf walrus-quilt-lab/
@@ -878,7 +851,7 @@ rm -rf walrus-quilt-lab/
 **Windows (Command Prompt):**
 
 ```cmd
-walrus delete --blob-id %QUILT_ID%
+walrus --context testnet delete --blob-id %QUILT_ID%
 
 rmdir /s /q walrus-quilt-lab
 ```
@@ -886,7 +859,7 @@ rmdir /s /q walrus-quilt-lab
 **Windows (PowerShell):**
 
 ```powershell
-walrus delete --blob-id $QUILT_ID
+walrus --context testnet delete --blob-id $QUILT_ID
 
 Remove-Item -Recurse -Force walrus-quilt-lab
 ```

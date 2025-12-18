@@ -7,7 +7,7 @@ This section covers common pitfalls when working with quilts and how to avoid th
 ### The Problem
 
 ```sh
-walrus store-quilt --epochs 10 \
+walrus --context testnet store-quilt --epochs 10 \
   --blobs '{"path":"./file1.txt","identifier":"config.json"}' \
           '{"path":"./file2.txt","identifier":"config.json"}'
 
@@ -29,7 +29,7 @@ project/
 ```
 
 ```sh
-walrus store-quilt --epochs 10 --paths ./project/
+walrus --context testnet store-quilt --epochs 10 --paths ./project/
 
 # Error: Duplicate identifier 'config.json'
 ```
@@ -39,7 +39,7 @@ walrus store-quilt --epochs 10 --paths ./project/
 **Solution 1**: Use unique identifiers with `--blobs`
 
 ```sh
-walrus store-quilt --epochs 10 \
+walrus --context testnet store-quilt --epochs 10 \
   --blobs '{"path":"./project/api/config.json","identifier":"api-config"}' \
           '{"path":"./project/web/config.json","identifier":"web-config"}'
 ```
@@ -91,7 +91,7 @@ find ./project -type f -exec basename {} \; | sort | uniq -d
 
 ```sh
 # User tries to read a patch using the regular BlobId
-walrus read 057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ik --out file.txt
+walrus --context testnet read 057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ik --out file.txt
 
 # This downloads the ENTIRE quilt, not the individual patch!
 ```
@@ -120,7 +120,7 @@ WRONG:
 
 ```sh
 # Correct way to read a specific patch
-walrus read-quilt --out ./output/ \
+walrus --context testnet read-quilt --out ./output/ \
   --quilt-id 057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ik \
   --identifiers my-file.pdf
 ```
@@ -129,10 +129,10 @@ walrus read-quilt --out ./output/ \
 
 ```sh
 # First, list patches to get QuiltPatchIds
-walrus list-patches-in-quilt 057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ik
+walrus --context testnet list-patches-in-quilt 057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ik
 
 # Then use the QuiltPatchId
-walrus read-quilt --out ./output/ \
+walrus --context testnet read-quilt --out ./output/ \
   --quilt-patch-ids 057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ikBAAACAAA
 ```
 
@@ -155,7 +155,7 @@ const files = await blob.files({
 
 ```sh
 # User tries to delete a specific file from a quilt
-walrus delete --blob-id <QuiltPatchId>
+walrus --context testnet delete --blob-id <QuiltPatchId>
 
 # Error: Operation not supported on quilt patches
 ```
@@ -256,7 +256,7 @@ await client.walrus.deleteBlob(specificBlobId);
 ### The Problem
 
 ```sh
-walrus store-quilt --epochs 10 \
+walrus --context testnet store-quilt --epochs 10 \
   --blobs '{"path":"file.txt","identifier":"file","tags":{"data":"'$(cat huge-data.txt)'"}}'
 
 # Error: Total tags size exceeds 64 KB limit
@@ -443,7 +443,7 @@ interface FileMapping {
 ### The Problem
 
 ```sh
-walrus store-quilt --epochs 10 \
+walrus --context testnet store-quilt --epochs 10 \
   --paths ./directory/ \
   --blobs '{"path":"./file.txt","identifier":"myfile"}'
 
@@ -460,10 +460,10 @@ walrus store-quilt --epochs 10 \
 
 ```sh
 # Option A: Use only --paths (simpler, auto-identifiers)
-walrus store-quilt --epochs 10 --paths ./directory/
+walrus --context testnet store-quilt --epochs 10 --paths ./directory/
 
 # Option B: Use only --blobs (more control)
-walrus store-quilt --epochs 10 \
+walrus --context testnet store-quilt --epochs 10 \
   --blobs '{"path":"./file1.txt","identifier":"file1"}' \
           '{"path":"./file2.txt","identifier":"file2"}'
 ```
@@ -485,7 +485,7 @@ for file in $(find "$DIR" -type f); do
 done
 
 # Now use with --blobs
-eval walrus store-quilt --epochs 10 --blobs $BLOBS_ARGS
+eval walrus --context testnet store-quilt --epochs 10 --blobs $BLOBS_ARGS
 ```
 
 ## Mistake 7: Forgetting to Handle Asynchronous Operations
@@ -540,7 +540,7 @@ console.log('Quilt created:', quilt[0].blobId);
 ### The Problem
 
 ```sh
-walrus store-quilt --epochs 10 \
+walrus --context testnet store-quilt --epochs 10 \
   --blobs '{"path":"./file.txt","identifier":" invalid-identifier"}'
 
 # Error: Identifier ' invalid-identifier' contains leading whitespace
@@ -589,7 +589,7 @@ const files = rawFiles.map(f =>
 ### The Problem
 
 ```sh
-walrus store-quilt --epochs 50 --paths ./large-collection/
+walrus --context testnet store-quilt --epochs 50 --paths ./large-collection/
 
 # Error: Insufficient funds for transaction
 # Required: 0.5 SUI + 2.5 WAL
@@ -606,7 +606,7 @@ walrus store-quilt --epochs 50 --paths ./large-collection/
 
 ```sh
 # Check cost before actual upload
-walrus store-quilt --dry-run --epochs 50 --paths ./large-collection/
+walrus --context testnet store-quilt --dry-run --epochs 50 --paths ./large-collection/
 
 # Output:
 # Estimated cost: 2.5 WAL
@@ -645,7 +645,7 @@ await ensureSufficientFunds(client, address, estimatedSuiCost, estimatedWalCost)
 
 ```sh
 # Trying to store 1000 files in one quilt
-walrus store-quilt --epochs 10 --paths ./1000-files/
+walrus --context testnet store-quilt --epochs 10 --paths ./1000-files/
 
 # Error: QuiltV1 supports maximum 666 blobs, attempted 1000
 ```

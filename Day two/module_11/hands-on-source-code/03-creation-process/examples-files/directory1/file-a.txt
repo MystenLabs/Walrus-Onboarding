@@ -1,0 +1,1 @@
+Sample file A in directory1 for CLI quilt examples.

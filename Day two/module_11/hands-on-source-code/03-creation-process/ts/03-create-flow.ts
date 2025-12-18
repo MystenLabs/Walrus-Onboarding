@@ -28,12 +28,12 @@ async function main() {
   // Prepare files
   const files = [
     WalrusFile.from({
-      contents: await readFileData('./file1.txt'),
+      contents: await readFileData('./create-flow-example-files/file1.txt'),
       identifier: 'file1',
       tags: { category: 'documents' },
     }),
     WalrusFile.from({
-      contents: await readFileData('./file2.txt'),
+      contents: await readFileData('./create-flow-example-files/file2.txt'),
       identifier: 'file2',
       tags: { category: 'documents' },
     }),
@@ -66,7 +66,7 @@ async function main() {
 
   // Step 6: Get the result
   const result = await flow.listFiles();
-  console.log('Stored patches:', result);
+  console.log('Stored patches:', JSON.stringify(result, null, 2));
 }
 
 main().catch(console.error);

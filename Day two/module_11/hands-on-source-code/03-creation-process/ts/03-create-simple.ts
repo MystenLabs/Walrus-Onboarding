@@ -14,7 +14,7 @@ async function main() {
   // Prepare files with metadata
   const files = [
     WalrusFile.from({
-      contents: new TextEncoder().encode('Hello, World!'),
+      contents: new TextEncoder().encode('Hello, World! +' + new Date().toISOString()),
       identifier: 'hello',
       tags: {
         type: 'text',
@@ -22,7 +22,7 @@ async function main() {
       },
     }),
     WalrusFile.from({
-      contents: new TextEncoder().encode('Second file content'),
+      contents: new TextEncoder().encode('Second file content +' + new Date().toISOString()),
       identifier: 'second-file',
       tags: {
         type: 'text',
@@ -39,7 +39,7 @@ async function main() {
     signer: keypair,
   });
 
-  console.log('Quilt created:', quilt);
+  console.log('Quilt created:', JSON.stringify(quilt, null, 2));
 }
 
 main().catch(console.error);

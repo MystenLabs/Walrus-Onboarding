@@ -8,7 +8,7 @@ async function main() {
     identifier: 'my-file',
     tags: { key: 'value' },
   });
-  console.log('Created file1');
+  console.log('Created file1:', JSON.stringify(file1, null, 2));
 
   // From Uint8Array (binary data)
   const binaryData = new Uint8Array([1, 2, 3]);
@@ -16,36 +16,22 @@ async function main() {
     contents: binaryData,
     identifier: 'binary-file',
   });
-  console.log('Created file2');
+  console.log('Created file2:', JSON.stringify(file2, null, 2));
 
   // From file system (Node.js)
   try {
-    const fileData = await readFile('./path/to/file.pdf');
+    const fileData = await readFile('./03-creation-process/ts/create-flow-example-files/file.pdf');
     const file3 = WalrusFile.from({
       contents: new Uint8Array(fileData),
       identifier: 'document.pdf',
       tags: { format: 'pdf', author: 'Alice' },
     });
-    console.log('Created file3');
+    console.log('Created file3:', JSON.stringify(file3, null, 2));
   } catch (e) {
-    console.log('Skipped file system example (file not found)');
+    console.log('Skipped file system example (file not found):', e);
   }
 
-  // From Blob (Browser environment simulation)
-  try {
-    // Note: fetch and Blob are global in modern Node.js or browser
-    const response = await fetch('https://example.com/image.png');
-    const blob = await response.blob();
-    const arrayBuffer = await blob.arrayBuffer();
-    const file4 = WalrusFile.from({
-      contents: new Uint8Array(arrayBuffer),
-      identifier: 'image.png',
-      tags: { source: 'external' },
-    });
-    console.log('Created file4');
-  } catch (e) {
-    console.log('Skipped fetch example');
-  }
+  
 }
 
 main().catch(console.error);

@@ -1,0 +1,10 @@
+Application Manifest
+====================
+
+Files included in this deployment:
+- config.yaml (application configuration)
+- settings.json (user preferences)
+- manifest.txt (this file)
+
+Retrieve all files at once with read-quilt command.
+

@@ -42,14 +42,14 @@ graph TD
 
 The `store-quilt` command provides two ways to specify files: using `--paths` or `--blobs`.
 
-> **Note**: You can find all CLI examples in this section in [`hands-on-source-code/03-creation-process/cli/03-cli-examples.sh`](./hands-on-source-code/03-creation-process/cli/03-cli-examples.sh).
+> **Note**: You can find all CLI examples in this section in the [`hands-on-source-code/03-creation-process/cli/`](../hands-on-source-code/03-creation-process/cli/) directory.
 
 ### Using `--paths` (Simple File Collection)
 
 The `--paths` option recursively includes files from specified directories:
 
 ```sh
-walrus store-quilt --epochs 10 --paths /path/to/directory1 /path/to/directory2
+walrus --context testnet store-quilt --epochs 10 --paths /path/to/directory1 /path/to/directory2
 ```
 
 **How it works**:
@@ -71,7 +71,7 @@ walrus store-quilt --epochs 10 --paths /path/to/directory1 /path/to/directory2
 #       ├── meta001.json
 #       └── meta002.json
 
-walrus store-quilt --epochs 20 --paths ./nft-collection/
+walrus --context testnet store-quilt --epochs 20 --paths ./nft-collection/
 ```
 
 This creates a quilt with identifiers:
@@ -89,7 +89,7 @@ This creates a quilt with identifiers:
 The `--blobs` option allows full control over identifiers and tags:
 
 ```sh
-walrus store-quilt --epochs 10 \
+walrus --context testnet store-quilt --epochs 10 \
   --blobs '{"path":"/path/to/file1.pdf","identifier":"paper-v2","tags":{"author":"Alice","status":"final"}}' \
           '{"path":"/path/to/file2.pdf","identifier":"paper-v3","tags":{"author":"Bob","status":"draft"}}'
 ```
@@ -109,7 +109,7 @@ walrus store-quilt --epochs 10 \
 **Example: Store documentation with metadata**
 
 ```sh
-walrus store-quilt --epochs 30 \
+walrus --context testnet store-quilt --epochs 30 \
   --blobs '{"path":"./docs/intro.html","identifier":"intro","tags":{"chapter":"1","lang":"en","version":"1.0"}}' \
           '{"path":"./docs/getting-started.html","identifier":"getting-started","tags":{"chapter":"2","lang":"en","version":"1.0"}}' \
           '{"path":"./docs/api-reference.html","identifier":"api-ref","tags":{"chapter":"3","lang":"en","version":"1.0"}}'
@@ -123,7 +123,7 @@ walrus store-quilt --epochs 30 \
 - Maximum identifier size: 64 KB
 - Maximum total tags size: 64 KB
 
-**Source Reference**: [`crates/walrus-service/src/client/cli/args.rs:251-263`](https://github.com/MystenLabs/walrus/tree/main/crates/walrus-service/src/client/cli/args.rs#L251-L263)
+**Source Reference**: [`crates/walrus-service/src/client/cli/args.rs:251-263`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/cli/args.rs#L234-L266)
 
 ### Storage Duration Options
 
@@ -131,26 +131,26 @@ Like regular `store` commands, you can specify duration using:
 
 ```sh
 # Store for a specific number of epochs
-walrus store-quilt --epochs 50 --paths ./files/
+walrus --context testnet store-quilt --epochs 50 --paths ./files/
 
 # Store until a specific epoch
-walrus store-quilt --end-epoch 1500 --paths ./files/
+walrus --context testnet store-quilt --end-epoch 1500 --paths ./files/
 
 # Store until a specific timestamp
-walrus store-quilt --earliest-expiry-time "2025-12-31T23:59:59Z" --paths ./files/
+walrus --context testnet store-quilt --earliest-expiry-time "2025-12-31T23:59:59Z" --paths ./files/
 
 # Store for the maximum allowed duration
-walrus store-quilt --epochs max --paths ./files/
+walrus --context testnet store-quilt --epochs max --paths ./files/
 ```
 
 ### Blob Type Options
 
 ```sh
 # Deletable blob (default)
-walrus store-quilt --epochs 10 --paths ./files/
+walrus --context testnet store-quilt --epochs 10 --paths ./files/
 
 # Permanent blob (cannot be deleted before expiry)
-walrus store-quilt --epochs 10 --permanent --paths ./files/
+walrus --context testnet store-quilt --epochs 10 --permanent --paths ./files/
 ```
 
 **Note**: If you want to create a shared quilt, you'll need to use the `share` command after storing, since shared blobs must be permanent.
@@ -159,7 +159,7 @@ walrus store-quilt --epochs 10 --permanent --paths ./files/
 
 ```sh
 # Create a quilt with custom metadata
-walrus store-quilt --epochs 25 \
+walrus --context testnet store-quilt --epochs 25 \
   --blobs '{"path":"./assets/logo.png","identifier":"logo","tags":{"type":"image","format":"png","size":"small"}}' \
           '{"path":"./assets/banner.jpg","identifier":"banner","tags":{"type":"image","format":"jpg","size":"large"}}' \
           '{"path":"./config/app.json","identifier":"config","tags":{"type":"config","format":"json"}}'
@@ -172,7 +172,7 @@ walrus store-quilt --epochs 25 \
 # Patches: 3
 ```
 
-**Source Reference**: See the implementation in [`crates/walrus-service/src/client/cli/runner.rs:982-1095`](https://github.com/MystenLabs/walrus/tree/main/crates/walrus-service/src/client/cli/runner.rs#L982-L1095)
+**Source Reference**: See the implementation in [`crates/walrus-service/src/client/cli/runner.rs:982-1095`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/cli/runner.rs#L1035-L1331)
 
 ## Method 2: TypeScript SDK
 
@@ -182,11 +182,8 @@ The TypeScript SDK provides two approaches: a simple one-step method and a detai
 
 The `writeFiles()` method handles all steps automatically:
 
-See [`03-create-simple.ts`](./hands-on-source-code/03-creation-process/ts/03-create-simple.ts) for the complete example.
+See [`03-create-simple.ts`](../hands-on-source-code/03-creation-process/ts/03-create-simple.ts) for the complete example.
 
-```typescript
-{{#include hands-on-source-code/03-creation-process/ts/03-create-simple.ts}}
-```
 
 **Source Reference**: [`ts-sdks/packages/walrus/examples/quilt/write-blob.ts`](https://github.com/MystenLabs/ts-sdks/tree/main/packages/walrus/examples/quilt/write-blob.ts)
 
@@ -194,10 +191,10 @@ See [`03-create-simple.ts`](./hands-on-source-code/03-creation-process/ts/03-cre
 
 For more control over the registration, upload, and certification steps:
 
-See [`03-create-flow.ts`](./hands-on-source-code/03-creation-process/ts/03-create-flow.ts) for the complete example.
+See [`03-create-flow.ts`](../hands-on-source-code/03-creation-process/ts/03-create-flow.ts) for the complete example.
 
 ```typescript
-{{#include hands-on-source-code/03-creation-process/ts/03-create-flow.ts}}
+{{#include ../hands-on-source-code/03-creation-process/ts/03-create-flow.ts}}
 ```
 
 **Why use the flow method?**
@@ -207,29 +204,13 @@ See [`03-create-flow.ts`](./hands-on-source-code/03-creation-process/ts/03-creat
 - **Progress tracking**: Monitor upload progress
 - **Debugging**: Easier to identify where issues occur
 
-**Source Reference**: [`ts-sdks/packages/walrus/examples/quilt/write-flow.ts`](../../../../ts-sdks/packages/walrus/examples/quilt/write-flow.ts)
+**Source Reference**: [`ts-sdks/packages/walrus/examples/quilt/write-flow.ts`](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/examples/quilt/write-flow.ts)
 
 ### Creating WalrusFile Objects
 
 There are multiple ways to create `WalrusFile` objects:
 
-See [`03-create-walrus-file.ts`](./hands-on-source-code/03-creation-process/ts/03-create-walrus-file.ts) for examples.
-
-```typescript
-{{#include hands-on-source-code/03-creation-process/ts/03-create-walrus-file.ts}}
-```
-
-## Method 3: Rust SDK
-
-For applications written in Rust, use the quilt client:
-
-See [`create_quilt.rs`](./hands-on-source-code/03-creation-process/rust/create_quilt.rs) for the complete example.
-
-```rust
-{{#include hands-on-source-code/03-creation-process/rust/create_quilt.rs}}
-```
-
-**Source Reference**: [`crates/walrus-sdk/src/client/quilt_client.rs`](https://github.com/MystenLabs/walrus/tree/main/crates/walrus-sdk/src/client/quilt_client.rs)
+See [`03-create-walrus-file.ts`](../hands-on-source-code/03-creation-process/ts/03-create-walrus-file.ts) for examples.
 
 ## Best Practices for Quilt Creation
 
@@ -287,20 +268,20 @@ Optimal quilt size depends on your use case:
 
 Always ensure identifiers are unique:
 
-See [`03-unique-ids.ts`](./hands-on-source-code/03-creation-process/ts/03-unique-ids.ts) for the implementation.
+See [`03-unique-ids.ts`](../hands-on-source-code/03-creation-process/ts/03-unique-ids.ts) for the implementation.
 
 ### 5. Error Handling
 
 Always handle potential errors:
 
-See [`03-error-handling.ts`](./hands-on-source-code/03-creation-process/ts/03-error-handling.ts) for the example pattern.
+See [`03-error-handling.ts`](../hands-on-source-code/03-creation-process/ts/03-error-handling.ts) for the example pattern.
 
 ## Dry Run for Cost Estimation
 
 Before creating large quilts, estimate costs:
 
 ```sh
-walrus store-quilt --dry-run --epochs 50 --paths ./large-collection/
+walrus --context testnet store-quilt --dry-run --epochs 50 --paths ./large-collection/
 ```
 
 **Output**:
@@ -362,13 +343,13 @@ Always verify your quilt was created successfully:
 
 ```sh
 # Check blob status
-walrus blob-status --blob-id <QUILT_ID>
+walrus --context testnet blob-status --blob-id <QUILT_ID>
 
 # List all patches
-walrus list-patches-in-quilt <QUILT_ID>
+walrus --context testnet list-patches-in-quilt <QUILT_ID>
 
 # Read a specific patch to verify
-walrus read-quilt --quilt-id <QUILT_ID> --identifiers <IDENTIFIER> --out ./verify/
+walrus --context testnet read-quilt --quilt-id <QUILT_ID> --identifiers <IDENTIFIER> --out ./verify/
 ```
 
 ## Key Takeaways

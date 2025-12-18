@@ -93,34 +93,79 @@ async function uploadGameAssets() {
 
   const keypair = await getFundedKeypair();
   
+  // Load real files from disk for our game assets
+  const [
+    level1Background,
+    level1Music,
+    level2Background,
+    uiButton,
+    gameConfig,
+  ] = await Promise.all([
+    // Level 1 background texture
+    readFile(
+      new URL(
+        '../03-creation-process/examples-files/assets/banner.jpg',
+        import.meta.url,
+      ),
+    ),
+    // Level 1 music (using an existing binary asset)
+    readFile(
+      new URL(
+        '../03-creation-process/examples-files/nft-collection/image001.png',
+        import.meta.url,
+      ),
+    ),
+    // Level 2 background texture
+    readFile(
+      new URL(
+        '../03-creation-process/examples-files/assets/logo.png',
+        import.meta.url,
+      ),
+    ),
+    // Common UI asset
+    readFile(
+      new URL(
+        '../03-creation-process/examples-files/docs/intro.html',
+        import.meta.url,
+      ),
+    ),
+    // Game configuration file
+    readFile(
+      new URL(
+        '../03-creation-process/examples-files/config/app.json',
+        import.meta.url,
+      ),
+    ),
+  ]);
+
   const files = [
     // Level 1 assets
     WalrusFile.from({
-      contents: new TextEncoder().encode('background 1 data'),
+      contents: level1Background,
       identifier: 'level1-background',
       tags: { level: '1', type: 'texture', common: 'false' },
     }),
     WalrusFile.from({
-      contents: new TextEncoder().encode('music 1 data'),
+      contents: level1Music,
       identifier: 'level1-music',
       tags: { level: '1', type: 'sound', common: 'false' },
     }),
-    
+
     // Level 2 assets
     WalrusFile.from({
-      contents: new TextEncoder().encode('background 2 data'),
+      contents: level2Background,
       identifier: 'level2-background',
       tags: { level: '2', type: 'texture', common: 'false' },
     }),
-    
+
     // Common assets (used across levels)
     WalrusFile.from({
-      contents: new TextEncoder().encode('ui button data'),
+      contents: uiButton,
       identifier: 'ui-button',
       tags: { type: 'texture', common: 'true' },
     }),
     WalrusFile.from({
-      contents: new TextEncoder().encode('config data'),
+      contents: gameConfig,
       identifier: 'game-config',
       tags: { type: 'config', common: 'true' },
     }),

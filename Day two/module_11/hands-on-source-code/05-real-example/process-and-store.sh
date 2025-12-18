@@ -39,12 +39,12 @@ done
 echo "Storing quilt with results..."
 
 # Store as quilt
-eval walrus store-quilt --epochs "$EPOCHS" --blobs $BLOBS_JSON --json > quilt-info.json
+eval walrus --context testnet store-quilt --epochs "$EPOCHS" --blobs $BLOBS_JSON --json > quilt-info.json
 
 QUILT_ID=$(grep -o '"quilt_id":"[^"]*"' quilt-info.json | cut -d'"' -f4)
-# Try alternate field if quilt_id not found (sometimes it might be blobId)
 if [ -z "$QUILT_ID" ]; then
-    QUILT_ID=$(grep -o '"blob_id":"[^"]*"' quilt-info.json | cut -d'"' -f4 | head -n 1)
+    # Current camelCase blobId field from walrus --json output
+    QUILT_ID=$(grep -o '"blobId": *"[^"]*"' quilt-info.json | head -n 1 | cut -d'"' -f4)
 fi
 
 echo "✓ Batch results stored!"

@@ -1,23 +1,34 @@
 #!/bin/bash
 # Retrieve by Identifier
 
-# Load quilt ID from previous step if available, otherwise use placeholder
-if [ -f ../../quilt-info.json ]; then
-    QUILT_ID=$(jq -r .quiltId ../../quilt-info.json)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+EXAMPLES_DIR="$SCRIPT_DIR/01-examples"
+QUILT_INFO="$SCRIPT_DIR/01-quilt-info.json"
+
+# Load quilt ID from previous step, or create a new quilt
+if [ -f "$QUILT_INFO" ]; then
+    QUILT_ID=$(jq -r '.blobStoreResult.newlyCreated.blobObject.blobId // .blobStoreResult.alreadyCertified.blobId' "$QUILT_INFO")
+    echo "Using existing Quilt ID: $QUILT_ID"
 else
-    QUILT_ID="057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ik"
+    echo "No quilt-info.json found. Creating a new quilt with identifiable documents..."
+    
+    # Create a quilt with identifiable HTML documents
+    RESULT=$(walrus --context testnet store-quilt --json --epochs 10 \
+      --blobs '{"path":"'"$EXAMPLES_DIR"'/intro.html","identifier":"intro.html"}' \
+              '{"path":"'"$EXAMPLES_DIR"'/chapter-01.html","identifier":"chapter-01.html"}' \
+              '{"path":"'"$EXAMPLES_DIR"'/chapter-02.html","identifier":"chapter-02.html"}')
+    
+    QUILT_ID=$(echo "$RESULT" | jq -r '.blobStoreResult.newlyCreated.blobObject.blobId // .blobStoreResult.alreadyCertified.blobId')
+    echo "$RESULT" > "$QUILT_INFO"
+    echo "Created new quilt with ID: $QUILT_ID"
 fi
 
-echo "Using Quilt ID: $QUILT_ID"
-
 # Create output directory
-mkdir -p ./downloads
+mkdir -p "$SCRIPT_DIR/01-downloads"
 
 # Retrieve specific documents from a quilt
-# Note: You might need to adjust identifiers based on what's actually in your quilt
-walrus read-quilt --out ./downloads/ \
+walrus --context testnet read-quilt --out "$SCRIPT_DIR/01-downloads/" \
   --quilt-id "$QUILT_ID" \
   --identifiers chapter-01.html chapter-02.html intro.html
 
-echo "Retrieval complete. Check ./downloads/"
-
+echo "Retrieval complete. Check ./01-downloads/"

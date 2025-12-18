@@ -31,7 +31,7 @@ When storing many small files individually, these gas fees add up significantly.
 
 **Real-world impact**: In test runs, storing 600 files individually cost **238x more** in Sui gas fees compared to storing them as a single quilt.*
 
-\* *Note: This comparison is based on storing 600 files as a single quilt versus storing them as individual blobs in batches of 25 on the Walrus Testnet. Reference: [Quilt Usage Guide](../../usage/quilt.md#lower-cost).*
+\* *Note: This comparison is based on storing 600 files as a single quilt versus storing them as individual blobs in batches of 25 on the Walrus Testnet. Reference: [Quilt Usage Guide](https://docs.wal.app/docs/usage/quilt).*
 
 ## Cost Comparison
 
@@ -47,7 +47,7 @@ The following table demonstrates the dramatic cost savings quilts provide when s
 |       1MB |            7.035 WAL |          0.535 WAL |            13x |
 
 > ℹ️ **Note:** These costs are illustrative and from Testnet. Actual costs vary based on network parameters, but the relative savings remain substantial.
-You can verify these costs on your current network using the [verification script](./hands-on-source-code/verify_costs.sh).
+You can verify these costs on your current network using the [verification script](../hands-on-source-code/verify_costs.sh).
 
 ## Key Insight
 
@@ -201,11 +201,6 @@ The quilt feature is implemented across several components:
   - [Version and configuration handling](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/quilt_encoding.rs#L823-L837): Implements versioning and configuration traits for QuiltV1.
 
 ### SDK Implementation
-
-#### Rust SDK
-- **Quilt client**: [`crates/walrus-sdk/src/client/quilt_client.rs`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client/quilt_client.rs)
-  - [`get_all_blobs()` method](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client/quilt_client.rs#L681-L698): Implementation for retrieving all blobs from a quilt.
-  - [Internal ID retrieval](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client/quilt_client.rs#L651-L679): Internal helper for fetching blob content by ID.
 
 #### TypeScript SDK
 - **Walrus Package**: [`@mysten/walrus`](https://github.com/MystenLabs/ts-sdks/tree/main/packages/walrus)

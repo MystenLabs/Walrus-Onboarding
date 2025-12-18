@@ -115,7 +115,7 @@ async function deployWebsite(siteDirectory: string, epochs: number) {
   
   // Generate access URLs
   console.log('\nAccess your site:');
-  console.log(`https://aggregator.testnet.walrus.space/v1/blobs/${quiltId}/by-identifier/index.html`);
+  console.log(`https://aggregator.walrus-testnet.walrus.space/v1/blobs/${quiltId}/by-identifier/index.html`);
   
   return {
       quiltId,

@@ -1,0 +1,8 @@
+Quarterly Report Q2 2024
+========================
+
+Summary of activities for the second quarter.
+Each file becomes a patch in the quilt.
+
+Revenue: $1.5M
+Growth: 25%

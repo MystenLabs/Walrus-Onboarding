@@ -215,10 +215,10 @@ echo "Hello" > demo-quilt/hello.txt
 echo '{"test": true}' > demo-quilt/config.json
 
 # Store as quilt (dry-run first!)
-walrus store-quilt --dry-run --epochs 5 --paths ./demo-quilt/
+walrus --context testnet store-quilt --dry-run --epochs 5 --paths ./demo-quilt/
 
 # If costs look good, store for real
-walrus store-quilt --epochs 5 --paths ./demo-quilt/
+walrus --context testnet store-quilt --epochs 5 --paths ./demo-quilt/
 ```
 
 **Transition to Next Section:**
@@ -273,14 +273,14 @@ walrus store-quilt --epochs 5 --paths ./demo-quilt/
 **Demonstration:**
 ```bash
 # First, list what's in the quilt
-walrus list-patches-in-quilt <QUILT_ID>
+walrus --context testnet list-patches-in-quilt <QUILT_ID>
 
 # Retrieve by identifier
 mkdir -p downloads
-walrus read-quilt --out ./downloads/ --quilt-id <QUILT_ID> --identifiers hello.txt
+walrus --context testnet read-quilt --out ./downloads/ --quilt-id <QUILT_ID> --identifiers hello.txt
 
 # Retrieve by tag
-walrus read-quilt --out ./downloads/ --quilt-id <QUILT_ID> --tag type document
+walrus --context testnet read-quilt --out ./downloads/ --quilt-id <QUILT_ID> --tag type document
 ```
 
 **Transition to Next Section:**
@@ -348,14 +348,14 @@ walrus read-quilt --out ./downloads/ --quilt-id <QUILT_ID> --tag type document
 - **Live demonstration of errors** - intentionally trigger them:
   ```bash
   # Duplicate identifier error
-  walrus store-quilt --epochs 5 \
+  walrus --context testnet store-quilt --epochs 5 \
     --blobs '{"path":"a.txt","identifier":"config"}' \
             '{"path":"b.txt","identifier":"config"}'
   # Error: Duplicate identifier 'config' in quilt
   ```
 - Show the "wrong command" error:
   ```bash
-  walrus read <QuiltPatchId>
+  walrus --context testnet read <QuiltPatchId>
   # Error or unexpected behavior - downloads entire quilt or fails
   ```
 - Emphasize the "Prevention Checklist" at the end of the section
@@ -414,9 +414,9 @@ walrus read-quilt --out ./downloads/ --quilt-id <QUILT_ID> --tag type document
 | Issue | Solution |
 |-------|----------|
 | "Duplicate identifier" error | Check for duplicate filenames in paths |
-| "Insufficient funds" error | Use `walrus get-wal` to exchange SUI for WAL |
+| "Insufficient funds" error | Use `walrus --context testnet get-wal` to exchange SUI for WAL |
 | `read-quilt` "No such file or directory" | Create output directory first with `mkdir -p` |
-| Wrong network (mainnet vs testnet) | Use `--config` to specify testnet config |
+| Wrong network (mainnet vs testnet) | Use `--context testnet` to specify testnet context |
 | QuiltPatchId not working | Use `read-quilt --quilt-patch-ids`, not `read` |
 
 **Verification Script:**
@@ -428,7 +428,7 @@ Encourage students to run the verify script to check their work:
 ⚠️ **Common Misconceptions During Lab:**
 - Students may try to use `walrus read` for patches - remind them: `read-quilt` only
 - Might forget to create output directories before `read-quilt`
-- Could use mainnet config by accident - verify network with `walrus info`
+- Could use mainnet config by accident - verify network with `walrus --context testnet info`
 
 💬 **Discussion Points (during wrap-up):**
 - "What surprised you about working with quilts?"
@@ -484,8 +484,8 @@ Use this to gauge if the module was successful:
 
 ### For Students
 
-- [Walrus Quilt Documentation](https://docs.wal.app/usage/quilt.html) - Official user guide
-- [CLI Reference](https://docs.wal.app/usage/client-cli.html) - Command documentation
+- [Walrus Quilt Documentation](https://docs.wal.app/docs/usage/quilt) - Official user guide
+- [CLI Reference](https://docs.wal.app/docs/usage/client-cli) - Command documentation
 - `ts-sdks/packages/walrus/examples/quilt/` - Runnable SDK examples
 - `hands-on-source-code/` - Lab source code and verification scripts
 

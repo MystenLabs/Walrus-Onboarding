@@ -6,7 +6,7 @@ This section explains the technical structure of quilts and how blobs are organi
 
 A quilt is a specialized blob that contains multiple smaller blobs (called "patches") along with metadata for each patch. The key insight is that quilts are structured so that individual patches can be retrieved without downloading the entire quilt.
 
-![Quilt Structure](./images/quilt-structure-diagram.svg)
+![Quilt Structure](../images/quilt-structure-diagram.svg)
 
 ## QuiltV1 Structure
 
@@ -94,13 +94,13 @@ Key differences:
 
 ## Visual Comparison
 
-![Blob ID Comparison](./images/blob-id-comparison.svg)
+![Blob ID Comparison](../images/blob-id-comparison.svg)
 
 **Key Insight**: The same file content has different QuiltPatchIds in different quilts!
 
 ## Metadata System
 
-Quilts introduce "**Walrus-native**" metadata stored directly within the quilt structure (see [Quilt Usage Guide](https://docs.wal.app/usage/quilt.html#walrus-native-blob-metadata)).
+Quilts introduce "**Walrus-native**" metadata stored directly within the quilt structure (see [Quilt Usage Guide](https://docs.wal.app/docs/usage/quilt)).
 
 ### Identifiers
 
@@ -188,7 +188,7 @@ impl QuiltColumnRangeReader for QuiltDecoderV1<'_> {
 
 **Efficient Individual Retrieval**: When you request a specific patch, storage nodes only need to return the slivers for that patch, not adjacent patches or the entire quilt.
 
-![Quilt Sliver Layout](./images/sliver-layout-diagram.svg)
+![Quilt Sliver Layout](../images/sliver-layout-diagram.svg)
 
 **Result**: Retrieval latency comparable to (or even better than) regular blobs, despite being part of a larger quilt.
 
@@ -217,7 +217,7 @@ sequenceDiagram
     Client->>PatchData: Reconstruct "document.pdf"
 ```
 
-**Code reference**: [`crates/walrus-sdk/src/client/quilt_client.rs:655-679`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client/quilt_client.rs#L655-L679) shows the implementation of `get_blobs_from_quilt_by_internal_ids_impl`.
+**Code reference**: [`crates/walrus-sdk/src/client/quilt_client.rs:655-679`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client/quilt_client.rs#L650-L672) shows the implementation of `get_blobs_from_quilt_by_internal_ids_impl`.
 
 ## Limitations and Constraints
 

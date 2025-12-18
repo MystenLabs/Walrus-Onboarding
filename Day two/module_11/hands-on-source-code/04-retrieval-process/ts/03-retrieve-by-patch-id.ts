@@ -1,6 +1,60 @@
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { walrus } from '@mysten/walrus';
 import * as fs from 'fs';
+import { createQuilt } from '../../src/create-quilt.js';
+
+async function getQuiltId(): Promise<string> {
+    // Check CLI argument (quilt ID or path to JSON file)
+    const cliArg = process.argv[2];
+    if (cliArg) {
+        // Check if it's a file path
+        if (fs.existsSync(cliArg) && fs.statSync(cliArg).isFile()) {
+            try {
+                const info = JSON.parse(fs.readFileSync(cliArg, 'utf-8'));
+                const quiltId = info.quiltId || info.blobStoreResult?.newlyCreated?.blobObject?.blobId || info.blobStoreResult?.alreadyCertified?.blobId;
+                if (quiltId) {
+                    console.log(`Using Quilt ID from file: ${cliArg}`);
+                    return quiltId;
+                }
+            } catch (e) {
+                console.log(`Warning: Could not read quilt ID from ${cliArg}, treating as quilt ID`);
+            }
+        }
+        // Treat as quilt ID
+        console.log(`Using Quilt ID from CLI argument: ${cliArg}`);
+        return cliArg;
+    }
+
+    // Fall back to quilt-info.json in current directory
+    try {
+        const info = JSON.parse(fs.readFileSync('quilt-info.json', 'utf-8'));
+        const quiltId = info.quiltId || info.blobStoreResult?.newlyCreated?.blobObject?.blobId || info.blobStoreResult?.alreadyCertified?.blobId;
+        if (quiltId) {
+            console.log(`Using Quilt ID from quilt-info.json: ${quiltId}`);
+            return quiltId;
+        }
+    } catch (e) {
+        // Continue to next fallback
+    }
+
+    // Fall back to parent directory
+    try {
+        const info = JSON.parse(fs.readFileSync('../../quilt-info.json', 'utf-8'));
+        const quiltId = info.quiltId || info.blobStoreResult?.newlyCreated?.blobObject?.blobId || info.blobStoreResult?.alreadyCertified?.blobId;
+        if (quiltId) {
+            console.log(`Using Quilt ID from ../../quilt-info.json: ${quiltId}`);
+            return quiltId;
+        }
+    } catch (e2) {
+        // Continue to auto-create
+    }
+
+    // Auto-create if nothing found
+    console.log('No existing quilt-info.json found. Creating a new quilt...');
+    const quiltId = await createQuilt();
+    console.log(`Created new quilt with ID: ${quiltId}`);
+    return quiltId;
+}
 
 async function main() {
     const client = new SuiClient({
@@ -8,48 +62,38 @@ async function main() {
         network: 'testnet' as any,
     }).$extend(walrus());
 
-    let quiltId = '057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ik';
-    try {
-        const info = JSON.parse(fs.readFileSync('quilt-info.json', 'utf-8'));
-        quiltId = info.quiltId;
-        console.log(`Using Quilt ID from info: ${quiltId}`);
-    } catch (e) {
-        try {
-            const info = JSON.parse(fs.readFileSync('../../quilt-info.json', 'utf-8'));
-            quiltId = info.quiltId;
-            console.log(`Using Quilt ID from info (parent path): ${quiltId}`);
-        } catch (e2) {
-            console.log(`Using default Quilt ID: ${quiltId}`);
-        }
-    }
+    const quiltId = await getQuiltId();
 
-    // First list all patches to get an ID (simulation)
-    const blob = await client.walrus.getBlob({ blobId: quiltId });
-    const allFiles = await blob.files();
-    if (allFiles.length === 0) {
-        console.log("No files in quilt to retrieve.");
+    // Fetch all patch IDs from the Walrus HTTP API, then retrieve by patch ID.
+    const AGGREGATOR = 'https://aggregator.walrus-testnet.walrus.space';
+
+    console.log(`Fetching patch list from ${AGGREGATOR} for quilt ${quiltId}...`);
+    const res = await fetch(`${AGGREGATOR}/v1/quilts/${quiltId}/patches`);
+    if (!res.ok) {
+        console.error(`Failed to fetch patches: HTTP ${res.status} - ${await res.text()}`);
         return;
     }
-    
-    // NOTE: The extracted example used hardcoded IDs. We can't easily guess valid patch IDs without listing.
-    // The SDK example uses `getFiles({ ids: patchIds })`.
-    
-    const patchIds = [
-      '057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ikBAAACAAA', // Example
-      '057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ikBAgADAAA', // Example
-    ];
 
-    console.log("Warning: Using example patch IDs. These will likely fail if the quilt ID is different.");
+    const patches: { identifier: string; patch_id: string; tags: Record<string, string> }[] =
+        await res.json();
 
-    try {
-        const files = await client.walrus.getFiles({ ids: patchIds });
+    if (patches.length === 0) {
+        console.log('No patches found for this quilt.');
+        return;
+    }
 
-        for (const file of files) {
-            const content = await file.bytes();
-            console.log('Retrieved patch, size:', content.length);
-        }
-    } catch (e) {
-        console.log("Failed to retrieve by ID (expected if IDs are invalid):", e);
+    const patchIds = patches.map(p => p.patch_id);
+    console.log('All patch IDs:', patchIds);
+
+    // Retrieve the first few patches by ID using the SDK
+    const selectedIds = patchIds.slice(0, 3); // Limit to first 3 patches for demonstration
+    console.log('Retrieving patches by ID:', selectedIds);
+
+    const files = await client.walrus.getFiles({ ids: selectedIds });
+
+    for (const [index, file] of files.entries()) {
+        const content = await file.bytes();
+        console.log(`Retrieved patch #${index}, size:`, content.length, 'bytes');
     }
 }
 

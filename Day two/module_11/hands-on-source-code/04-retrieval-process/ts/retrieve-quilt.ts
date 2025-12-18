@@ -1,6 +1,68 @@
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { walrus } from '@mysten/walrus';
-import { readFile } from 'fs/promises';
+import { readFile, stat } from 'fs/promises';
+import { createQuilt } from '../../src/create-quilt.js';
+
+async function getQuiltId(): Promise<string> {
+    // Check CLI argument (quilt ID or path to JSON file)
+    const cliArg = process.argv[2];
+    if (cliArg) {
+        // Check if it's a file path
+        try {
+            const stats = await stat(cliArg);
+            if (stats.isFile()) {
+                try {
+                    const data = await readFile(cliArg, 'utf-8');
+                    const info = JSON.parse(data);
+                    const quiltId = info.quiltId || info.blobStoreResult?.newlyCreated?.blobObject?.blobId || info.blobStoreResult?.alreadyCertified?.blobId;
+                    if (quiltId) {
+                        console.log(`Using Quilt ID from file: ${cliArg}`);
+                        return quiltId;
+                    }
+                } catch (e) {
+                    console.log(`Warning: Could not read quilt ID from ${cliArg}, treating as quilt ID`);
+                }
+            }
+        } catch (e) {
+            // File doesn't exist, treat as quilt ID
+        }
+        // Treat as quilt ID
+        console.log(`Using Quilt ID from CLI argument: ${cliArg}`);
+        return cliArg;
+    }
+
+    // Fall back to quilt-info.json in current directory
+    try {
+        const data = await readFile('quilt-info.json', 'utf-8');
+        const info = JSON.parse(data);
+        const quiltId = info.quiltId || info.blobStoreResult?.newlyCreated?.blobObject?.blobId || info.blobStoreResult?.alreadyCertified?.blobId;
+        if (quiltId) {
+            console.log(`Using Quilt ID from quilt-info.json: ${quiltId}`);
+            return quiltId;
+        }
+    } catch (error) {
+        // Continue to next fallback
+    }
+
+    // Fall back to parent directory
+    try {
+        const data = await readFile('../../quilt-info.json', 'utf-8');
+        const info = JSON.parse(data);
+        const quiltId = info.quiltId || info.blobStoreResult?.newlyCreated?.blobObject?.blobId || info.blobStoreResult?.alreadyCertified?.blobId;
+        if (quiltId) {
+            console.log(`Using Quilt ID from ../../quilt-info.json: ${quiltId}`);
+            return quiltId;
+        }
+    } catch (error) {
+        // Continue to auto-create
+    }
+
+    // Auto-create if nothing found
+    console.log('No existing quilt-info.json found. Creating a new quilt...');
+    const quiltId = await createQuilt();
+    console.log(`Created new quilt with ID: ${quiltId}`);
+    return quiltId;
+}
 
 async function retrieveFromQuilt() {
   const client = new SuiClient({
@@ -8,15 +70,7 @@ async function retrieveFromQuilt() {
     network: 'testnet' as any,
   }).$extend(walrus());
 
-  // Load quilt ID
-  let quiltId: string;
-  try {
-    const data = await readFile('quilt-info.json', 'utf-8');
-    quiltId = JSON.parse(data).quiltId;
-  } catch (error) {
-    console.error('Error reading quilt-info.json. Did you run create-quilt.ts first?');
-    process.exit(1);
-  }
+  const quiltId = await getQuiltId();
 
   console.log('Retrieving from quilt:', quiltId);
   console.log('Available methods:', Object.keys(client.walrus));
