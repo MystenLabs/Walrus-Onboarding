@@ -3,6 +3,9 @@
 # Passphrase for keypair (students must set this)
 PASSPHRASE ?= 
 
+# Optional blob ID for download test
+BLOB_ID ?= 
+
 help:
 	@echo "SDK Upload Relay Module - Docker Commands"
 	@echo "=========================================="
@@ -12,7 +15,7 @@ help:
 	@echo "  make build              - Build the Docker image"
 	@echo "  make test PASSPHRASE='...'  - Run all tests"
 	@echo "  make test-upload PASSPHRASE='...'  - Run basic upload test"
-	@echo "  make test-download      - Run basic download test (no passphrase needed)"
+	@echo "  make test-download PASSPHRASE='...' [BLOB_ID='...']  - Run download test (uploads first if no blob ID)"
 	@echo "  make test-hands-on PASSPHRASE='...'  - Run hands-on lab"
 	@echo "  make test-integrity PASSPHRASE='...'  - Run integrity checks"
 	@echo "  make test-retry PASSPHRASE='...'  - Run retry patterns test"
@@ -23,6 +26,7 @@ help:
 	@echo "Example usage:"
 	@echo "  PASSPHRASE='dress boy allow mammal...' make test"
 	@echo "  make test PASSPHRASE='your passphrase here'"
+	@echo "  make test-download PASSPHRASE='...' BLOB_ID='abc123...'"
 	@echo ""
 	@echo "For TypeScript source code, see ../hands-on-source-code/"
 
@@ -48,7 +52,15 @@ test-upload:
 	docker-compose run --rm -e PASSPHRASE="$(PASSPHRASE)" sdk-relay-lab npm run test:basic-upload
 
 test-download:
-	docker-compose run --rm sdk-relay-lab npm run test:basic-download
+	@if [ -z "$(PASSPHRASE)" ]; then \
+		echo "⚠️  ERROR: PASSPHRASE required! Usage: make test-download PASSPHRASE='your passphrase' [BLOB_ID='...']"; \
+		exit 1; \
+	fi
+	@if [ -z "$(BLOB_ID)" ]; then \
+		docker-compose run --rm -e PASSPHRASE="$(PASSPHRASE)" sdk-relay-lab npm run test:basic-download; \
+	else \
+		docker-compose run --rm -e PASSPHRASE="$(PASSPHRASE)" sdk-relay-lab npm run test:basic-download -- $(BLOB_ID); \
+	fi
 
 test-hands-on:
 	@if [ -z "$(PASSPHRASE)" ]; then \
