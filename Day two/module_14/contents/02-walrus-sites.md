@@ -11,12 +11,12 @@ Host entire websites on Walrus with censorship resistance and high availability.
 **Key characteristics**:
 - Website assets (HTML, CSS, JS, images) stored as blobs/quilts
 - Site configuration stored on Sui
-- Accessed via `.walrus.site` domains or custom portals
+- Accessed via `.wal.app` domains or custom portals
 - No traditional web servers
 - Censorship resistant
 - Verifiable content
 
-**Example**: `https://my-project.walrus.site`
+**Example**: `https://my-project.wal.app`
 
 **💬 Discussion**: What types of websites work well as Walrus Sites?
 
@@ -29,7 +29,7 @@ Host entire websites on Walrus with censorship resistance and high availability.
 ```
 User Browser
     ↓
-Walrus Site Portal (walrus.site)
+Walrus Site Portal (wal.app)
     ↓
 Sui (site configuration)
     ↓
@@ -43,12 +43,11 @@ Walrus (HTML, CSS, JS, images)
    struct Site {
        id: UID,
        name: String,
-       routes: vector<Route>,
-       // ...
+       // Dynamic fields map paths to blob IDs
    }
    ```
 
-2. **Routes** map paths to blob IDs:
+2. **Dynamic fields** map paths to blob IDs:
    ```
    /index.html → blob_id_1
    /style.css  → blob_id_2
@@ -57,7 +56,7 @@ Walrus (HTML, CSS, JS, images)
    ```
 
 3. **Portal** resolves requests:
-   - User visits `my-site.walrus.site`
+   - User visits `my-site.wal.app`
    - Portal queries Sui for site object
    - Portal fetches blobs from Walrus
    - Portal serves content to browser
@@ -68,15 +67,18 @@ Walrus (HTML, CSS, JS, images)
 
 ### Installation
 
-```bash
-# Install site builder
-npm install -g @mysten/walrus-site-builder
+The Walrus site builder is built with Rust and can be installed from source:
 
-# Or use from source
+```bash
+# Clone the repository
 git clone https://github.com/MystenLabs/walrus-sites.git
 cd walrus-sites
+
+# Build the site builder CLI
 cargo build --release
 ```
+
+For detailed installation instructions, see the [official installation guide](https://docs.wal.app/docs/walrus-sites/tutorial-install).
 
 ### Basic Usage
 
@@ -85,7 +87,7 @@ cargo build --release
 npm run build  # Creates ./dist or ./build
 
 # Deploy to Walrus
-walrus-site publish --directory ./dist
+site-builder deploy ./dist
 ```
 
 **Output**:
@@ -93,13 +95,13 @@ walrus-site publish --directory ./dist
 Uploaded index.html (blob ID: 057MX9P...)
 Uploaded style.css (blob ID: 1aF3kL...)
 Uploaded app.js (blob ID: 9Bn2Xq...)
-Site deployed: https://abc123.walrus.site
+Site deployed: https://abc123.wal.app
 Site Object ID: 0x...
 ```
 
 ### ✅ Checkpoint: Understand the Flow
 
-Trace what happens when you visit `https://my-site.walrus.site/about.html`:
+Trace what happens when you visit `https://my-site.wal.app/about.html`:
 1. Browser requests URL from portal
 2. Portal does what?
 3. Where does portal find the blob ID?
@@ -127,7 +129,7 @@ my-site/
 
 **Deployment**:
 ```bash
-walrus-site publish --directory my-site --epochs 26
+site-builder deploy my-site --epochs 26
 ```
 
 **Costs**:
@@ -160,7 +162,7 @@ dist/
 npm run build
 
 # Deploy
-walrus-site publish --directory dist --epochs 26
+site-builder deploy dist --epochs 26
 ```
 
 **Key consideration**: Large JS bundles increase costs
@@ -187,7 +189,7 @@ walrus store images/high-res-2.jpg --epochs 52
 # <img src="https://aggregator.walrus.space/v1/057MX9P..." />
 
 # Deploy site with referenced IDs
-walrus-site publish --directory site --epochs 26
+site-builder deploy site --epochs 26
 ```
 
 **Why**: Extend image epochs independently of site updates
@@ -215,8 +217,8 @@ vim index.html
 # Rebuild if needed
 npm run build
 
-# Publish update
-walrus-site publish --directory dist --epochs 26
+# Deploy update
+site-builder deploy dist --epochs 26
 ```
 
 **What happens**:
@@ -368,9 +370,6 @@ npm run build -- --analyze
 ```bash
 # Run local server to test
 python -m http.server -d ./dist 8000
-
-# Or use site builder preview
-walrus-site preview --directory ./dist
 ```
 
 ### 5. Monitor Storage Extensions
@@ -408,7 +407,7 @@ walrus extend <blob-id> --additional-epochs 26
 
 2. Deploy it:
    ```bash
-   walrus-site publish --directory . --epochs 1
+   site-builder deploy . --epochs 1
    ```
 
 3. Visit your site at the provided URL
@@ -467,8 +466,8 @@ walrus extend <blob-id> --additional-epochs 26
 ## Key Takeaways
 
 - Walrus Sites = static websites on decentralized storage
-- Site builder tool handles deployment
-- Routes map paths to blob IDs
+- Rust-based site builder CLI handles deployment
+- Dynamic fields on the Site object map paths to blob IDs (not a routes vector)
 - Optimize bundle sizes to reduce costs
 - Use quilts for small files, individual blobs for large assets
 - Plan epochs based on update frequency
