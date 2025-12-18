@@ -19,7 +19,8 @@
   "license": "ISC",
   "dependencies": {
     "@mysten/sui": "^1.45.0",
-    "@mysten/walrus": "^0.8.4"
+    "@mysten/walrus": "^0.8.4",
+    "dotenv": "^17.2.3"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
@@ -28,4 +29,3 @@
     "typescript": "^5.9.3"
   }
 }
-

@@ -134,7 +134,6 @@ PASSPHRASE='your passphrase' make test
 ```bash
 cd hands-on-source-code
 npm install
-export PASSPHRASE='your passphrase'
 npm test
 ```
 

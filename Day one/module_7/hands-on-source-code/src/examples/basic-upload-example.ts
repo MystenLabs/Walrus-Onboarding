@@ -9,9 +9,9 @@
 
 import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { walrus } from '@mysten/walrus';
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { getFundedKeypair } from '../utils/getFundedKeypair.js';
 import { validateTestnetConfig } from '../utils/validateTestnet.js';
+import { isMainModule } from '../utils/isMainModule.js';
 
 // Simple Blob Upload
 async function uploadBlob() {
@@ -27,7 +27,7 @@ async function uploadBlob() {
   const keypair = await getFundedKeypair();
   
   // Your data as bytes
-  const data = new TextEncoder().encode('Hello, Walrus!');
+  const data = new TextEncoder().encode('Hello, Walrus!'+ Date.now());
   
   const { blobId, blobObject } = await client.walrus.writeBlob({
     blob: data,
@@ -64,7 +64,7 @@ async function uploadWithRelay() {
 
   const keypair = await getFundedKeypair();
   
-  const data = new TextEncoder().encode('Hello, Walrus with Relay!');
+  const data = new TextEncoder().encode('Hello, Walrus with Relay!'+Date.now());
   
   // Same API, but uses relay internally
   const { blobId, blobObject } = await client.walrus.writeBlob({
@@ -94,9 +94,8 @@ async function main() {
 }
 
 // Run if executed directly
-if (import.meta.url.endsWith(process.argv[1] || '') || import.meta.url.includes('basic-upload-example.ts')) {
+if (isMainModule(import.meta.url)) {
   main().catch(console.error);
 }
 
 export { uploadBlob, uploadWithRelay };
-

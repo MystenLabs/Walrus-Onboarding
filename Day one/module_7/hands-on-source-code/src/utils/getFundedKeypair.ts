@@ -4,34 +4,49 @@ import { requestSuiFromFaucetV0 } from '@mysten/sui/faucet';
 import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
 import { MIST_PER_SUI, parseStructTag } from '@mysten/sui/utils';
 import { TESTNET_WALRUS_PACKAGE_CONFIG } from '@mysten/walrus';
+import { config } from 'dotenv';
 
-// Default passphrase (fallback if environment variable not set)
-const DEFAULT_PASSPHRASE = 'dress boy allow mammal heavy glow alter canal aunt broken eye secret';
+// Load .env file from project root
+config();
 
 /**
- * Gets the passphrase from environment variable or uses default.
- * Students should set PASSPHRASE environment variable in Docker.
+ * Gets the passphrase from environment variable or .env file.
+ * Students must set PASSPHRASE environment variable or create a .env file.
+ * 
+ * @throws Error if PASSPHRASE is not set
  */
 function getPassphrase(): string {
   const envPassphrase = process.env.PASSPHRASE;
-  if (envPassphrase) {
-    console.log('Using passphrase from environment variable');
-    return envPassphrase.trim();
+  if (!envPassphrase || envPassphrase.trim() === '') {
+    console.error('\n❌ ERROR: PASSPHRASE environment variable is not set!\n');
+    console.error('Please set your wallet passphrase using one of these methods:\n');
+    console.error('  Option 1: Export in your shell');
+    console.error('    export PASSPHRASE="your twelve word passphrase here"\n');
+    console.error('  Option 2: Create a .env file in the project root');
+    console.error('    echo \'PASSPHRASE="your twelve word passphrase here"\' > .env\n');
+    console.error('  Option 3: Pass inline when running commands');
+    console.error('    PASSPHRASE="your passphrase" npm run test:hands-on\n');
+    console.error('  For Docker:');
+    console.error('    PASSPHRASE="your passphrase" make test-hands-on\n');
+    throw new Error('PASSPHRASE environment variable is required');
   }
-  console.log('Using default passphrase (set PASSPHRASE environment variable to use your own)');
-  return DEFAULT_PASSPHRASE;
+  console.log('Using passphrase from environment variable');
+  return envPassphrase.trim();
 }
 
 /**
  * Gets or creates a funded keypair for testing.
- * Derives the keypair from a passphrase (from environment variable or default).
+ * Derives the keypair from a passphrase (from environment variable).
  * 
- * To use your own passphrase in Docker:
- *   docker-compose run -e PASSPHRASE="your passphrase here" sdk-verification npm test
- * Or set it in docker-compose.yml environment section
+ * @throws Error if PASSPHRASE environment variable is not set
+ * 
+ * To set your passphrase:
+ *   export PASSPHRASE="your passphrase here"
+ * Or in Docker:
+ *   docker-compose run -e PASSPHRASE="your passphrase here" sdk-relay-lab npm test
  */
 export async function getFundedKeypair(): Promise<Ed25519Keypair> {
-  // Get passphrase from environment or use default
+  // Get passphrase from environment (required)
   const passphrase = getPassphrase();
   
   // Derive keypair from passphrase
@@ -170,4 +185,3 @@ export async function getFundedKeypair(): Promise<Ed25519Keypair> {
   
   return keypair;
 }
-

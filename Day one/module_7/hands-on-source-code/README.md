@@ -15,7 +15,9 @@ hands-on-source-code/
 │   │   ├── partial-failures.ts          # Partial failure handling
 │   │   └── integrity-checks.ts          # Integrity verification examples
 │   ├── utils/
-│   │   └── getFundedKeypair.ts          # Utility for test keypairs
+│   │   ├── getFundedKeypair.ts          # Utility for test keypairs
+│   │   ├── isMainModule.ts              # Utility for detecting main module
+│   │   └── validateTestnet.ts           # Testnet environment validation
 │   └── run-all.ts                       # Main test runner
 ├── package.json                         # Node.js dependencies
 ├── tsconfig.json                        # TypeScript configuration
@@ -48,10 +50,16 @@ npm install
 
 ### Set Your Passphrase
 
-The examples need a keypair to sign transactions. Set your passphrase:
+**⚠️ REQUIRED:** The examples need a keypair to sign transactions. Set your passphrase:
 
 ```sh
-export PASSPHRASE='your passphrase here'
+export PASSPHRASE='your twelve word passphrase here'
+```
+
+Or pass it inline when running commands:
+
+```sh
+PASSPHRASE='your passphrase' npm run test:hands-on
 ```
 
 ## Running Examples
@@ -59,29 +67,32 @@ export PASSPHRASE='your passphrase here'
 ### Run All Examples
 
 ```sh
-npm test
+PASSPHRASE='your passphrase' npm test
 ```
 
 ### Run Individual Examples
 
 ```sh
 # Basic upload example
-npm run test:basic-upload
+PASSPHRASE='your passphrase' npm run test:basic-upload
 
-# Basic download example (requires a blob ID)
-npm run test:basic-download <blob-id>
+# Basic download example (uploads first if no blob ID provided)
+PASSPHRASE='your passphrase' npm run test:basic-download
+
+# Or download a specific blob by ID
+PASSPHRASE='your passphrase' npm run test:basic-download <blob-id>
 
 # Hands-on lab
-npm run test:hands-on
+PASSPHRASE='your passphrase' npm run test:hands-on
 
 # Retry patterns
-npm run test:retry
+PASSPHRASE='your passphrase' npm run test:retry
 
 # Partial failures
-npm run test:partial-failures
+PASSPHRASE='your passphrase' npm run test:partial-failures
 
 # Integrity checks
-npm run test:integrity-checks
+PASSPHRASE='your passphrase' npm run test:integrity-checks
 ```
 
 ## Code Examples Included
@@ -92,8 +103,10 @@ npm run test:integrity-checks
 - Demonstrates the upload API
 
 ### 2. Basic Download Example (`basic-download-example.ts`)
+- Uploads a test blob first if no blob ID is provided
 - Simple blob download
 - Download with error handling
+- Content verification
 - Demonstrates the download API
 
 ### 3. Hands-On Lab (`hands-on-lab.ts`)
@@ -124,7 +137,7 @@ npm run test:integrity-checks
 - `@mysten/sui`: Sui blockchain client
 - `@mysten/walrus`: Walrus SDK for storage operations
 - `typescript`: TypeScript compiler
-- `ts-node`: TypeScript execution environment
+- `tsx`: TypeScript execution environment
 
 ## Notes
 

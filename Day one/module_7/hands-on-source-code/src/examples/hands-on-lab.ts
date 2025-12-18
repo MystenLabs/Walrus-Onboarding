@@ -11,6 +11,7 @@ import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { walrus, RetryableWalrusClientError } from '@mysten/walrus';
 import { getFundedKeypair } from '../utils/getFundedKeypair.js';
 import { validateTestnetConfig } from '../utils/validateTestnet.js';
+import { isMainModule } from '../utils/isMainModule.js';
 
 // Initialize the client with uploadRelay config
 const network = 'testnet';
@@ -95,12 +96,8 @@ async function main() {
 }
 
 // Run if executed directly
-const isMainModule = import.meta.url === `file://${process.argv[1]}` || 
-                     import.meta.url.includes('hands-on-lab.ts') ||
-                     process.argv[1]?.endsWith('hands-on-lab.ts');
-if (isMainModule) {
+if (isMainModule(import.meta.url)) {
   main().catch(console.error);
 }
 
 export { main as handsOnLab };
-

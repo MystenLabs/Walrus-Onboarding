@@ -3,14 +3,9 @@
  * 
  * This script runs all code examples from the SDK Upload Relay curriculum
  * to verify they work correctly.
+ * 
+ * Tests are run sequentially to avoid race conditions with blockchain transactions.
  */
-
-import { uploadBlob, uploadWithRelay } from './examples/basic-upload-example.js';
-import { downloadBlob } from './examples/basic-download-example.js';
-import { handsOnLab } from './examples/hands-on-lab.js';
-import { uploadWithRetry } from './examples/retry-patterns.js';
-import { uploadWithRecovery } from './examples/partial-failures.js';
-import { uploadAndVerify } from './examples/integrity-checks.js';
 
 interface TestResult {
   name: string;
@@ -20,14 +15,17 @@ interface TestResult {
 }
 
 async function runTest(name: string, testFn: () => Promise<any>): Promise<TestResult> {
+  console.log(`\n  → Running: ${name}...`);
   const startTime = Date.now();
   try {
     await testFn();
     const duration = Date.now() - startTime;
+    console.log(`  ✅ ${name} completed in ${(duration / 1000).toFixed(2)}s`);
     return { name, success: true, duration };
   } catch (error) {
     const duration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
+    console.log(`  ❌ ${name} failed: ${errorMessage}`);
     return { name, success: false, error: errorMessage, duration };
   }
 }
@@ -35,53 +33,99 @@ async function runTest(name: string, testFn: () => Promise<any>): Promise<TestRe
 async function main() {
   console.log('🚀 Starting SDK Upload Relay Code Verification\n');
   console.log('='.repeat(60));
+  console.log('\nRunning tests sequentially to avoid transaction conflicts...');
   
   const results: TestResult[] = [];
   
-  // Run tests sequentially to avoid overwhelming the network
-  console.log('\n📤 Running Upload Examples...\n');
+  // Import modules dynamically and run tests sequentially
+  // This ensures no side effects from static imports
   
-  results.push(await runTest('Basic Upload', async () => {
-    console.log('  → Testing basic upload...');
-    await uploadBlob();
-  }));
+  console.log('\n📤 Upload Examples');
+  console.log('-'.repeat(40));
   
-  // Small delay between tests
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  // Test 1: Basic Upload
+  {
+    const { uploadBlob } = await import('./examples/basic-upload-example.js');
+    results.push(await runTest('Basic Upload', uploadBlob));
+  }
   
-  results.push(await runTest('Upload with Relay', async () => {
-    console.log('  → Testing upload with relay...');
-    await uploadWithRelay();
-  }));
+  // Wait between tests to avoid transaction conflicts
+  await new Promise(resolve => setTimeout(resolve, 3000));
   
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  // Test 2: Upload with Relay
+  {
+    const { uploadWithRelay } = await import('./examples/basic-upload-example.js');
+    results.push(await runTest('Upload with Relay', uploadWithRelay));
+  }
   
-  results.push(await runTest('Hands-On Lab', async () => {
-    console.log('  → Testing hands-on lab...');
-    await handsOnLab();
-  }));
+  await new Promise(resolve => setTimeout(resolve, 3000));
   
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  // Test 3: Hands-On Lab
+  {
+    const { handsOnLab } = await import('./examples/hands-on-lab.js');
+    results.push(await runTest('Hands-On Lab', handsOnLab));
+  }
   
-  results.push(await runTest('Retry Patterns', async () => {
-    console.log('  → Testing retry patterns...');
-    const data = new TextEncoder().encode('Retry Test - ' + Date.now());
-    await uploadWithRetry(data);
-  }));
+  await new Promise(resolve => setTimeout(resolve, 3000));
   
-  results.push(await runTest('Partial Failures', async () => {
-    console.log('  → Testing partial failure handling...');
-    const data = new TextEncoder().encode('Partial Failure Test - ' + Date.now());
-    await uploadWithRecovery(data, 2); // Limit retries for testing
-  }));
+  console.log('\n📥 Download Examples');
+  console.log('-'.repeat(40));
   
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  // Test 4: Basic Download (uploads first if no blob ID)
+  {
+    // Note: downloadBlob requires a blob ID, so we test the main function
+    // which handles uploading first if needed
+    const downloadModule = await import('./examples/basic-download-example.js');
+    // We'll test downloadBlob with a blob we upload first
+    const { uploadBlob } = await import('./examples/basic-upload-example.js');
+    results.push(await runTest('Download (with upload)', async () => {
+      const { blobId } = await uploadBlob();
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      await downloadModule.downloadBlob(blobId);
+    }));
+  }
   
-  results.push(await runTest('Integrity Checks', async () => {
-    console.log('  → Testing integrity checks...');
-    const data = new TextEncoder().encode('Integrity Test - ' + Date.now());
-    await uploadAndVerify(data);
-  }));
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  
+  console.log('\n🔄 Retry Patterns');
+  console.log('-'.repeat(40));
+  
+  // Test 5: Retry Patterns
+  {
+    const { uploadWithRetry } = await import('./examples/retry-patterns.js');
+    results.push(await runTest('Retry Patterns', async () => {
+      const data = new TextEncoder().encode('Retry Test - ' + Date.now());
+      await uploadWithRetry(data);
+    }));
+  }
+  
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  
+  console.log('\n⚠️ Partial Failures');
+  console.log('-'.repeat(40));
+  
+  // Test 6: Partial Failures
+  {
+    const { uploadWithRecovery } = await import('./examples/partial-failures.js');
+    results.push(await runTest('Partial Failures', async () => {
+      const data = new TextEncoder().encode('Partial Failure Test - ' + Date.now());
+      await uploadWithRecovery(data, 2);
+    }));
+  }
+  
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  
+  console.log('\n🔍 Integrity Checks');
+  console.log('-'.repeat(40));
+  
+  // Test 7: Integrity Checks
+  {
+    const { uploadAndVerify } = await import('./examples/integrity-checks.js');
+    results.push(await runTest('Integrity Checks', async () => {
+      const data = new TextEncoder().encode('Integrity Test - ' + Date.now());
+      await uploadAndVerify(data);
+    }));
+  }
   
   // Print summary
   console.log('\n' + '='.repeat(60));
@@ -121,4 +165,3 @@ main().catch(error => {
   console.error('Fatal error:', error);
   process.exit(1);
 });
-

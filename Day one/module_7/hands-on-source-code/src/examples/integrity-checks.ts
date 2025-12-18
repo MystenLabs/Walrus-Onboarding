@@ -11,6 +11,7 @@ import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { walrus, InconsistentBlobError, BlobNotCertifiedError, NotEnoughSliversReceivedError } from '@mysten/walrus';
 import { getFundedKeypair } from '../utils/getFundedKeypair.js';
 import { validateTestnetConfig } from '../utils/validateTestnet.js';
+import { isMainModule } from '../utils/isMainModule.js';
 
 const network = 'testnet';
 const url = getFullnodeUrl(network);
@@ -140,7 +141,7 @@ async function main() {
 }
 
 // Run if executed directly
-if (import.meta.url.endsWith(process.argv[1] || '') || import.meta.url.includes('integrity-checks.ts')) {
+if (isMainModule(import.meta.url)) {
   main().catch(console.error);
 }
 
@@ -149,4 +150,3 @@ export {
   verifyBlobWithErrorHandling, 
   uploadAndVerify,
 };
-

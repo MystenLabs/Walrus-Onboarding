@@ -17,6 +17,7 @@ import {
 } from '@mysten/walrus';
 import { getFundedKeypair } from '../utils/getFundedKeypair.js';
 import { validateTestnetConfig } from '../utils/validateTestnet.js';
+import { isMainModule } from '../utils/isMainModule.js';
 
 const network = 'testnet';
 const url = getFullnodeUrl(network);
@@ -203,7 +204,6 @@ async function downloadWithRetry(blobId: string) {
 // Main execution
 async function main() {
   try {
-    const keypair = await getFundedKeypair();
     const data = new TextEncoder().encode('Retry Pattern Test - ' + Date.now());
     
     console.log('=== Testing Basic Retry ===');
@@ -222,7 +222,7 @@ async function main() {
 }
 
 // Run if executed directly
-if (import.meta.url.endsWith(process.argv[1] || '') || import.meta.url.includes('retry-patterns.ts')) {
+if (isMainModule(import.meta.url)) {
   main().catch(console.error);
 }
 
@@ -234,4 +234,3 @@ export {
   uploadWithSmartRetry,
   downloadWithRetry,
 };
-

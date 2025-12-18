@@ -12,6 +12,8 @@ import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { walrus, NotEnoughBlobConfirmationsError, NotEnoughSliversReceivedError, InconsistentBlobError, BlobBlockedError } from '@mysten/walrus';
 import { getFundedKeypair } from '../utils/getFundedKeypair.js';
 import { validateTestnetConfig } from '../utils/validateTestnet.js';
+import { isMainModule } from '../utils/isMainModule.js';
+import { retry } from './retry-patterns.js';
 
 const network = 'testnet';
 const url = getFullnodeUrl(network);
@@ -118,13 +120,15 @@ async function uploadWithClassification(blob: Uint8Array) {
     
     if (classification === 'retryable') {
       // Retry with backoff
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return await client.walrus.writeBlob({
-        blob,
-        deletable: true,
-        epochs: 3,
-        signer: keypair,
-      });
+      return retry(
+        () => client.walrus.writeBlob({
+          blob,
+          deletable: true,
+          epochs: 3,
+          signer: keypair,
+        }),
+        { count: 3, delay: 1000 }
+      );
     }
     
     // Don't retry permanent errors
@@ -137,7 +141,6 @@ async function main() {
   try {
     console.log('=== Testing Partial Failure Handling ===');
     
-    const keypair = await getFundedKeypair();
     const data = new TextEncoder().encode('Partial Failure Test - ' + Date.now());
     
     console.log('\n=== Testing Upload with Quorum Check ===');
@@ -161,7 +164,7 @@ async function main() {
 }
 
 // Run if executed directly
-if (import.meta.url.endsWith(process.argv[1] || '') || import.meta.url.includes('partial-failures.ts')) {
+if (isMainModule(import.meta.url)) {
   main().catch(console.error);
 }
 
@@ -171,4 +174,3 @@ export {
   classifyError, 
   uploadWithClassification,
 };
-
