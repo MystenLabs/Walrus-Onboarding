@@ -12,12 +12,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // Placeholder retry function — intentionally unimplemented for the lab
-// TODO: Implement this with real retry logic. Suggested steps:
+// TODO: Implement this with real retry logic. Suggested steps (match the lab):
 // 1) Detect retryable errors: network timeouts (ECONN, ETIMEDOUT), HTTP 429/5xx,
 //    and Walrus-specific transient errors (e.g., RetryableWalrusClientError).
 //    Fail fast on most other 4xx errors.
-// 2) Use exponential backoff with jitter: baseDelay * 2^(attempt-1), capped with maxDelay.
-// 3) Limit attempts (e.g., 3-5). On each retry, optionally log attempt and delay.
+// 2) Use exponential backoff with jitter: baseDelay * 2^(attempt-1) + random(0..baseDelay).
+//    Use baseDelay = 200ms and cap delays at maxDelay = 2000ms.
+// 3) Limit to exactly 4 attempts. On each retry, optionally log:
+//    `Attempt N failed: <msg>. Retrying in Xms...`.
 // 4) If the error is Walrus retryable, call `client.reset()` before retrying to refresh state.
 // 5) Return the successful result; after last attempt, throw the last seen error.
 //    See `ts/debug-scenario-solution.ts` for a reference implementation.

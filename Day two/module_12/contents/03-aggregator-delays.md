@@ -30,7 +30,7 @@ const client = new WalrusClient({
 
 **Rust SDK:**
 
-> **Note**: A Rust SDK exists in the Walrus codebase (`crates/walrus-sdk`) but is not yet published to crates.io or documented for external use. For Rust applications, you can use the [Walrus CLI](https://github.com/MystenLabs/walrus/blob/main/docs/content/usage/client-cli.mdx) or interact with the [HTTP API](https://github.com/MystenLabs/walrus/blob/main/docs/content/usage/web-api.mdx) directly.
+> **Note**: A Rust SDK exists in the Walrus codebase (`crates/walrus-sdk`) but is not yet published to crates.io or documented for external use. For Rust applications, you can use the [Walrus CLI](https://github.com/MystenLabs/walrus/tree/main/docs/content/book/usage/client-cli.md) or interact with the [HTTP API](https://github.com/MystenLabs/walrus/tree/main/docs/content/book/usage/web-api.md) directly.
 
 ### Asynchronous Design
 
