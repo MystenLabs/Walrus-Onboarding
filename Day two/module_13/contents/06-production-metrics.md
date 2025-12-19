@@ -2,29 +2,28 @@
 
 To optimize performance, you must first measure it. When running Walrus components (Publisher/Aggregator) in production, you should monitor specific metrics to identify bottlenecks.
 
-## Prometheus Metrics Endpoint
+## Fetch Metrics with a Simple CLI
 
-Walrus services expose a `/metrics` endpoint compatible with Prometheus by default.
+Walrus services expose a plaintext `/metrics` endpoint. You can inspect it with basic Linux tools (no Prometheus/Grafana required):
 
 ```bash
-# Default metrics endpoint
-curl http://127.0.0.1:27182/metrics
+# Set once and reuse
+METRICS_URL=${METRICS_URL:-http://127.0.0.1:27182/metrics}
 
-# Configure with --metrics-address
-walrus aggregator --bind-address "0.0.0.0:31415" --metrics-address "0.0.0.0:27182"
+# Peek at latency histogram buckets for blob reads
+curl -s "$METRICS_URL" | grep '^http_server_request_duration_seconds_bucket' | grep 'http_route="/v1/blobs/{blob_id}"'
+
+# See cumulative response bytes served for reads
+curl -s "$METRICS_URL" | grep '^http_server_response_body_size_bytes_sum' | grep 'http_route="/v1/blobs/{blob_id}"'
+
+# See cumulative request bytes received for uploads
+curl -s "$METRICS_URL" | grep '^http_server_request_body_size_bytes_sum' | grep 'http_route="/v1/blobs"'
+
+# Count 2xx vs non-2xx responses
+curl -s "$METRICS_URL" | grep '^http_server_request_duration_seconds_count' | grep 'http_response_status_code='
 ```
 
-```mermaid
-flowchart LR
-    subgraph Services["Walrus Services"]
-        Pub[Publisher<br/>:27182/metrics]
-        Agg[Aggregator<br/>:27182/metrics]
-    end
-    
-    Prom[Prometheus] -->|Scrape| Pub
-    Prom -->|Scrape| Agg
-    Prom --> Graf[Grafana Dashboard]
-```
+> Tip: To eyeball rates without external tooling, capture a snapshot, wait (e.g., 60s), capture again, and compute the delta.
 
 ## Key Metrics Categories
 
@@ -35,12 +34,6 @@ flowchart LR
 | **End-to-End Latency** | Time from request start to response | High latency = network issues or slow nodes |
 | **Time to First Byte (TTFB)** | Time until aggregator starts sending data | Critical for perceived performance |
 | **Requests per Second** | Upload/download throughput | Capacity planning |
-
-**Example Prometheus Query:**
-```promql
-# p95 latency for blob reads
-histogram_quantile(0.95, rate(walrus_read_duration_seconds_bucket[5m]))
-```
 
 ### 2. Encoding / Decoding Performance
 
@@ -84,53 +77,17 @@ High retry rates drastically increase perceived latency even if eventual success
 | **File Descriptors** | Open connections | Exhaustion causes failures |
 | **CPU Usage** | Encoding is CPU-intensive | Sustained > 80% = bottleneck |
 
-## Alerting Thresholds
+## Quick CLI Checks (no external tools)
 
-| Metric | Warning | Critical | Possible Cause |
-|:-------|:-------:|:--------:|:---------------|
-| **Success Rate** | < 99% | < 95% | Network partition, bad nodes |
-| **p95 Latency** | > 2s (small blobs) | > 5s | Congestion, CPU starvation |
-| **Active Connections** | 80% of limit | 95% of limit | Connection leak, high load |
-| **Memory Usage** | > 70% | > 85% | Memory leak, large blobs |
-| **Retry Rate** | > 10% | > 25% | Node failures, rate limiting |
+| What you want | Command (run twice and diff for rates) |
+|:--------------|:---------------------------------------|
+| Check success/error counts by status | `curl -s "$METRICS_URL" \| grep '^http_server_request_duration_seconds_count' \| grep 'http_response_status_code='` |
+| Approximate read throughput (bytes served) | `curl -s "$METRICS_URL" \| grep '^http_server_response_body_size_bytes_sum' \| grep 'http_route="/v1/blobs/{blob_id}"'` |
+| Approximate upload throughput (bytes received) | `curl -s "$METRICS_URL" \| grep '^http_server_request_body_size_bytes_sum' \| grep 'http_route="/v1/blobs"'` |
+| Spot latency distribution buckets for reads | `curl -s "$METRICS_URL" \| grep '^http_server_request_duration_seconds_bucket' \| grep 'http_route="/v1/blobs/{blob_id}"'` |
+| See active connections (if exposed by your setup) | `curl -s "$METRICS_URL" \| grep active_connections` |
 
-## Grafana Dashboard Setup
-
-> 📚 **Reference:** A local Grafana/Prometheus setup is available at [`docker/grafana-local/`](https://github.com/MystenLabs/walrus/tree/main/docker/grafana-local) for development.
-
-**Recommended Dashboard Panels with PromQL Queries:**
-
-| Panel | PromQL Query | Visualization |
-|:------|:-------------|:--------------|
-| **Upload Throughput** | `rate(walrus_blob_upload_bytes_total[5m])` | Graph (bytes/sec) |
-| **Read Throughput** | `rate(walrus_blob_read_bytes_total[5m])` | Graph (bytes/sec) |
-| **Success Rate** | `sum(rate(walrus_requests_total{status="success"}[5m])) / sum(rate(walrus_requests_total[5m])) * 100` | Stat (percentage) |
-| **p95 Latency** | `histogram_quantile(0.95, rate(walrus_request_duration_seconds_bucket[5m]))` | Heatmap or Graph |
-| **Retry Rate** | `rate(walrus_retries_total[5m]) / rate(walrus_requests_total[5m]) * 100` | Stat (percentage) |
-| **Error Rate by Type** | `sum by (error_type) (rate(walrus_errors_total[5m]))` | Pie chart or Table |
-
-> ⚠️ **Note:** The exact metric names may vary. Run `curl http://127.0.0.1:27182/metrics` to see available metrics from your Walrus services.
-
-**Conceptual Dashboard Layout:**
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Walrus Performance Dashboard                               │
-├─────────────────────┬─────────────────────┬─────────────────┤
-│  Upload Throughput  │  Read Throughput    │  Success Rate   │
-│  (Graph: bytes/sec) │  (Graph: bytes/sec) │  (Stat: 99.5%)  │
-├─────────────────────┴─────────────────────┴─────────────────┤
-│  p95 Latency (Heatmap - shows distribution over time)       │
-├─────────────────────────────────────────────────────────────┤
-│  Retry Rate (Stat)  │  Error Rate by Type (Pie/Table)       │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Key Dashboard Design Principles:**
-1. **Throughput side-by-side** - Compare upload vs. read rates
-2. **Use Heatmaps for latency** - Averages hide problems; distributions reveal them
-3. **Group by error type** - Distinguish transient (retry-able) vs. permanent errors
-4. **Add annotations** - Mark deployments, config changes to correlate with metric changes
+> Quick rate math: capture a value (e.g., `response_body_size_bytes_sum`), wait 60s, capture again, then compute `(new - old) / 60` for bytes/sec.
 
 ## Debugging Common Issues
 
@@ -151,12 +108,11 @@ flowchart TD
 
 ## Key Takeaways
 
-- **Prometheus integration**: Services expose `/metrics` endpoint on port 27182 (configurable via `--metrics-address`)
 - **Four metric categories**: Latency/throughput, encoding performance, reliability metrics, and resource usage
 - **Retry rate impact**: High retry rates kill latency even with good eventual success rate
-- **Proactive alerting**: Set thresholds (e.g., success rate < 99% warning, < 95% critical) before users report issues
+- **Cumulative metrics**: `http_server_*_sum` and `_count` grow over time—take two samples to compute rates without extra tooling
+- **Bucketed latency**: `http_server_request_duration_seconds_bucket` lets you spot slow responses by route
 - **Metric correlation**: Latency spike + CPU spike typically indicates encoding bottleneck
-- **Dashboard visualization**: Use Grafana to display throughput and error rate side-by-side for quick diagnosis
 
 ## Next Steps
 

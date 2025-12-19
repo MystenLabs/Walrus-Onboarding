@@ -14,32 +14,11 @@ By completing this lab, you will:
 
 ## Prerequisites
 
-- ✅ Node.js 18+ installed (or Docker)
+- ✅ Node.js 18+ installed
 - ✅ A terminal with internet access (to reach Sui Testnet and Walrus nodes)
 - ✅ A funded Testnet wallet with SUI tokens (script can request from faucet)
 
-## Running in Docker (Recommended)
-
-For a consistent environment across all operating systems, use the Docker setup:
-
-```bash
-# From the performance_optimization module directory
-cd docker
-make build
-PASSPHRASE='your testnet passphrase' make run
-
-# Interactive shell for exploration
-make shell
-```
-
-> 💡 **Docker Benefits:**
-> - Identical Node.js version across all systems
-> - Pre-installed dependencies
-> - Consistent test results
-
-## Local Setup (Alternative)
-
-If you prefer running locally without Docker:
+## Local Setup
 
 1. Navigate to the hands-on directory:
 
@@ -53,9 +32,11 @@ cd docs/book/curriculum/performance_optimization/hands-on-source-code
 npm install
 ```
 
-3. Set your wallet passphrase:
+3. Set your wallet passphrase (use `.env` or export):
 
 ```bash
+echo "PASSPHRASE='your testnet passphrase'" > .env
+# or
 export PASSPHRASE='your testnet passphrase'
 ```
 
@@ -63,7 +44,7 @@ export PASSPHRASE='your testnet passphrase'
 
 The script `ts/throughput-tuner.ts` performs:
 
-1. **Generate**: Creates random data blobs (1MB each)
+1. **Generate**: Creates a fixed set of random data blobs (1MB each) used for both scenarios
 2. **Sequential Upload**: Uploads blobs one by one
 3. **Parallel Upload**: Uploads all blobs concurrently
 4. **Report**: Calculates and compares throughput (MB/s)
@@ -88,16 +69,14 @@ flowchart LR
 
 ## Run the Script
 
-**Docker (Recommended):**
-
-```bash
-PASSPHRASE='your testnet passphrase' make run
-```
-
-**Local:**
-
 ```bash
 npm start
+```
+
+To cap concurrency (optional):
+
+```bash
+CONCURRENCY=2 npm start
 ```
 
 > **Note:** The script will automatically request testnet SUI tokens from the faucet if needed. This might take a few seconds.
@@ -110,7 +89,7 @@ You should see output similar to this (times vary significantly by network):
 === Walrus Performance Tuning Lab ===
 Comparing sequential vs concurrent upload patterns
 
-Using default passphrase (set PASSPHRASE environment variable to use your own)
+Using passphrase from environment variable
 Using wallet address: 0x98cd680f8332b94446f16ad992f1d5ef220e601542a1997d61dea562f5654b4d
 Wallet already has 102.377908595 SUI
 Current WAL balance: 0.86569 WAL
@@ -132,7 +111,7 @@ Sequential Results:
   Throughput: 0.04 MB/s
 
 --- Scenario B: Concurrent Uploads ---
-Using concurrency limit of 2 with retry logic...
+Uploading all blobs concurrently with retry logic...
 (Single wallet causes coin contention - production uses sub-wallets)
 
   Retry 1/3 in 2347ms...
@@ -151,6 +130,8 @@ Concurrent:  0.07 MB/s (5 blobs in 75.2s)
 • Single wallet = coin contention in parallel transactions
 • Production systems use sub-wallets (--n-clients 8+ in Publisher)
 • HTTP 429 = rate limiting; back off and retry
+• Retry logic essential for handling transient failures
+• Concurrency limits prevent overwhelming the network
 ```
 
 > **Note:** Results vary significantly (30-400% improvement) based on network conditions, Testnet load, and geographic location. The key insight is the *relative* improvement, not absolute numbers.
@@ -205,33 +186,31 @@ Modify `ts/throughput-tuner.ts` to increase `TOTAL_BLOBS` to 20. What happens to
 
 ### Challenge 2: Concurrency Limit
 
-Implement a concurrency limit (e.g., max 5 simultaneous uploads) to avoid overwhelming the publisher:
+Set a concurrency limit (e.g., max 5 simultaneous uploads) to avoid overwhelming the publisher:
 
-```typescript
-// Hint: Use p-limit library
-import pLimit from 'p-limit';
-
-const limit = pLimit(5); // Max 5 concurrent uploads
-
-const uploadPromises = blobs.map((blob, i) =>
-    limit(() => client.writeBlob({ blob }))
-);
-
-await Promise.all(uploadPromises);
+```bash
+CONCURRENCY=5 npm start
 ```
 
 ### Challenge 3: Find Optimal Concurrency
 
 Run experiments with different concurrency limits (1, 2, 5, 10, 20) and plot throughput vs. concurrency. Where is the sweet spot?
 
+```bash
+CONCURRENCY=1 npm start
+CONCURRENCY=2 npm start
+CONCURRENCY=5 npm start
+CONCURRENCY=10 npm start
+CONCURRENCY=20 npm start
+```
+
 ## Troubleshooting
 
 | Issue | Solution |
 |:------|:---------|
-| "PASSPHRASE not set" | Export environment variable: `export PASSPHRASE='...'` |
+| "PASSPHRASE not set" | Set `.env` or export: `echo "PASSPHRASE='...'" > .env` or `export PASSPHRASE='...'` |
 | Faucet rate limited | Wait 1-2 minutes, or use existing balance |
 | Insufficient WAL | Script auto-exchanges SUI for WAL |
-| Docker not installed | Use local setup with `npm install && npm start` |
 | Results vary wildly | Network conditions vary; run multiple times and average |
 | HTTP 429 errors | Rate limited; reduce concurrency or wait before retrying |
 | Timeouts on large blobs | Increase timeout settings; check network stability |

@@ -83,6 +83,8 @@ server {
 }
 ```
 
+> ℹ️ **Aggregator defaults:** The Walrus daemon already returns `Cache-Control: public, max-age=86400, stale-while-revalidate=3600`, an `ETag` equal to the blob ID, and `X-Content-Type-Options: nosniff` while mirroring the request `Content-Type`. Override these headers in your proxy if you need longer TTLs (e.g., CDN use) or different cache behavior.
+
 > **Why this works:** Blob IDs are immutable, so a cached response for `/v1/blobs/abc123` is valid forever (until you need the space for other data).
 
 #### ⚠️ Nginx Caveats
@@ -180,7 +182,7 @@ app.get('/content/:blobId', async (req, res) => {
 });
 ```
 
-> ⚠️ **Important:** Walrus aggregators do NOT automatically set these cache headers. It's your responsibility to configure caching when serving content through your own infrastructure.
+> ⚠️ **Important:** The daemon sets conservative defaults (`max-age=86400` + `stale-while-revalidate`). If you need longer-lived caching (e.g., CDN `immutable` for a year), set the headers yourself at your origin or proxy.
 
 | Header | Value | Meaning |
 |:-------|:------|:--------|
@@ -283,7 +285,7 @@ flowchart TD
 - **Aggressive caching**: Use `Cache-Control: public, max-age=31536000, immutable` for maximum cache efficiency
 - **Three cache layers**: Aggregator-level (Nginx/Varnish), Application-level (Redis/Memcached), CDN/Edge
 - **LRU eviction only**: Remove entries to free space, never for freshness—content never becomes stale
-- **Manual header configuration**: Walrus aggregators don't set cache headers; configure them in your infrastructure
+- **Header overrides**: Aggregators set short-lived defaults (`max-age=86400` + `stale-while-revalidate`); override in your proxy/app for longer TTLs or different cache policies
 - **Perfect ETag**: Blob ID serves as an ideal ETag since it's a content-derived identifier
 
 ## Next Steps

@@ -45,10 +45,9 @@ This curriculum is organized into the following sections:
    - Cache-Control header configuration
 
 6. **[Metrics that Matter in Production](./06-production-metrics.md)** - Monitoring for performance
-   - Prometheus metrics endpoints
+   - Metrics collection and alerting thresholds
    - Key performance indicators
    - Alerting thresholds
-   - Grafana dashboard setup
 
 7. **[Hands-On Lab: Tune Upload Parameters](./07-hands-on.md)** - Practical exercises
    - Sequential vs parallel upload comparison
@@ -63,7 +62,7 @@ Before starting this module, you should have:
 - ✅ Working knowledge of Walrus SDK basics (`writeBlob`)
 - ✅ Basic understanding of async/await patterns in TypeScript/JavaScript
 - ✅ A funded Testnet wallet with SUI and WAL tokens
-- ✅ Node.js 18+ installed (or Docker)
+- ✅ Node.js 18+ installed
 
 ## Key Takeaways
 

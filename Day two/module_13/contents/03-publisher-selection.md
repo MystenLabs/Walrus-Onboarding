@@ -23,7 +23,7 @@ flowchart LR
 
 ### 2. Private / Dedicated Publisher
 
-Run your own publisher instance using Docker or directly via the `walrus` binary.
+Run your own publisher instance directly via the `walrus` binary.
 
 ```bash
 # Run a dedicated publisher
@@ -60,19 +60,21 @@ flowchart LR
 **Example: Direct SDK Write (TypeScript)**
 
 ```typescript
-import { WalrusClient } from '@mysten/walrus';
+import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
+import { walrus } from '@mysten/walrus';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 
 // Your application directly uses the SDK with a signer
 const keypair = Ed25519Keypair.deriveKeypair(process.env.MNEMONIC!);
 
-const client = await WalrusClient.create({
-    network: 'testnet',
-});
+const client = new SuiClient({ url: getFullnodeUrl('testnet') }).$extend(
+    walrus({ network: 'testnet' }),
+);
 
 // Direct write - no HTTP publisher involved
 const result = await client.writeBlob({
     blob: myData,
+    deletable: true,
     signer: keypair,
     epochs: 5,
 });

@@ -5,7 +5,7 @@
 **Total Time:** 60-75 minutes
 **Difficulty:** Intermediate to Advanced
 **Hands-on Components:** Lab - Tune Upload Parameters (20-30 min)
-**Materials Needed:** Walrus SDK, Node.js environment, Docker (optional), network access
+**Materials Needed:** Walrus SDK, Node.js environment, network access
 
 **Key Takeaways:**
 - Parallel chunking enables **2-4x throughput improvement** for large uploads
@@ -23,20 +23,20 @@
 - Working knowledge of Walrus SDK basics (`writeBlob`)
 - Basic understanding of async/await patterns in TypeScript/JavaScript
 - A funded Testnet wallet with SUI + WAL tokens
-- Node.js 18+ installed (or Docker)
+- Node.js 18+ installed
 
 ### For Instructor
 
 - Understanding of erasure encoding overhead and sliver distribution
 - Familiarity with publisher architecture and sub-wallet management
-- Experience with Prometheus metrics and Grafana dashboards
+- Experience with production metrics and alerting
 - Comfort explaining network latency vs. throughput tradeoffs
 - Prepared demo environment with performance comparison results
 
 ## Classroom Setup
 
 **Advance Prep (15 min before class):**
-- [ ] Verify Node.js/Docker environment works
+- [ ] Verify Node.js environment works
 - [ ] Test the throughput tuner script on testnet
 - [ ] Ensure students have funded wallets (SUI + WAL)
 - [ ] Prepare whiteboard for throughput diagrams
@@ -55,7 +55,7 @@
 3. **Publisher Selection (10-12 min):** Remote vs private vs **direct SDK writes** | Latency/load/geographic selection | Trust implications
 4. **Storage Extensions (8-10 min):** Duration estimation | Zombie data avoidance | Expiration vs deletion | PTB batch operations
 5. **Local Caching (8-10 min):** Aggregator/Application/CDN levels | Immutable = no invalidation | **Caveats for each layer** (timeouts, size limits, costs)
-6. **Production Metrics (8-10 min):** Prometheus `/metrics` on :27182 | PromQL examples | Alert thresholds | Grafana setup reference
+6. **Production Metrics (8-10 min):** Key metrics | Alert thresholds | Debugging correlations
 7. **Hands-On Lab (20-30 min):** Sequential vs parallel comparison | Throughput measurement | Two parallelism levels | Challenge: concurrency limits
 
 ---
@@ -276,27 +276,22 @@
 ⏱️ **Duration:** 8-10 minutes
 
 🎯 **Key Points to Emphasize:**
-- **Prometheus Integration**: `/metrics` endpoint on port 27182 (configurable via `--metrics-address`)
 - **Key Metrics**:
   - End-to-end latency, TTFB
   - Encoding duration (CPU bottleneck indicator)
   - Storage node availability, retry rate
   - Memory usage, network I/O
 - **Alert Thresholds**: Success rate <99% warning, <95% critical
-- **Grafana Setup**: Reference `docker/grafana-local/` for dev setup; PromQL queries provided
 
 💡 **Teaching Tips:**
-- Show example PromQL queries: `histogram_quantile(0.95, rate(walrus_read_duration_seconds_bucket[5m]))`
 - Walk through the alerting threshold table
 - Explain: "High retry rate kills latency even if eventual success"
 - Discuss correlation: "Encoding spike + high latency = CPU bottleneck"
-- Note: Exact metric names may vary - always check `/metrics` output first
 
 ⚠️ **Common Misconceptions:**
 - Students may only monitor success/failure (latency matters too!)
 - Could ignore resource metrics until OOM kills happen
 - May not correlate metrics (e.g., retry rate + latency)
-- Might assume metric names are standardized (check actual `/metrics` output)
 
 💬 **Discussion Points:**
 - "What does high retry rate indicate?"
@@ -306,7 +301,7 @@
 
 ✅ **Quick Check:**
 - "What success rate triggers a warning alert?" (<99%)
-- "What port does the metrics endpoint run on by default?" (27182)
+- "Name one latency metric to monitor" (End-to-end latency, TTFB)
 - "Name two resource metrics you should monitor" (Memory usage, network I/O)
 
 **Transition to Hands-On:**
@@ -327,7 +322,7 @@
 - **Analysis**: Latency stays similar, but overlap increases throughput
 
 💡 **Teaching Tips:**
-- Walk through Docker setup first (5 min)
+- Walk through the local setup first (5 min)
 - Run the experiment together as a class first
 - Let students run independently and compare results
 - Discuss variance: "Network conditions affect results"
@@ -340,7 +335,6 @@
 | "PASSPHRASE not set" | Export environment variable: `export PASSPHRASE='...'` |
 | Faucet rate limited | Wait 1-2 minutes, or use existing balance |
 | Insufficient WAL | Script auto-exchanges SUI for WAL |
-| Docker not installed | Use local setup with `npm install && npm start` |
 | Results vary wildly | Network conditions; run multiple times |
 | HTTP 429 errors | Rate limited; reduce concurrency |
 | CPU maxed during test | Encoding is intensive; expected behavior |
@@ -404,7 +398,7 @@ Use this to gauge if the module was successful:
 - [ ] Student understands storage extension cost implications (gas fees add up)
 - [ ] Student can explain why caching is easy with immutable blob IDs
 - [ ] Student knows caveats for each cache layer (Nginx timeouts, Redis size limits, CDN costs)
-- [ ] Student knows key production metrics to monitor (Prometheus on :27182)
+- [ ] Student knows key production metrics to monitor
 - [ ] Student understands HTTP 429 indicates rate limiting/overload
 - [ ] Student completed hands-on lab and measured throughput improvement
 
@@ -445,10 +439,9 @@ Students should now be ready for:
 - Integration with CDNs and edge caching
 
 **Key Concepts to Reinforce in Future Modules:**
-- Always measure before optimizing (metrics first - Prometheus on :27182)
+- Always measure before optimizing (metrics first)
 - Chunk large files (10-100MB); use Quilts for small files (<1MB)
 - Cache aggressively with proper headers (`immutable` directive)
 - Configure caches for large blobs (timeouts, size limits, buffering)
 - Estimate storage duration upfront to avoid extension overhead
 - Watch for HTTP 429 when pushing parallelism; use concurrency limits
-

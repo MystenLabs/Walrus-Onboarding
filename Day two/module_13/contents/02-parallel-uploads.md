@@ -141,44 +141,38 @@ flowchart LR
 ## Example: Parallel Upload with Concurrency Limit
 
 ```typescript
+import pLimit from 'p-limit';
 import { WalrusClient } from '@mysten/walrus';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 
 async function uploadBlobsWithLimit(
     client: WalrusClient,
     blobs: Uint8Array[],
-    concurrencyLimit = 5
+    signer: Ed25519Keypair,
+    concurrencyLimit = 5,
+    epochs = 5,
 ) {
-    const results: string[] = [];
-    const pending: Promise<void>[] = [];
-    
-    for (const blob of blobs) {
-        // Start upload
-        const uploadPromise = client.writeBlob({ blob })
-            .then(result => {
-                results.push(result.blobId);
-            });
-        
-        pending.push(uploadPromise);
-        
-        // If at limit, wait for one to complete
-        if (pending.length >= concurrencyLimit) {
-            await Promise.race(pending);
-            // Remove completed promises
-            const completed = pending.filter(p => 
-                p.then(() => true).catch(() => true)
-            );
-            pending.length = 0;
-            pending.push(...completed);
-        }
-    }
-    
-    // Wait for remaining uploads
-    await Promise.all(pending);
+    const limit = pLimit(concurrencyLimit);
+
+    const results = await Promise.all(
+        blobs.map((blob) =>
+            limit(async () => {
+                const { blobId } = await client.writeBlob({
+                    blob,
+                    signer,
+                    epochs,
+                    deletable: true,
+                });
+                return blobId;
+            }),
+        ),
+    );
+
     return results;
 }
 ```
 
-> 💡 **Tip:** Use libraries like `p-limit` for cleaner concurrency control in production code.
+> 💡 **Tip:** A small stagger between `limit`-wrapped calls can further reduce coin contention if you reuse a single wallet.
 
 ## Key Takeaways
 
