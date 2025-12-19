@@ -1,159 +1,114 @@
 /**
- * Solution: Debugging Failure Scenarios
+ * Solution: Debugging Failure Scenarios (Real SDK)
  * 
- * This file demonstrates proper retry logic and error handling
- * for Walrus operations.
+ * Proper retry logic and error handling for Walrus operations
+ * using the real TypeScript SDK on testnet.
  */
 
-export {}; // Make this an ES module to avoid global scope conflicts
+import 'dotenv/config';
+export {};
 
-// --- Mock Client Wrapper to Simulate Failures ---
-// In a real scenario, you would import and use the actual WalrusClient.
+import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { WalrusClient, RetryableWalrusClientError } from "@mysten/walrus";
+import { readFile } from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 
-class MockClient {
-    private attemptCount = 0;
-
-    async storeBlob(data: string): Promise<string> {
-        this.attemptCount++;
-        console.log(`[MockClient] Attempt ${this.attemptCount} to store blob...`);
-
-        // Simulate 2 failures then success
-        if (this.attemptCount < 3) {
-            if (Math.random() > 0.5) {
-                throw new Error("Network Error: Connection refused");
-            } else {
-                const err: any = new Error("Service Unavailable");
-                err.status = 503;
-                throw err;
-            }
-        }
-
-        return "blob_id_success_12345";
-    }
+function getKeypairFromEnv(): Ed25519Keypair {
+    const mnemonic = process.env.PASSPHRASE;
+    const derivationPath = process.env.DERIVATION_PATH; // optional
+    if (!mnemonic) throw new Error("Missing PASSPHRASE (12/24-word mnemonic) in environment/.env.");
+    return derivationPath
+        ? Ed25519Keypair.deriveKeypair(mnemonic, derivationPath)
+        : Ed25519Keypair.deriveKeypair(mnemonic);
 }
 
-// --- Solution: Retry Logic with Exponential Backoff ---
-
-interface RetryOptions {
-    maxAttempts?: number;
-    baseDelay?: number;
-    maxDelay?: number;
-    jitter?: boolean;
-}
-
-/**
- * Determines if an error is retryable.
- * - Network errors (connection refused, timeout) -> retry
- * - HTTP 5xx errors (503 Service Unavailable) -> retry
- * - HTTP 429 Too Many Requests -> retry
- * - HTTP 4xx client errors (except 429) -> do NOT retry
- */
 function isRetryableError(error: any): boolean {
-    // Network-level errors
-    if (error.message?.includes("Network Error") || 
-        error.message?.includes("timeout") ||
-        error.message?.includes("ECONNREFUSED")) {
-        return true;
+    if (!error) return true;
+
+    // Walrus-specific retryable errors (epoch changes, transient conditions)
+    if (error instanceof RetryableWalrusClientError) return true;
+
+    const msg = String(error.message || "");
+    if (msg.match(/ECONN|ENET|ETIMEDOUT|timeout|Network Error/i)) return true;
+
+    const status = error?.status ?? error?.response?.status;
+    if (typeof status === "number") {
+        if (status === 429) return true; // Too Many Requests
+        if (status >= 500 && status < 600) return true; // Server errors
+        if (status >= 400 && status < 500) return false; // Other client errors
     }
-    
-    // HTTP status-based errors
-    if (typeof error.status === 'number') {
-        // 5xx server errors are retryable
-        if (error.status >= 500 && error.status < 600) {
-            return true;
-        }
-        // 429 Too Many Requests is retryable
-        if (error.status === 429) {
-            return true;
-        }
-        // 4xx client errors (except 429) are NOT retryable
-        if (error.status >= 400 && error.status < 500) {
-            return false;
-        }
-    }
-    
-    // Default: retry unknown errors (conservative approach)
+
+    // Conservative default: retry unknowns
     return true;
 }
 
-/**
- * Executes a function with exponential backoff retry logic.
- */
-async function retryWithBackoff<T>(
-    fn: () => Promise<T>,
-    options: RetryOptions = {}
-): Promise<T> {
-    const {
-        maxAttempts = 5,
-        baseDelay = 100,
-        maxDelay = 10000,
-        jitter = true
-    } = options;
+async function retryWithBackoff<T>(fn: () => Promise<T>, client?: WalrusClient): Promise<T> {
+    const maxAttempts = 4;
+    const baseDelay = 200;
+    const maxDelay = 2_000;
 
-    let attempt = 0;
-    let lastError: Error | undefined;
-
-    while (attempt < maxAttempts) {
-        attempt++;
-        
+    let lastError: any;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {
             return await fn();
         } catch (error: any) {
             lastError = error;
-            
-            // Check if we should retry this error
-            if (!isRetryableError(error)) {
-                console.error(`Attempt ${attempt} failed with non-retryable error:`, error.message);
-                throw error; // Fail fast for non-retryable errors
-            }
-            
-            console.warn(`Attempt ${attempt} failed:`, error.message);
-            
-            // Don't wait after the last attempt
-            if (attempt >= maxAttempts) {
-                break;
-            }
-            
-            // Calculate delay with exponential backoff
-            let delay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
-            
-            // Add jitter to prevent thundering herd
-            if (jitter) {
-                delay += Math.random() * baseDelay;
-            }
-            
-            console.log(`Retrying in ${Math.round(delay)}ms...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
+            if (!isRetryableError(error)) throw error;
+            if (error instanceof RetryableWalrusClientError && client) client.reset();
+            if (attempt === maxAttempts) break;
+
+            const delay = Math.min(baseDelay * Math.pow(2, attempt - 1) + Math.random() * baseDelay, maxDelay);
+            console.log(`Attempt ${attempt} failed: ${error?.message || error}. Retrying in ${Math.round(delay)}ms...`);
+            await new Promise((r) => setTimeout(r, delay));
         }
     }
-
-    throw lastError ?? new Error("Retry failed without error");
+    throw lastError ?? new Error("Retry failed");
 }
 
-// --- Main Application Logic ---
-
 async function main() {
-    const client = new MockClient();
-    const data = "Hello Walrus";
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
 
-    console.log("Starting upload with retry logic...\n");
+    const filePath = process.env.FILE || path.resolve(__dirname, "../sample/hello.txt");
+    const epochs = Number(process.env.EPOCHS || 1);
+    const aggregatorUrl = process.env.AGGREGATOR_URL;
+
+    console.log("Reading file:", filePath);
+    const fileBytes = new Uint8Array(await readFile(filePath));
+
+    const keypair = getKeypairFromEnv();
+    const suiClient = new SuiClient({ url: getFullnodeUrl("testnet") });
+    const client = new WalrusClient({
+        network: "testnet",
+        suiClient,
+        ...(aggregatorUrl ? { aggregatorUrl } : {}),
+    });
+
+    console.log("Starting upload with retry logic...");
 
     try {
-        const blobId = await retryWithBackoff(
-            () => client.storeBlob(data),
-            {
-                maxAttempts: 5,
-                baseDelay: 100,
-                jitter: true
-            }
+        const result = await retryWithBackoff(
+            () => client.writeBlob({ blob: fileBytes, epochs, signer: keypair, deletable: false }),
+            client
         );
-        
-        console.log(`\n✅ Success! Blob ID: ${blobId}`);
+        const blobIdValue = typeof result === 'string' ? result : result.blobId;
+        console.log(`\n✅ Uploaded. Blob ID: ${blobIdValue}`);
+
+        const data = await retryWithBackoff(
+            () => client.readBlob({ blobId: blobIdValue }),
+            client
+        );
+        const text = new TextDecoder().decode(data);
+        console.log("📖 Read back text:", text);
+
+        const same = Buffer.from(data).equals(Buffer.from(fileBytes));
+        console.log(`Match with source: ${same ? "✅ Yes" : "❌ No"}`);
     } catch (error: any) {
-        console.error(`\n❌ Upload failed after all retries:`, error.message);
+        console.error(`\n❌ Operation failed after retries:`, error?.message || error);
         process.exit(1);
     }
 }
 
 main();
-

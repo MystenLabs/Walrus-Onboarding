@@ -103,19 +103,7 @@ hands-on-source-code/
 
 See the hands-on lab in [contents/08-hands-on-debug-scenario.md](./contents/08-hands-on-debug-scenario.md) for detailed instructions.
 
-## 🐳 Docker Environment
-
-The `docker/` directory provides a containerized environment for running the hands-on exercises:
-
-```sh
-cd docker/
-make build      # Build the Docker image
-make test       # Run the debug scenario (broken code)
-make solution   # Run the solution
-make shell      # Open interactive shell
-```
-
-This is useful for consistent environments without local Node.js setup. See [docker/README.md](./docker/README.md) for details.
+For setup and running instructions, see the [hands-on-source-code/README.md](./hands-on-source-code/README.md).
 
 ## 👨‍🏫 Instructor Resources
 

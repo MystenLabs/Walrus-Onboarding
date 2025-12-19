@@ -8,7 +8,7 @@
 
 **Hands-on Components:** Yes - Debugging a Failure Scenario (20-30 min)
 
-**Materials Needed:** Node.js environment, hands-on source code directory
+**Materials Needed:** Node.js environment, hands-on source code directory, `.env` with testnet mnemonic (`PASSPHRASE`), funded testnet account (SUI gas + WAL storage)
 
 **Key Takeaways:**
 
@@ -36,6 +36,8 @@
 
 - Node.js and npm installed for hands-on exercises
 
+- Testnet Sui mnemonic in `.env` (`PASSPHRASE`) with testnet SUI and WAL tokens
+
 ### For Instructor
 
 - Familiarity with HTTP status codes and their meanings
@@ -56,7 +58,9 @@
 
 - [ ] Ensure access to hands-on source code: `docs/book/curriculum/failure_handling/hands-on-source-code/`
 
-- [ ] Run `debug-scenario.ts` yourself to see the failure mode
+- [ ] Prepare `.env` with `PASSPHRASE` and verify testnet SUI + WAL balances
+
+- [ ] Run `npm run debug-scenario` yourself to see the failure mode
 
 - [ ] Prepare whiteboard diagram: "Simple Retry Loop" vs "Exponential Backoff with Jitter"
 
@@ -72,7 +76,7 @@
 
 1. **Chunk-Level Failures & SDK Errors (15 min):** SDK handles node failures transparently | 2f+1 slivers needed | Know the 4 main error types
 
-2. **Publisher & Aggregator Issues (15 min):** Epoch changes → call `client.reset()` | Configure timeouts | Aggregator down ≠ data lost
+2. **Publisher & Aggregator Issues (15 min):** Epoch changes → call `client.reset()` | Configure timeouts | Aggregator down ≠ data lost | Real testnet behavior
 
 3. **Expired Storage & Data Integrity (10 min):** Blobs expire after N epochs | Only `permanent` blobs have `endEpoch` | Integrity verified automatically
 
@@ -371,7 +375,7 @@
 
 - **Students implement**: `retryWithBackoff()` function, `isRetryableError()` function, jitter calculation
 
-- **Mock client simulates 2 failures then success**: Tests their retry logic without network dependencies
+- **Real SDK on testnet**: Transient failures may occur; students' retry logic must handle them
 
 - **Compare with reference solution**: `npm run solution` shows best practices
 
@@ -399,7 +403,7 @@
 
 - Walk around and check if students are checking error types, not just catching `any`
 
-- Highlight that the mock client simulates 2 failures then succeeds—this tests their retry logic
+- Highlight that real testnet conditions can intermittently fail; proper backoff and jitter should eventually succeed
 
 - If students get stuck, hint: "Check the error's `status` property for HTTP codes"
 
@@ -409,7 +413,7 @@
 
 - "Just catch all errors and retry." → Must distinguish retryable vs non-retryable
 
-- "The mock client is like the real SDK." → No, real SDK uses `writeBlob`, mock uses `storeBlob`
+- "Catching any error and retrying is enough." → No, handle `RetryableWalrusClientError` by calling `client.reset()`; distinguish HTTP 5xx/429 vs other 4xx
 
 - "More retries is always better." → No, need max attempts to avoid infinite loops
 
@@ -426,11 +430,11 @@
 
 ✅ **Quick Check:**
 
-- Students should have working retry logic that handles the mock failures
+- Students should have working retry logic that handles transient testnet failures and succeeds
 
-- Ask: "What happens on attempt 1 and 2?" (Random failure - network error or 503)
+- Ask: "When should you call `client.reset()` during retries?" (After catching `RetryableWalrusClientError`)
 
-- Ask: "What happens on attempt 3?" (Success - returns blob ID)
+- Ask: "What signals a retryable vs non-retryable error?" (Network errors, 5xx/429, Walrus retryable errors vs other 4xx)
 
 - Review student implementations and provide feedback
 

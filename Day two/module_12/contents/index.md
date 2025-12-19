@@ -71,6 +71,7 @@ Before starting this module, you should have:
 - ✅ Completed the `Walrus SDK with Upload Relay` module (recommended)
 - ✅ Familiarity with HTTP status codes (429, 503, etc.)
 - ✅ Node.js and npm installed for hands-on exercises
+ - ✅ Testnet Sui mnemonic (`PASSPHRASE` in `.env`) with testnet SUI and WAL tokens (for the hands-on lab)
 
 ## Key Takeaways
 
@@ -83,4 +84,3 @@ Before starting this module, you should have:
 ## Next Steps
 
 Start with **[Chunk Level Failures](./01-chunk-level-failures.md)** to understand the foundational error types, then work through each section to build your understanding of failure handling patterns.
-
