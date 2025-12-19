@@ -11,33 +11,34 @@ This directory contains the source code for the Performance Optimization hands-o
 
 ## Running the Lab
 
-### Using Docker (Recommended)
-
-See the `../docker/` directory for Docker-based execution:
-
-```bash
-cd ../docker
-make build
-PASSPHRASE='your testnet passphrase' make run
-```
-
-### Local Execution
-
 1. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Run the experiment:
+2. Set your wallet passphrase (use `.env` or export):
    ```bash
-   PASSPHRASE='your testnet passphrase' npm start
+   echo "PASSPHRASE='your testnet passphrase'" > .env
    ```
+
+3. Run the experiment:
+   ```bash
+   npm start  # defaults: 3 blobs, 256KB each, concurrency=5, wallets=1
+   ```
+
+   To cap concurrency or use multiple wallets (optional):
+   ```bash
+   CONCURRENCY=2 NUM_WALLETS=2 npm start
+   ```
+   - `CONCURRENCY` sets parallel uploads (default: 5)
+   - `NUM_WALLETS` derives/funds multiple wallets from `PASSPHRASE` to reduce coin contention (default: 1)
+   - Derived wallet details are written to `.generated_wallets.env` (address, public key, secret key)
 
 ## What It Does
 
 The throughput tuner:
 
-1. Generates 5 random blobs (1MB each)
+1. Generates 3 random blobs (256KB each)
 2. Uploads them **sequentially** and measures throughput
 3. Uploads them **in parallel** and measures throughput
 4. Reports the performance improvement percentage
@@ -69,4 +70,3 @@ Modify `ts/throughput-tuner.ts` to:
 4. Watch for HTTP 429 responses when pushing concurrency too high
 
 Hint: Use a library like `p-limit` for concurrency control.
-

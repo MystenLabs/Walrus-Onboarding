@@ -7,12 +7,16 @@
     "start": "tsx ts/throughput-tuner.ts"
   },
   "dependencies": {
-    "@mysten/sui": "^1.21.1",
+    "@mysten/sui": "^1.45.0",
     "@mysten/walrus": "^0.8.4",
-    "tsx": "^4.7.1",
+    "dotenv": "^16.4.5",
     "undici": "^6.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
   }
 }
-
 
 

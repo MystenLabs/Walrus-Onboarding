@@ -1,9 +1,9 @@
 import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { walrus } from '@mysten/walrus';
-import { getFundedKeypair, generateRandomBuffer } from './utils.js';
+import { getFundedKeypair, getFundedKeypairs, generateRandomBuffer } from './utils.js';
 
 const TOTAL_BLOBS = 5;
-const BLOB_SIZE = 1024 * 1024; // 1MB
+const BLOB_SIZE = 128 * 1024; // 128KB
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
 
@@ -72,21 +72,24 @@ async function run() {
     console.log("=== Walrus Performance Tuning Lab ===");
     console.log("Comparing sequential vs concurrent upload patterns\n");
 
-    // 1. Setup Client
-    const keypair = await getFundedKeypair();
+    // 1. Setup Client + wallets
+    const NUM_WALLETS = Number(process.env.NUM_WALLETS || '1');
+    const signers =
+        NUM_WALLETS > 1 ? await getFundedKeypairs(NUM_WALLETS) : [await getFundedKeypair()];
+    const primarySigner = signers[0];
+    if (signers.length > 1) {
+        console.log(`Using ${signers.length} wallets (round-robin) to reduce coin contention`);
+    } else {
+        console.log('Using a single wallet (expect some coin contention at higher concurrency)');
+    }
     const client = new SuiClient({
         url: getFullnodeUrl('testnet'),
         network: 'testnet',
-    }).$extend(
-        walrus({
-            walrusPackageId: "0x8270feb7375eee355e64fdb69c50abb6b5f9393a722883c1cf45f8e26048810a",
-        })
-    );
+    }).$extend(walrus());
 
-    // Prepare data - generate fresh blobs for each scenario
+    // Prepare data - use the same blobs for both scenarios
     console.log(`Generating ${TOTAL_BLOBS} blobs of ${BLOB_SIZE / 1024} KB each...`);
-    const blobsA = Array.from({ length: TOTAL_BLOBS }, () => generateRandomBuffer(BLOB_SIZE));
-    const blobsB = Array.from({ length: TOTAL_BLOBS }, () => generateRandomBuffer(BLOB_SIZE));
+    const blobs = Array.from({ length: TOTAL_BLOBS }, () => generateRandomBuffer(BLOB_SIZE));
 
     // Scenario A: Sequential Uploads (baseline)
     console.log("\n--- Scenario A: Sequential Uploads ---");
@@ -95,19 +98,19 @@ async function run() {
     const startA = performance.now();
     let successA = 0;
     
-    for (let i = 0; i < blobsA.length; i++) {
+    for (let i = 0; i < blobs.length; i++) {
         process.stdout.write(`Uploading blob ${i + 1}/${TOTAL_BLOBS}... `);
         try {
             await withRetry(() => client.walrus.writeBlob({
-                blob: blobsA[i],
+                blob: blobs[i],
                 epochs: 1,
-                signer: keypair,
+                signer: primarySigner,
                 deletable: true,
             }));
             successA++;
             console.log("Done.");
         } catch (error) {
-            console.log(`Failed: ${(error as Error).message.slice(0, 50)}...`);
+            console.log(`Failed: ${(error as Error).message}`);
         }
     }
     
@@ -119,38 +122,35 @@ async function run() {
     console.log(`  Total Time: ${durationA.toFixed(2)}s`);
     console.log(`  Throughput: ${throughputA.toFixed(2)} MB/s`);
 
-    // Scenario B: Concurrent Uploads with controlled concurrency
-    // Note: With a single wallet, we use limited concurrency + retry to handle coin contention
-    const CONCURRENCY = 2; // Limited to avoid coin conflicts with single wallet
-    
+    // Scenario B: Concurrent Uploads
+    // Note: With a single wallet, we rely on retry logic to handle coin contention
+    const CONCURRENCY = Number(process.env.CONCURRENCY) || 5;
+    const limit = createLimiter(CONCURRENCY);
     console.log("\n--- Scenario B: Concurrent Uploads ---");
-    console.log(`Using concurrency limit of ${CONCURRENCY} with retry logic...`);
+    if (CONCURRENCY < blobs.length) {
+        console.log(`Using concurrency limit of ${CONCURRENCY} with retry logic...`);
+    } else {
+        console.log("Uploading all blobs concurrently with retry logic...");
+    }
     console.log("(Single wallet causes coin contention - production uses sub-wallets)\n");
     
     const startB = performance.now();
-    const limit = createLimiter(CONCURRENCY);
     let successB = 0;
     
-    // Add small stagger between starting uploads to reduce coin conflicts
-    const uploadPromises = blobsB.map((blob, index) => {
-        return new Promise<void>(async (resolve) => {
-            // Stagger start times slightly
-            await new Promise(r => setTimeout(r, index * 500));
-            
-            try {
-                await limit(() => withRetry(() => client.walrus.writeBlob({
-                    blob: blob,
-                    epochs: 1,
-                    signer: keypair,
-                    deletable: true,
-                })));
-                successB++;
-                console.log(`[Concurrent] Blob ${index + 1} Done.`);
-            } catch (error) {
-                console.log(`[Concurrent] Blob ${index + 1} Failed: ${(error as Error).message.slice(0, 40)}...`);
-            }
-            resolve();
-        });
+    const uploadPromises = blobs.map(async (blob, index) => {
+        try {
+            const signer = signers[index % signers.length];
+            await limit(() => withRetry(() => client.walrus.writeBlob({
+                blob: blob,
+                epochs: 1,
+                signer,
+                deletable: true,
+            })));
+            successB++;
+            console.log(`[Concurrent] Blob ${index + 1} Done.`);
+        } catch (error) {
+            console.log(`[Concurrent] Blob ${index + 1} Failed: ${(error as Error).message}`);
+        }
     });
 
     await Promise.all(uploadPromises);
