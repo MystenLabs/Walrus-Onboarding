@@ -99,7 +99,7 @@ walrus publisher \
 
 ```bash
 # Create test file
-echo "Hello Walrus!" > test.txt
+echo "Hello Walrus\!" > test.txt
 
 # Upload
 curl -X PUT http://localhost:31415/v1/blobs \
