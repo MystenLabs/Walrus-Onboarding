@@ -26,6 +26,7 @@ An **aggregator** provides an HTTP interface for downloading blobs from Walrus.
 ### Basic Command
 
 ```bash
+# Run aggregator after killing publisher.
 walrus aggregator --bind-address "127.0.0.1:31416"
 ```
 
