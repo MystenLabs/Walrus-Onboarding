@@ -55,7 +55,8 @@ sui client new-address ed25519
 
 # Get Testnet tokens
 # SUI: https://faucet.testnet.sui.io/
-# WAL: https://faucet.walrus.site/
+# WAL (swap testnet SUI for WAL at 1:1 rate)
+walrus get-wal
 
 # Check balance
 sui client gas
