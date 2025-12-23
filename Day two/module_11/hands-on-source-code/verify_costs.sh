@@ -81,12 +81,21 @@ for size in "${SIZES[@]}"; do
     fi
     
     # Convert to WAL (divide by 1,000,000,000)
-    regular_wal=$(awk "BEGIN {printf \"%.3f\", $total_regular_cost / 1000000000}")
-    quilt_wal=$(awk "BEGIN {printf \"%.3f\", $quilt_cost / 1000000000}")
+    # Use higher precision for calculation
+    regular_wal_precise=$(awk "BEGIN {printf \"%.9f\", $total_regular_cost / 1000000000}")
+    quilt_wal_precise=$(awk "BEGIN {printf \"%.9f\", $quilt_cost / 1000000000}")
     
-    # Calculate savings factor
-    if (( $(echo "$quilt_wal > 0" | bc -l) )); then
-        factor=$(awk "BEGIN {printf \"%.0f\", $regular_wal / $quilt_wal}")
+    # Format display values (use more precision for small quilt costs)
+    regular_wal=$(awk "BEGIN {printf \"%.3f\", $total_regular_cost / 1000000000}")
+    if (( $(echo "$quilt_wal_precise < 0.001" | bc -l) )); then
+        quilt_wal=$(awk "BEGIN {printf \"%.4f\", $quilt_cost / 1000000000}")
+    else
+        quilt_wal=$(awk "BEGIN {printf \"%.3f\", $quilt_cost / 1000000000}")
+    fi
+    
+    # Calculate savings factor using precise values
+    if (( $(echo "$quilt_wal_precise > 0" | bc -l) )); then
+        factor=$(awk "BEGIN {printf \"%.0f\", $regular_wal_precise / $quilt_wal_precise}")
         factor_str="${factor}x"
     else
         factor_str="Inf"
