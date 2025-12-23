@@ -147,12 +147,15 @@ The client collects these signatures until it reaches a **quorum** (sufficient s
 ### TypeScript SDK
 The TypeScript SDK does not emit debug logs by default. Monitor the `certificateFromConfirmations` execution.
 
-### Rust SDK (Reference)
-If using the Rust SDK (`crates/walrus-sdk`), look for:
--   `get {n} blobs certificates` (indicating successful collection and aggregation)
+### Rust SDK / CLI
+If using the Rust SDK or CLI, look for these debug-level messages:
+-   `retrieving confirmation` — client requesting confirmation from a node
+-   `return=ThresholdReached` — quorum threshold has been met (enough signatures collected)
 
 ### Storage Node Logs
 -   Look for metrics updates on `storage_confirmations_issued_total`.
+
+> 💡 **Docker Tip:** The `make grep-logs` command searches for `retrieving confirmation` and `ThresholdReached` patterns to identify this phase.
 
 ## Key Takeaways
 

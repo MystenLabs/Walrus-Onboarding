@@ -9,7 +9,7 @@ In this hands-on exercise, you will run a local upload and inspect the logs to i
 
 ## Running in Docker (Recommended for Consistent Results)
 
-For a consistent environment across all operating systems, use the Docker setup in the `docker/` directory:
+For a consistent environment across all operating systems, use the Docker setup in the `../docker/` directory (from the module root):
 
 ```sh
 # From the upload_transaction_lifecycle module directory
@@ -17,8 +17,8 @@ cd docker
 make build
 SUI_WALLET_PATH=~/.sui/sui_config make run
 
-# Or run the trace lifecycle exercise
-make trace-lifecycle
+# Or run the trace lifecycle exercise (SUI_WALLET_PATH is required)
+SUI_WALLET_PATH=~/.sui/sui_config make trace-lifecycle
 ```
 
 > 💡 **Docker Benefits:** Debug logging is pre-configured to show all lifecycle stages.
@@ -45,42 +45,47 @@ walrus store test.txt
 
 ## Step 3: Analyze the Logs
 
-Look for the following patterns in your terminal output:
+Look for the following patterns in your terminal output. If using the Docker setup, run `make grep-logs` to automatically search for these patterns, or `make analyze-logs` to see the reference guide.
 
 ### 1. Chunk Creation
 Find the encoding traces:
 ```text
 DEBUG ... starting to encode blob with metadata
-INFO ... encoded sliver pairs and metadata
-DEBUG ... successfully encoded blob
+INFO ... finished blob encoding duration=...
 ```
 
 ### 2. Submission (Registration)
 Find the Sui transaction traces:
 ```text
 DEBUG ... starting to register blobs
+DEBUG ... registering blobs
+INFO ... finished registering blobs duration=...
 ```
-You might also see logs related to `Sign and submit transaction`.
 
 ### 3. Sealing (Store Slivers)
-Find the storage node interaction traces. Note that individual sliver uploads are often at `TRACE` level.
+Find the storage node interaction traces:
 ```text
-TRACE ... starting to store sliver
+DEBUG ... sliver upload completed on node
+DEBUG ... finished storing slivers on node
+DEBUG ... storing metadata and sliver pairs finished
 ```
-(If running with `RUST_LOG=walrus_storage_node_client=trace`)
 
 ### 4. Proof Creation
 Find the confirmation collection traces:
 ```text
-INFO ... get {n} blobs certificates
+DEBUG ... retrieving confirmation
+DEBUG ... return=ThresholdReached
 ```
+The `ThresholdReached` message indicates enough signatures have been collected.
 
 ### 5. Certification
 Find the certification transaction:
 ```text
-DEBUG ... certifying blob on Sui
+INFO ... obtained 1 blob certificate duration=...
+INFO ... finished certifying and extending blobs on Sui duration=...
+INFO ... finished storing blobs duration=...
 ```
-Or successful completion of the command returning the Blob ID.
+Or look for the final success message with the Blob ID.
 
 ## Step 4: Storage Node Logs (Optional)
 
@@ -98,8 +103,14 @@ Try uploading a file larger than 10MB. Does the logging pattern change? Do you s
 ## Key Takeaways
 
 - **Log Visibility**: Debug logs provide a step-by-step trace of the entire upload lifecycle.
-- **Stage Identification**: Specific log messages ("starting to encode", "register_blob", "certify_blob") map directly to protocol phases.
+- **Stage Identification**: Specific log messages map directly to protocol phases:
+  - Encoding: `starting to encode blob` → `finished blob encoding`
+  - Registration: `starting to register blobs` → `finished registering blobs`
+  - Sealing: `sliver upload completed` → `storing metadata and sliver pairs finished`
+  - Proof: `retrieving confirmation` → `ThresholdReached`
+  - Certification: `obtained blob certificate` → `finished storing blobs`
 - **Troubleshooting**: Tracing logs allows you to pinpoint exactly where an upload failed (e.g., node interaction vs. blockchain transaction).
 - **Verification**: Logs serve as confirmation that the client is correctly executing the distributed protocol.
+- **Docker Tools**: Use `make grep-logs` for automated pattern matching and `make analyze-logs` for the reference guide.
 
 

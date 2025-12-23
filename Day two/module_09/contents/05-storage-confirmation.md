@@ -126,10 +126,11 @@ async fn process_blob_certified_event(...) {
 ### TypeScript SDK
 The TypeScript SDK does not emit debug logs by default. Monitor the `certifyBlob` transaction execution.
 
-### Rust SDK (Reference)
-If using the Rust SDK (`crates/walrus-sui` / `crates/walrus-sdk`), look for:
--   `certifying blob on Sui`
--   `certified {n} blobs on Sui`
+### Rust SDK / CLI
+If using the Rust SDK or CLI, look for these messages:
+-   `obtained N blob certificate` — certificate successfully obtained (INFO level)
+-   `finished certifying and extending blobs on Sui` — certification transaction complete
+-   `finished storing blobs` — entire upload process complete (with total duration)
 
 ### Sui Events
 You can verify the certification by looking for the `BlobCertified` event in the transaction result or on a Sui explorer.
@@ -140,6 +141,8 @@ You can verify the certification by looking for the `BlobCertified` event in the
 -   `sliver successfully synced` (if the node was missing data and recovered it)
 
 The upload is now complete! The blob is immutable, durable, and available for retrieval.
+
+> 💡 **Docker Tip:** The `make grep-logs` command searches for `blob certificate`, `finished certifying`, and `finished storing blobs` patterns.
 
 ## Key Takeaways
 

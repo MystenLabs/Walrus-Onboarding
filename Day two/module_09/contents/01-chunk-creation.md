@@ -134,17 +134,18 @@ pub fn encode_with_metadata(&self) -> (Vec<SliverPair>, VerifiedBlobMetadataWith
 ### TypeScript SDK
 The TypeScript SDK does not emit debug logs by default. Monitor the `encodeBlob` function execution.
 
-### Rust SDK (Reference)
-When running a Walrus client with debug logs enabled, look for these messages:
+### Rust SDK / CLI
+When running a Walrus client with debug logs enabled (`RUST_LOG=walrus_sdk=debug,walrus_core=debug`), look for these messages:
 
 **In `walrus-core` (encoding layer)**:
 -   `starting to encode blob with metadata` — encoding begins
--   `successfully encoded blob` — encoding complete with blob ID
 
 **In `walrus-sdk` (client layer)**:
--   `encoded sliver pairs and metadata` — client has finished encoding
+-   `finished blob encoding` — client has finished encoding (with duration)
 
 These logs indicate that the local client has successfully transformed your file into the format required for the Walrus network.
+
+> 💡 **Docker Tip:** Use `make trace-lifecycle` followed by `make grep-logs` to automatically search for these patterns. See the [docker/](../docker/) directory for setup.
 
 ## Key Takeaways
 

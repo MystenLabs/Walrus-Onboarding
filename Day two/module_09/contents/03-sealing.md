@@ -137,16 +137,19 @@ pub(crate) async fn store_sliver_unchecked(
 ### TypeScript SDK
 The TypeScript SDK does not emit debug logs by default. Monitor the `writeSliver` promises.
 
-### Rust SDK (Reference)
-If using the Rust SDK (`crates/walrus-storage-node-client`), look for:
--   `starting to store sliver` (trace level)
--   `error storing sliver` (if something goes wrong)
+### Rust SDK / CLI
+If using the Rust SDK or CLI, look for these debug-level messages:
+-   `sliver upload completed on node` — individual sliver stored on a node
+-   `finished storing slivers on node` — all slivers for a node complete
+-   `storing metadata and sliver pairs finished` — sealing phase complete for a blob
 
 ### Storage Node Logs
 -   Look for HTTP 200/201 responses with message: `sliver stored successfully`.
 -   Metrics increments for `slivers_stored_total`.
 
 This step ensures that the data is physically present on the network. However, the network doesn't *know* it's there yet until the proofs are submitted.
+
+> 💡 **Docker Tip:** The `make grep-logs` command searches for `sliver upload completed` and `finished storing slivers` patterns.
 
 ## Key Takeaways
 

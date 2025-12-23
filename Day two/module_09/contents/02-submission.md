@@ -126,11 +126,15 @@ The TypeScript SDK does not emit debug logs by default. To trace this step:
 -   **Network Activity**: Monitor for a Sui transaction execution.
 -   **Success**: The promise resolves with the created `Blob` object.
 
-### Rust SDK (Reference)
+### Rust SDK / CLI
 If using the Rust SDK or CLI (source in `crates/walrus-sui`), look for:
--   `starting to register blobs`
+-   `starting to register blobs` — registration begins
+-   `registering blobs` — processing registration
+-   `finished registering blobs` — registration complete (with duration)
 
 At this stage, the blob exists on Sui as a `Blob` object, but the actual data (slivers) has not yet been sent to the storage nodes. The blob is in a "Registered" state, waiting for proof of storage.
+
+> 💡 **Docker Tip:** Use `make grep-logs` after running `make trace-lifecycle` to find these patterns automatically.
 
 ## Key Takeaways
 

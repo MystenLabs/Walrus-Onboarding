@@ -44,9 +44,20 @@ By the end of this module, you will be able to:
 8.  **[Hands-On: Trace Logs](./08-hands-on-trace-logs.md)**
     *   Practical exercise: Run a local upload and `grep` for the lifecycle markers in your logs.
 
+## Docker Environment
+
+A Docker environment is provided for consistent hands-on exercises across all platforms. Navigate to the `../docker/` directory and use:
+
+```sh
+make build                                          # Build the image
+SUI_WALLET_PATH=~/.sui/sui_config make trace-lifecycle  # Run upload trace
+make grep-logs                                      # Search for lifecycle patterns
+make analyze-logs                                   # Show pattern reference guide
+```
+
 ## Prerequisites
 
-*   Familiarity with the [Walrus Architecture](../walrus_architecture/index.md).
+*   Familiarity with the Walrus Architecture (covered in earlier modules).
 *   Basic understanding of [Sui Transactions](https://docs.sui.io).
 *   Comfort reading logs and basic Rust code structure.
 

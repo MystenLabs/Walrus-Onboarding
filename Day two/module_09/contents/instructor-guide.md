@@ -33,15 +33,21 @@
 ## Classroom Setup
 
 **Advance Prep (15 min before class):**
+- [ ] Verify Docker is installed: `docker --version` and `docker-compose --version`
+- [ ] Build the Docker image: `cd docker && make build`
+- [ ] Test the lifecycle trace: `SUI_WALLET_PATH=~/.sui/sui_config make trace-lifecycle`
+- [ ] Verify log analysis works: `make grep-logs` and `make analyze-logs`
+- [ ] Prepare whiteboard space for sequence diagrams
+- [ ] Queue up key diagrams from student materials (especially `07-full-lifecycle-diagram.md`)
+- [ ] Have sample log files ready in `docker/workspace/lifecycle.log`
+
+**Alternative (Without Docker):**
 - [ ] Verify Walrus CLI is working: `walrus info`
 - [ ] Prepare sample file: `echo "Hello Walrus Lifecycle" > test.txt`
 - [ ] Test debug logging: `RUST_LOG=walrus_sdk=debug walrus store test.txt`
-- [ ] Prepare whiteboard space for sequence diagrams
-- [ ] Queue up key diagrams from student materials (especially `07-full-lifecycle-diagram.md`)
-- [ ] Have sample log files ready (successful upload, failed upload)
 
 **Optional Materials:**
-- Pre-captured log files for students without CLI access
+- Pre-captured log files for students without CLI/Docker access (copy from `docker/workspace/lifecycle.log`)
 - Sui explorer access to show on-chain blob objects and events
 
 ## Instructor Cheat Sheet
@@ -322,12 +328,13 @@
 
 🎯 **Key Points to Emphasize:**
 - **Log Levels**: `RUST_LOG=walrus_sdk=debug,walrus_core=debug,walrus_sui=debug`
-- **Key Log Messages by Phase**:
-  - Encoding: `starting to encode blob with metadata` → `successfully encoded blob`
-  - Registration: `starting to register blobs`
-  - Sealing: `starting to store sliver` (trace level)
-  - Proof: `get N blobs certificates`
-  - Certification: `certifying blob on Sui`
+- **Docker Commands**: `make trace-lifecycle` → `make grep-logs` → `make analyze-logs`
+- **Key Log Messages by Phase** (matches `make grep-logs` output):
+  - Encoding: `starting to encode blob with metadata` → `finished blob encoding`
+  - Registration: `starting to register blobs` → `finished registering blobs`
+  - Sealing: `sliver upload completed on node` → `storing metadata and sliver pairs finished`
+  - Proof: `retrieving confirmation` → `ThresholdReached`
+  - Certification: `obtained N blob certificate` → `finished storing blobs`
 - **Storage Node Logs** (if accessible):
   - `sliver stored successfully`
   - `process_blob_certified_event`
@@ -339,7 +346,25 @@
 - Show both CLI output AND what to look for in logs
 - Have pre-captured logs ready for students without CLI access
 
-**Live Demonstration Script:**
+**Live Demonstration Script (Using Docker):**
+```bash
+# Navigate to docker directory
+cd docker
+
+# 1. Build the Docker image (first time only)
+make build
+
+# 2. Run the full lifecycle trace
+SUI_WALLET_PATH=~/.sui/sui_config make trace-lifecycle
+
+# 3. Analyze the logs with built-in patterns
+make grep-logs
+
+# 4. Show the log patterns reference
+make analyze-logs
+```
+
+**Alternative (Without Docker):**
 ```bash
 # 1. Set up logging
 export RUST_LOG="walrus_sdk=debug,walrus_core=debug,walrus_sui=debug"
@@ -351,7 +376,7 @@ echo "Hello Walrus Lifecycle" > test.txt
 walrus store test.txt 2>&1 | tee upload.log
 
 # 4. Review key log lines together
-grep -E "encode|register|store|certif" upload.log
+grep -E "encode|register|sliver upload|ThresholdReached|certificate|finished" upload.log
 ```
 
 ⚠️ **Common Misconceptions:**
@@ -420,14 +445,14 @@ Ask students to answer:
 ## Additional Resources
 
 ### For Students
-- [Walrus Design: Operations Off-Chain](../../../design/operations-off-chain.md)
-- [Walrus Design: Operations on Sui](../../../design/operations-sui.md)
-- [Walrus CLI Usage](../../../usage/client-cli.md)
+- [Walrus Documentation: Operations](https://docs.wal.app/docs/operator-guide)
+- [Walrus Documentation: Client CLI](https://docs.wal.app/docs/usage/client-cli)
+- [Walrus Documentation: Encoding](https://docs.wal.app/docs/design/encoding)
 
 ### For Instructors
 - Sample log files (successful upload, failed upload, retrieval)
 - Failure scenario scripts for demonstrations
-- [Walrus Encoding Documentation](../../../design/encoding.md)
+- [Walrus Technical Whitepaper](https://docs.wal.app/assets/files/walrus_whitepaper_v2-31701a689e75cc47048440b56789f388.pdf)
 
 ---
 

@@ -124,11 +124,13 @@ The TypeScript SDK does not emit debug logs by default. To trace this step:
 -   **Network Activity**: Monitor for parallel GET requests to storage nodes.
 -   **Success**: The promise resolves with the file bytes (`Uint8Array`).
 
-### Rust SDK (Reference)
-If using the Rust SDK (`crates/walrus-sdk`), look for:
--   `starting to read blob`
--   `starting to retrieve slivers`
+### Rust SDK / CLI
+If using the Rust SDK or CLI with debug logging enabled, look for:
+-   `starting to read blob` — retrieval begins
+-   `starting to retrieve slivers` — fetching slivers from nodes
 -   `retrieving sliver failed` (debug level, if errors occur)
+
+> 💡 **Note:** The Docker setup in `../docker/` is focused on upload tracing. For retrieval, use `walrus read <blob_id>` with `RUST_LOG=debug` enabled.
 
 ## Integrity Check
 
