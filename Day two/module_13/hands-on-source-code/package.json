@@ -4,7 +4,13 @@
   "description": "Hands-on lab for Walrus performance optimization",
   "type": "module",
   "scripts": {
-    "start": "tsx ts/throughput-tuner.ts"
+    "start": "echo '📊 Running with: CONCURRENCY=${CONCURRENCY:-1}, NUM_WALLETS=${NUM_WALLETS:-1}' && tsx ts/throughput-tuner.ts",
+    "start:c2": "CONCURRENCY=2 NUM_WALLETS=2 npm run start",
+    "start:c3": "CONCURRENCY=3 NUM_WALLETS=3 npm run start",
+    "start:c5": "CONCURRENCY=5 NUM_WALLETS=5 npm run start",  
+    "start:w2": "NUM_WALLETS=2 CONCURRENCY=1 npm run start",
+    "start:w3c2": "NUM_WALLETS=3 CONCURRENCY=2 npm run start",
+    "start:w4c5": "NUM_WALLETS=4 CONCURRENCY=5 npm run start"
   },
   "dependencies": {
     "@mysten/sui": "^1.45.0",

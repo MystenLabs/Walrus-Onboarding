@@ -23,14 +23,30 @@ This directory contains the source code for the Performance Optimization hands-o
 
 3. Run the experiment:
    ```bash
-   npm start  # defaults: 3 blobs, 256KB each, concurrency=5, wallets=1
+   npm start  # defaults: 5 blobs, 128KB each, concurrency=1, wallets=1
    ```
 
-   To cap concurrency or use multiple wallets (optional):
+   The script will display configuration at startup:
+   ```
+   📊 Running with: CONCURRENCY=1, NUM_WALLETS=1
+   ```
+
+   **Available npm scripts:**
+   ```bash
+   npm start          # Default: concurrency=1, wallets=1
+   npm run start:c2   # concurrency=2, wallets=2
+   npm run start:c3   # concurrency=3, wallets=3
+   npm run start:c5   # concurrency=5, wallets=5
+   npm run start:w2   # concurrency=1, wallets=2
+   npm run start:w3c2 # concurrency=2, wallets=3
+   npm run start:w4c5 # concurrency=5, wallets=4
+   ```
+
+   Or set environment variables directly:
    ```bash
    CONCURRENCY=2 NUM_WALLETS=2 npm start
    ```
-   - `CONCURRENCY` sets parallel uploads (default: 5)
+   - `CONCURRENCY` sets parallel uploads (default: 1)
    - `NUM_WALLETS` derives/funds multiple wallets from `PASSPHRASE` to reduce coin contention (default: 1)
    - Derived wallet details are written to `.generated_wallets.env` (address, public key, secret key)
 
@@ -38,7 +54,7 @@ This directory contains the source code for the Performance Optimization hands-o
 
 The throughput tuner:
 
-1. Generates 3 random blobs (256KB each)
+1. Generates 5 random blobs (128KB each)
 2. Uploads them **sequentially** and measures throughput
 3. Uploads them **in parallel** and measures throughput
 4. Reports the performance improvement percentage

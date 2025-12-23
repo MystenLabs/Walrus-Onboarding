@@ -124,15 +124,25 @@ async function run() {
 
     // Scenario B: Concurrent Uploads
     // Note: With a single wallet, we rely on retry logic to handle coin contention
-    const CONCURRENCY = Number(process.env.CONCURRENCY) || 5;
+    const CONCURRENCY = Number(process.env.CONCURRENCY) || 1;
     const limit = createLimiter(CONCURRENCY);
     console.log("\n--- Scenario B: Concurrent Uploads ---");
+    console.log(`Configuration: concurrency=${CONCURRENCY}, wallets=${signers.length}`);
+    console.log(`Wallet addresses:`);
+    signers.forEach((signer, idx) => {
+        console.log(`  [${idx + 1}] ${signer.toSuiAddress()}`);
+    });
     if (CONCURRENCY < blobs.length) {
-        console.log(`Using concurrency limit of ${CONCURRENCY} with retry logic...`);
+        console.log(`\nUsing concurrency limit of ${CONCURRENCY} with retry logic...`);
     } else {
-        console.log("Uploading all blobs concurrently with retry logic...");
+        console.log("\nUploading all blobs concurrently with retry logic...");
     }
-    console.log("(Single wallet causes coin contention - production uses sub-wallets)\n");
+    if (signers.length === 1) {
+        console.log("(Single wallet causes coin contention - production uses sub-wallets)");
+    } else {
+        console.log(`(Using ${signers.length} wallets in round-robin to reduce coin contention)`);
+    }
+    console.log();
     
     const startB = performance.now();
     let successB = 0;

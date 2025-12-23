@@ -328,6 +328,15 @@
 - Discuss variance: "Network conditions affect results"
 - Explain why not 5x: intra-blob parallelism already saturates resources
 
+**Available npm scripts for demonstrations:**
+```bash
+npm start          # Default: concurrency=1, wallets=1 (no improvement expected)
+npm run start:c2   # concurrency=2, wallets=2 (~40-50% improvement)
+npm run start:c3   # concurrency=3, wallets=3 (~60-80% improvement)
+npm run start:c5   # concurrency=5, wallets=5 (~150-200% improvement)
+npm run start:w4c5 # concurrency=5, wallets=4 (may fail - demonstrates rate limiting!)
+```
+
 **Common Issues During Lab:**
 
 | Issue | Solution |
@@ -338,11 +347,19 @@
 | Results vary wildly | Network conditions; run multiple times |
 | HTTP 429 errors | Rate limited; reduce concurrency |
 | CPU maxed during test | Encoding is intensive; expected behavior |
+| "Too many failures" errors | Concurrency exceeds wallets; use matching numbers |
 
-**Expected Results:**
-- Sequential: 0.04-0.5 MB/s (varies significantly by network/Testnet load)
-- Parallel: 0.07-2.0 MB/s (varies significantly by network/Testnet load)
-- Improvement: 30-400% (relative improvement is the key insight, not absolute numbers)
+**Expected Results (from actual test runs):**
+
+| Script | Concurrency | Wallets | Improvement |
+|--------|-------------|---------|-------------|
+| `npm start` | 1 | 1 | ⚠️ No improvement (same as sequential) |
+| `npm run start:c2` | 2 | 2 | ✅ ~42% |
+| `npm run start:c3` | 3 | 3 | ✅ ~70% |
+| `npm run start:c5` | 5 | 5 | ✅ ~184% (best!) |
+| `npm run start:w4c5` | 5 | 4 | ❌ Failures (rate limiting) |
+
+> **Key insight:** Matching wallets to concurrency provides best results. Too much concurrency with too few wallets causes failures.
 
 ⚠️ **Common Misconceptions During Lab:**
 - Students may think exact numbers matter more than relative improvement
@@ -361,9 +378,11 @@
 - "What limits prevented exactly 5x improvement?"
 
 **Challenge Discussion:**
-For students who complete early, discuss the challenge:
-- Implementing `p-limit` for concurrency control
-- Why 5 concurrent uploads might be optimal
+For students who complete early, discuss the challenges:
+- Try `npm run start:w4c5` to observe rate limiting failures
+- Why matching wallets to concurrency matters
+- The built-in concurrency limiter in `throughput-tuner.ts`
+- Why 5 concurrent uploads with 5 wallets gives best results (~184% improvement)
 
 ---
 

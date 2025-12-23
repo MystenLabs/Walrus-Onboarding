@@ -70,13 +70,28 @@ flowchart LR
 ## Run the Script
 
 ```bash
-npm start
+npm start  # defaults: 5 blobs, 128KB each, concurrency=1, wallets=1
 ```
 
-To cap concurrency (optional):
+The script will display configuration at startup:
+```
+📊 Running with: CONCURRENCY=1, NUM_WALLETS=1
+```
 
+**Available npm scripts:**
 ```bash
-CONCURRENCY=2 npm start
+npm start          # Default: concurrency=1, wallets=1
+npm run start:c2   # concurrency=2, wallets=2
+npm run start:c3   # concurrency=3, wallets=3
+npm run start:c5   # concurrency=5, wallets=5
+npm run start:w2   # concurrency=1, wallets=2
+npm run start:w3c2 # concurrency=2, wallets=3
+npm run start:w4c5 # concurrency=5, wallets=4
+```
+
+Or set environment variables directly:
+```bash
+CONCURRENCY=2 NUM_WALLETS=2 npm start
 ```
 
 > **Note:** The script will automatically request testnet SUI tokens from the faucet if needed. This might take a few seconds.
@@ -86,14 +101,12 @@ CONCURRENCY=2 npm start
 You should see output similar to this (times vary significantly by network):
 
 ```text
+📊 Running with: CONCURRENCY=1, NUM_WALLETS=1
 === Walrus Performance Tuning Lab ===
 Comparing sequential vs concurrent upload patterns
 
-Using passphrase from environment variable
-Using wallet address: 0x98cd680f8332b94446f16ad992f1d5ef220e601542a1997d61dea562f5654b4d
-Wallet already has 102.377908595 SUI
-Current WAL balance: 0.86569 WAL
-✅ Sufficient WAL balance available
+Loaded 1 wallet(s) from .generated_wallets.env
+Using a single wallet (expect some coin contention at higher concurrency)
 Generating 5 blobs of 128 KB each...
 
 --- Scenario A: Sequential Uploads ---
@@ -107,23 +120,27 @@ Uploading blob 5/5... Done.
 
 Sequential Results:
   Successful uploads: 5/5
-  Total Time: 120.83s
-  Throughput: 0.04 MB/s
+  Total Time: 107.22s
+  Throughput: 0.01 MB/s
 
 --- Scenario B: Concurrent Uploads ---
-Uploading all blobs concurrently with retry logic...
+Configuration: concurrency=1, wallets=1
+Wallet addresses:
+  [1] 0x0ab71dd58899ba2d5668ceb6467ac3992069a557371f4987cd5389266b7c9fb5
+
+Using concurrency limit of 1 with retry logic...
 (Single wallet causes coin contention - production uses sub-wallets)
 
-  Retry 1/3 in 2347ms...
 [Concurrent] Blob 1 Done.
 [Concurrent] Blob 2 Done.
 ...
 
 === Performance Comparison ===
-Sequential:  0.04 MB/s (5 blobs in 120.8s)
-Concurrent:  0.07 MB/s (5 blobs in 75.2s)
+Sequential:  0.01 MB/s (5 blobs in 107.2s)
+Concurrent:  0.01 MB/s (5 blobs in 121.7s)
 
-✅ Performance Improvement: 75.0%
+⚠️ No improvement (likely due to coin contention or network conditions)
+   In production, use Publisher with multiple sub-wallets for true parallelism.
 
 --- Key Insights ---
 • Two parallelism levels: inter-blob (your code) + intra-blob (SDK distributes to ~1000 shards)
@@ -132,6 +149,25 @@ Concurrent:  0.07 MB/s (5 blobs in 75.2s)
 • HTTP 429 = rate limiting; back off and retry
 • Retry logic essential for handling transient failures
 • Concurrency limits prevent overwhelming the network
+```
+
+**With multiple wallets (`npm run start:c5`):**
+
+```text
+📊 Running with: CONCURRENCY=5, NUM_WALLETS=5
+--- Scenario B: Concurrent Uploads ---
+Configuration: concurrency=5, wallets=5
+Wallet addresses:
+  [1] 0x0ab71dd58899ba2d5668ceb6467ac3992069a557371f4987cd5389266b7c9fb5
+  [2] 0xa69f16ac6cca2f361f5c94bdf881aa201a091455a2a23d5833820eff52d5366f
+  [3] 0xec36aaef1a47ce6ad3501dd227aa2195a8f48414c4fa480d016c90e54f06d6a3
+  [4] 0x57bc27c0fe537a20474aa12a18e8a88c60b88a2b85a0c5450f3c6ca41845f515
+  [5] 0x2b187c70fb067798168207181519a4a27d476b490a197b0288add11a5f9f79e5
+
+Uploading all blobs concurrently with retry logic...
+(Using 5 wallets in round-robin to reduce coin contention)
+
+✅ Performance Improvement: 183.9%
 ```
 
 > **Note:** Results vary significantly (30-400% improvement) based on network conditions, Testnet load, and geographic location. The key insight is the *relative* improvement, not absolute numbers.
@@ -184,25 +220,37 @@ In sequential mode, the bottleneck is "waiting for HTTP response." In parallel m
 
 Modify `ts/throughput-tuner.ts` to increase `TOTAL_BLOBS` to 20. What happens to the throughput?
 
-### Challenge 2: Concurrency Limit
+### Challenge 2: Try Different Configurations
 
-Set a concurrency limit (e.g., max 5 simultaneous uploads) to avoid overwhelming the publisher:
+Use the pre-configured npm scripts to compare different concurrency/wallet combinations:
 
 ```bash
-CONCURRENCY=5 npm start
+npm run start:c2   # concurrency=2, wallets=2
+npm run start:c3   # concurrency=3, wallets=3
+npm run start:c5   # concurrency=5, wallets=5 (best performance!)
 ```
 
 ### Challenge 3: Find Optimal Concurrency
 
-Run experiments with different concurrency limits (1, 2, 5, 10, 20) and plot throughput vs. concurrency. Where is the sweet spot?
+Run experiments with different concurrency limits and plot throughput vs. concurrency. Where is the sweet spot?
 
 ```bash
-CONCURRENCY=1 npm start
-CONCURRENCY=2 npm start
-CONCURRENCY=5 npm start
-CONCURRENCY=10 npm start
-CONCURRENCY=20 npm start
+npm start          # concurrency=1, wallets=1 (baseline)
+npm run start:c2   # concurrency=2, wallets=2
+npm run start:c3   # concurrency=3, wallets=3
+npm run start:c5   # concurrency=5, wallets=5
+npm run start:w4c5 # concurrency=5, wallets=4 (watch for failures!)
 ```
+
+### Challenge 4: Observe Rate Limiting
+
+Try high concurrency with fewer wallets to observe rate limiting and failures:
+
+```bash
+npm run start:w4c5  # 5 concurrent uploads but only 4 wallets
+```
+
+Watch for "Too many failures" errors - this demonstrates why matching wallets to concurrency matters!
 
 ## Troubleshooting
 
