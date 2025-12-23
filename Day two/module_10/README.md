@@ -32,17 +32,14 @@ By the end of this module, participants will be able to:
 module_10/
 ├── README.md                          # This file
 ├── contents/
-│   ├── index.md                       # Module introduction and overview
-│   ├── 01-upload.md                   # Upload transaction lifecycle
-│   ├── 02-extension.md                # Extending storage duration
-│   ├── 03-retrieval.md                # Reading and verifying data
-│   ├── 04-quilt.md                    # Batching small files
-│   ├── 05-production.md               # Best practices and optimization
-│   ├── hands-on.md                    # Practical classification exercise
-│   └── instructor-guide.md            # Teaching notes and solutions
-├── assets/                            # Supporting materials
-├── images/                            # Diagrams and screenshots
-└── docker/                            # Container configurations
+    ├── index.md                       # Module introduction and overview
+    ├── 01-upload.md                   # Upload transaction lifecycle
+    ├── 02-extension.md                # Extending storage duration
+    ├── 03-retrieval.md                # Reading and verifying data
+    ├── 04-quilt.md                    # Batching small files
+    ├── 05-production.md               # Best practices and optimization
+    ├── hands-on.md                    # Practical classification exercise
+    └── instructor-guide.md            # Teaching notes and solutions
 ```
 
 ## Curriculum Sections
