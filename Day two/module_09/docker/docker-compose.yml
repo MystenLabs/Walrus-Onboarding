@@ -4,7 +4,7 @@ services:
     container_name: walrus-lifecycle-lab
     volumes:
       - ./workspace:/workspace
-      - ${SUI_WALLET_PATH:-./wallet}:/home/student/.sui/sui_config:ro
+      - ${SUI_WALLET_PATH:-./wallet}:/home/student/.sui/sui_config_mounted:ro
     working_dir: /workspace
     stdin_open: true
     tty: true
