@@ -5,10 +5,10 @@ help:
 	@echo "======================================================"
 	@echo ""
 	@echo "  make build           - Build the Docker image"
-	@echo "  make run             - Start shell with debug logging enabled"
-	@echo "  make trace-lifecycle - Trace full upload lifecycle (saves to workspace/lifecycle.log)"
+	@echo "  make run             - Start interactive shell with debug logging"
+	@echo "  make trace-lifecycle - Upload a test file and trace the full lifecycle"
 	@echo "  make grep-logs       - Search saved logs for lifecycle stage patterns"
-	@echo "  make analyze-logs    - Show log patterns reference guide"
+	@echo "  make analyze-logs    - Show log patterns to identify each stage"
 	@echo "  make clean           - Remove containers and images"
 	@echo ""
 	@echo "Note: SUI_WALLET_PATH is required for 'run' and 'trace-lifecycle' commands."
@@ -51,7 +51,7 @@ endif
 		echo "" | tee -a lifecycle.log && \
 		echo "Creating test file..." | tee -a lifecycle.log && \
 		echo "Hello Walrus Lifecycle" > test.txt && \
-		echo "Created at: $$(date -u +\"%Y-%m-%d %H:%M:%S UTC\")" >> test.txt && \
+		echo "Created at: $$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> test.txt && \
 		echo "" | tee -a lifecycle.log && \
 		echo "Uploading test.txt to trace the lifecycle..." | tee -a lifecycle.log && \
 		echo "-------------------------------------------" | tee -a lifecycle.log && \

@@ -26,7 +26,8 @@ SUI_WALLET_PATH=~/.sui/sui_config make trace-lifecycle
 | `make build` | Build the Docker image |
 | `make run` | Start interactive shell with debug logging |
 | `make trace-lifecycle` | Upload a test file and trace the full lifecycle |
-| `make analyze-logs` | Show log patterns to identify each stage |
+| `make grep-logs` | Search saved logs for lifecycle stage patterns |
+| `make analyze-logs` | Show log patterns reference guide |
 | `make clean` | Remove containers and images |
 
 ## Log Patterns
