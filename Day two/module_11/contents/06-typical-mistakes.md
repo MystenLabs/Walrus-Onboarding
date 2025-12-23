@@ -708,7 +708,7 @@ Before creating a quilt, verify:
 
 ## Next Steps
 
-Now that you know what to avoid, proceed to [Hands-On Lab 4](./07-hands-on.md) to practice creating and retrieving quilts with proper techniques.
+Now that you know what to avoid, proceed to [Hands-On Lab](./07-hands-on.md) to practice creating and retrieving quilts with proper techniques.
 
 
 

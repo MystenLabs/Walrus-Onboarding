@@ -43,7 +43,6 @@ This curriculum is organized into the following sections:
 5. **[Real Examples](./05-real-examples.md)** - Practical code examples
    - CLI examples with real commands
    - TypeScript SDK examples
-   - Python API examples
    - NFT collection use case
 
 6. **[Typical Mistakes](./06-typical-mistakes.md)** - Common pitfalls and how to avoid them
@@ -52,7 +51,7 @@ This curriculum is organized into the following sections:
    - Operational limitations
    - Performance considerations
 
-7. **[Hands-On Lab 4](./07-hands-on.md)** - Practical exercise
+7. **[Hands-On Lab](./07-hands-on.md)** - Practical exercise
    - Create a small quilt with metadata
    - Retrieve blobs by different methods
    - Verify retrieval and metadata
