@@ -80,6 +80,40 @@ npm run example-website-deploy
 npm run example-website-retrieve
 ```
 
+### Verifying Storage Cost Savings
+
+The `verify_costs.sh` script demonstrates the cost efficiency of using Quilts compared
+to storing files individually. It performs dry-run comparisons across different file sizes.
+
+```bash
+./verify_costs.sh
+```
+
+**What it does:**
+
+- Creates test files in various sizes (10KB, 50KB, 100KB, 200KB, 500KB, 1MB)
+- Generates 600 copies of each size to simulate a collection
+- Compares regular blob storage cost vs. quilt storage cost
+- Outputs a table showing the savings factor for each file size
+
+**Requirements:**
+
+- `walrus` CLI must be installed and in your PATH
+- `jq` must be installed for JSON parsing
+
+**Example output:**
+
+```
+| Blob Size | Regular Storage Cost (WAL) | Quilt Storage Cost (WAL) | Savings Factor |
+|----------:|---------------------------:|-------------------------:|---------------:|
+|      10KB |                  1.234 WAL |                0.012 WAL |          102x |
+|      50KB |                  6.170 WAL |                0.062 WAL |           99x |
+...
+```
+
+This helps you understand when quilts provide the most benefit—typically when storing
+many similar-sized files that can be efficiently packed together.
+
 ### Using CLI Scripts
 
 See the README files in each subdirectory for detailed instructions:

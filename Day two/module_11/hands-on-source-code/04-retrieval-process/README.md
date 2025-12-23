@@ -65,18 +65,7 @@ cd ../..
 npm install
 ```
 
-Then run the examples using `npx tsx`:
-
-```bash
-cd 04-retrieval-process/ts
-npx tsx 01-get-files-identifiers.ts
-npx tsx 02-query-by-tag.ts
-npx tsx 03-retrieve-by-patch-id.ts
-npx tsx 04-get-all-patches.ts
-npx tsx 05-patterns.ts
-```
-
-Alternatively, you can use npm scripts from the root `hands-on-source-code` directory:
+you can use npm scripts from the root `hands-on-source-code` directory:
 
 ```bash
 # From the root hands-on-source-code directory

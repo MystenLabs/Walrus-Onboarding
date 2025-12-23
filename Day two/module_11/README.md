@@ -1,6 +1,6 @@
-# Module 7: Quilts - Batch Storage in Walrus
+# Module 11: Quilts - Batch Storage in Walrus
 
-Welcome to Module 7 of the Walrus Training Program! This module provides comprehensive training on efficiently storing and managing large numbers of small blobs using Walrus's quilt feature, with dramatic cost savings of up to 413x.
+Welcome to Module 11 of the Walrus Training Program! This module provides comprehensive training on efficiently storing and managing large numbers of small blobs using Walrus's quilt feature, with dramatic cost savings of up to 413x.
 
 ## 📚 Overview
 
@@ -62,7 +62,6 @@ The module is organized into 7 comprehensive lessons:
 5. **[Real Examples](./contents/05-real-examples.md)** - Practical code examples
    - CLI examples with real commands
    - TypeScript SDK examples
-   - Python API examples
    - NFT collection use case
 
 ### Best Practices
@@ -94,8 +93,6 @@ Before starting this module, ensure you have:
 
 - ✅ SUI and WAL tokens for hands-on exercises
 
-- ✅ Docker installed (for hands-on lab)
-
 ### Quick Start
 
 1. **Read the curriculum**: Start with the [index page](./contents/index.md)
@@ -112,7 +109,6 @@ The `hands-on-source-code/` directory contains runnable examples in multiple lan
 
 - **CLI Examples**: Shell scripts demonstrating quilt creation and retrieval
 - **TypeScript Examples**: SDK integration for web applications
-- **Rust Examples**: Low-level SDK usage for systems programming
 - **Real-World Examples**: NFT collections, website deployment, game assets
 
 See [hands-on-source-code/README.md](./hands-on-source-code/README.md) for detailed instructions.
