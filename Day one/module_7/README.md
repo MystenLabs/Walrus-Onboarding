@@ -55,7 +55,7 @@ Before starting this module, ensure you have:
 - ✅ Understanding of async/await patterns
 - ✅ Familiarity with the Sui blockchain ([Sui Documentation](https://docs.sui.io))
 - ✅ A Sui wallet with SUI and WAL tokens
-- ✅ Node.js (v18+) and npm/pnpm installed
+ - ✅ Node.js (v20+) and npm/pnpm installed
 
 ### Quick Start
 
