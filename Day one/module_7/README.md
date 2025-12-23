@@ -64,7 +64,7 @@ Before starting this module, ensure you have:
 3. **Run examples**: Use the hands-on code in the `hands-on-source-code/` directory
 4. **Practice**: Complete the hands-on lab in lesson 12
 
-## 🐳 Docker Environment (Recommended)
+## 🐳 Docker Environment
 
 This module includes a Docker environment for consistent, hassle-free setup across all platforms. The Docker setup provides:
 
@@ -89,17 +89,21 @@ PASSPHRASE='your passphrase here' make test
 # Run specific tests
 PASSPHRASE='your passphrase' make test-upload
 PASSPHRASE='your passphrase' make test-hands-on
-make test-download  # No passphrase needed
+
+# Download test: requires passphrase if no blob ID provided (uploads first)
+PASSPHRASE='your passphrase' make test-download
+# Or with existing blob ID (no passphrase needed)
+BLOB_ID='your blob id' make test-download
 ```
 
 ### Available Docker Commands
 
-| Command | Description | Requires Passphrase? |
+| Command | Description | Requires PASSPHRASE? |
 |---------|-------------|---------------------|
 | `make build` | Build the Docker image | ❌ No |
 | `make test` | Run all tests | ✅ Yes |
 | `make test-upload` | Run basic upload test | ✅ Yes |
-| `make test-download` | Run basic download test | ❌ No |
+| `make test-download` | Run basic download test (uploads first if no blob ID) | ✅ Yes (if no BLOB_ID) |
 | `make test-hands-on` | Run hands-on lab | ✅ Yes |
 | `make test-integrity` | Run integrity checks | ✅ Yes |
 | `make test-retry` | Run retry patterns test | ✅ Yes |

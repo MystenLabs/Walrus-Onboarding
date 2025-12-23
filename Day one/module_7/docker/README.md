@@ -19,7 +19,7 @@ PASSPHRASE='your passphrase here' make test
 | `make build` | Build the Docker image | ❌ No |
 | `make test` | Run all tests | ✅ Yes |
 | `make test-upload` | Run basic upload test | ✅ Yes |
-| `make test-download` | Run basic download test (uploads first if no blob ID) | ✅ Yes |
+| `make test-download` | Run basic download test (uploads first if no blob ID) | ✅ Yes (if no BLOB_ID) |
 | `make test-hands-on` | Run hands-on lab | ✅ Yes |
 | `make test-integrity` | Run integrity checks | ✅ Yes |
 | `make test-retry` | Run retry patterns test | ✅ Yes |
