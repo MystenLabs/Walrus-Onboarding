@@ -20,10 +20,11 @@ corresponding to Module 11, Section 3 of the curriculum.
 
 ## Running CLI Examples
 
-All CLI scripts should be run from the `cli/` directory:
+All CLI scripts should be run from the `cli/` directory. From the
+`hands-on-source-code` directory:
 
 ```bash
-cd cli
+cd 03-creation-process/cli
 chmod +x *.sh
 ./03-01-simple-file-collection.sh
 ./03-02-nft-collection.sh
@@ -51,20 +52,11 @@ chmod +x *.sh
 Ensure dependencies are installed in the root `hands-on-source-code` directory:
 
 ```bash
-cd ../..
+cd hands-on-source-code
 npm install
 ```
 
-Then run the examples using `npx tsx`:
-
-```bash
-cd 03-creation-process/ts
-npx tsx 03-create-simple.ts
-npx tsx 03-create-walrus-file.ts
-npx tsx 03-create-flow.ts
-```
-
-Alternatively, you can use npm scripts from the root `hands-on-source-code` directory:
+You can use npm scripts from the root `hands-on-source-code` directory:
 
 ```bash
 # From the root hands-on-source-code directory
@@ -99,6 +91,6 @@ The `examples-files/` directory contains sample data used by the examples:
 - All examples use the `testnet` context by default. Modify the scripts if you want
   to use a different network.
 - The TypeScript examples use a helper function `getFundedKeypair()` from
-  `../../src/get-keypair.js` to get a funded keypair for Testnet.
+  `../../src/get-keypair.ts` to get a funded keypair for Testnet.
 - Some examples may require specific file paths to exist. Check the script comments
   for requirements.

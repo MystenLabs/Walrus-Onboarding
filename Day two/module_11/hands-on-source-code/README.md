@@ -24,13 +24,7 @@ This directory contains the source code for the hands-on lab in the Quilts curri
    echo 'PASSPHRASE="your twelve word passphrase here"' > .env
    ```
 
-   **Option 2: Export in your shell**
-
-   ```bash
-   export PASSPHRASE="your twelve word passphrase here"
-   ```
-
-   **Option 3: Pass inline when running commands**
+   **Option 2: Pass inline when running commands**
 
    ```bash
    PASSPHRASE="your passphrase" npm run create-simple
@@ -92,15 +86,6 @@ See the README files in each subdirectory for detailed instructions:
 
 - [`03-creation-process/README.md`](./03-creation-process/README.md)
 - [`04-retrieval-process/README.md`](./04-retrieval-process/README.md)
-
-### Using TypeScript Directly
-
-You can also run TypeScript files directly using `tsx`:
-
-```bash
-npx tsx 03-creation-process/ts/03-create-simple.ts
-npx tsx 04-retrieval-process/ts/01-get-files-identifiers.ts
-```
 
 ## What the Examples Cover
 

@@ -7,7 +7,20 @@ corresponding to Module 11, Section 4 of the curriculum.
 
 1. **Walrus CLI**: Ensure `walrus` is in your PATH and configured.
 2. **Node.js**: Required for TypeScript examples.
-3. **Quilt Info**: The scripts look for quilt info JSON files (created in previous
+3. **jq**: Required for CLI scripts to parse JSON responses. Install via your
+   package manager (e.g., `brew install jq` on macOS, `apt install jq` on Ubuntu).
+4. **PASSPHRASE**: Required for TypeScript examples that create quilts. Set up using
+   one of these methods:
+   - **Option 1**: Create a `.env` file in the `hands-on-source-code` directory:
+     ```bash
+     echo 'PASSPHRASE="your twelve word passphrase here"' > .env
+     ```
+   - **Option 2**: Pass inline when running commands:
+     ```bash
+     PASSPHRASE="your passphrase" npm run retrieve-identifiers
+     ```
+5. **Network Access**: Required for connecting to Walrus testnet and aggregators.
+6. **Quilt Info**: The scripts look for quilt info JSON files (created in previous
    labs) for the Quilt ID. If not found, they may create a new quilt or use a
    placeholder.
 
@@ -81,7 +94,6 @@ npm run retrieve-patterns
 - **03-retrieve-by-patch-id.ts**: Retrieve specific files using patch IDs.
 - **04-get-all-patches.ts**: Get all patches from a quilt.
 - **05-patterns.ts**: Common retrieval patterns and best practices.
-- **retrieve-quilt.ts**: Comprehensive example of retrieving an entire quilt.
 
 ## Notes
 
