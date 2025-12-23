@@ -76,8 +76,15 @@ async function main() {
     const aggregatorUrl = process.env.AGGREGATOR_URL;
 
     console.log("Reading file:", filePath);
-    const fileBytes = new Uint8Array(await readFile(filePath));
-
+    const originalContent = await readFile(filePath);
+    const runningTime = new Date().toISOString();
+    const contentWithTime = Buffer.concat([
+        originalContent,
+        Buffer.from(`\nRunning time: ${runningTime}\n`)
+    ]);
+    const fileBytes = new Uint8Array(contentWithTime);
+    console.log("Content to upload:\n" + new TextDecoder().decode(fileBytes));
+    console.log("-------upload content end-------\n");
     const keypair = getKeypairFromEnv();
     const suiClient = new SuiClient({ url: getFullnodeUrl("testnet") });
     const client = new WalrusClient({

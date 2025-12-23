@@ -16,7 +16,7 @@ However, the current implementation includes a placeholder `retryWithBackoff` th
 1) Navigate to the source code directory and install deps:
 
 ```bash
-cd docs/book/curriculum/failure_handling/hands-on-source-code
+cd hands-on-source-code
 npm install
 ```
 
