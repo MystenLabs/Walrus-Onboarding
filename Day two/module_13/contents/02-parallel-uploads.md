@@ -136,7 +136,7 @@ flowchart LR
 **When to batch:**
 - Many files < 100KB each
 - Files have the same lifecycle (can be stored/deleted together)
-- Consider using [Quilts](../../../usage/quilt.md) for efficient small-file storage
+- Consider using **Quilts** (see Module 11) for efficient small-file storage
 
 ## Example: Parallel Upload with Concurrency Limit
 

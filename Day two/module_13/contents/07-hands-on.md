@@ -23,7 +23,7 @@ By completing this lab, you will:
 1. Navigate to the hands-on directory:
 
 ```bash
-cd docs/book/curriculum/performance_optimization/hands-on-source-code
+cd "Day two/module_13/hands-on-source-code"
 ```
 
 2. Install dependencies:
@@ -44,7 +44,7 @@ export PASSPHRASE='your testnet passphrase'
 
 The script `ts/throughput-tuner.ts` performs:
 
-1. **Generate**: Creates a fixed set of random data blobs (1MB each) used for both scenarios
+1. **Generate**: Creates a fixed set of random data blobs (128KB each) used for both scenarios
 2. **Sequential Upload**: Uploads blobs one by one
 3. **Parallel Upload**: Uploads all blobs concurrently
 4. **Report**: Calculates and compares throughput (MB/s)
@@ -94,7 +94,7 @@ Using wallet address: 0x98cd680f8332b94446f16ad992f1d5ef220e601542a1997d61dea562
 Wallet already has 102.377908595 SUI
 Current WAL balance: 0.86569 WAL
 ✅ Sufficient WAL balance available
-Generating 5 blobs of 1024 KB each...
+Generating 5 blobs of 128 KB each...
 
 --- Scenario A: Sequential Uploads ---
 Uploading one blob at a time, waiting for each to complete...
@@ -238,6 +238,6 @@ Congratulations on completing the Performance Optimization module! You've learne
 7. ✅ Hands-on performance measurement
 
 **Suggested next modules:**
-- [Failure Handling & Robustness](../../failure_handling/contents/index.md) - Build resilient applications
-- [Quilts](../../quilts/contents/index.md) - Optimize small file storage
-- [Storage Costs](../../storage_costs/contents/index.md) - Deep dive into cost optimization
+- **Failure Handling & Robustness** - Build resilient applications
+- **Quilts** (Module 11) - Optimize small file storage
+- **Storage Costs** - Deep dive into cost optimization
