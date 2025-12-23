@@ -23,7 +23,7 @@ cd hands-on-source-code
 npm run test:basic-upload
 # IMPORTANT: <blob-id> must be the blobId printed by the upload step above.
 # The download script does not mint a new blob; it only reads an existing one.
-npm run test:basic-download <blob-id>
+npm run test:basic-download -- <blob-id>
 
 # For a quick one-off check, you can run without a blob ID.
 # If you omit <blob-id>, the script will upload a test blob first
@@ -90,7 +90,7 @@ retry, alert users, or fall back to a different blob.
 
 ## Running the script end-to-end
 
-When you run `npm run test:basic-download <blob-id>`, the harness calls `downloadBlob()` and
+When you run `npm run test:basic-download -- <blob-id>`, the harness calls `downloadBlob()` and
 prints a success banner. 
 
 The `<blob-id>` argument is expected to be the **on-chain numeric blob ID**

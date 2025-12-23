@@ -324,7 +324,7 @@
 - "What command runs the upload tests in Docker?"
   - **Answer:** `make test-upload`
 - "How do you pass a blob ID to the download test?"
-  - **Answer:** `npm run test:basic-download <blob-id>`
+  - **Answer:** `npm run test:basic-download -- <blob-id>`
 
 **Transition to Next Section:**
 

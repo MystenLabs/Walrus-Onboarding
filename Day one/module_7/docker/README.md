@@ -59,7 +59,7 @@ npm test
 ### Directory Structure
 
 ```
-sdk_upload_relay/
+module_7/
 ├── docker/                    # Docker environment (this folder)
 │   ├── Dockerfile
 │   ├── docker-compose.yml

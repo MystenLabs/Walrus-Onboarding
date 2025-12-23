@@ -24,7 +24,7 @@ hands-on-source-code/
 └── README.md                            # This file
 ```
 
-## Docker Setup (Recommended for Students)
+## Docker Setup
 
 For a consistent Docker-based environment, see the `../docker/` folder:
 
@@ -52,11 +52,7 @@ npm install
 
 **⚠️ REQUIRED:** The examples need a keypair to sign transactions. Set your passphrase:
 
-```sh
-export PASSPHRASE='your twelve word passphrase here'
-```
-
-Or pass it inline when running commands:
+pass it inline when running commands:
 
 ```sh
 PASSPHRASE='your passphrase' npm run test:hands-on
@@ -80,7 +76,7 @@ PASSPHRASE='your passphrase' npm run test:basic-upload
 PASSPHRASE='your passphrase' npm run test:basic-download
 
 # Or download a specific blob by ID
-PASSPHRASE='your passphrase' npm run test:basic-download <blob-id>
+PASSPHRASE='your passphrase' npm run test:basic-download -- <blob-id>
 
 # Hands-on lab
 PASSPHRASE='your passphrase' npm run test:hands-on
@@ -145,8 +141,3 @@ PASSPHRASE='your passphrase' npm run test:integrity-checks
 - You need a funded keypair with both SUI (for gas) and WAL (for storage) tokens
 - Some examples may fail if network conditions are poor or nodes are unavailable
 - Errors related to insufficient funds are expected if the keypair is not funded
-
-## Source Documentation
-
-All code examples are extracted from the markdown files in:
-- `docs/book/curriculum/sdk_upload_relay/`
