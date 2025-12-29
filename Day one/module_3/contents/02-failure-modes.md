@@ -437,7 +437,7 @@ Error: RPC timeout waiting for transaction
 **Client mitigation:**
 - **Critical**: Check on-chain state to see if transaction succeeded
 ```bash
-sui client tx <transaction-id>
+sui client tx-block <transaction-id>
 ```
 - If transaction succeeded, proceed
 - If transaction failed, retry
