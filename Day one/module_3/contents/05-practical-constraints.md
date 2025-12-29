@@ -1,5 +1,7 @@
 # Practical Constraints
 
+🟡 **Intermediate**
+
 When building applications on Walrus, you'll encounter real-world limitations. Understanding these constraints helps you design better systems and avoid surprises in production.
 
 ## Blob Size Limits

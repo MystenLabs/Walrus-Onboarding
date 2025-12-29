@@ -1,5 +1,7 @@
 # Hands-On: Log Inspection and Troubleshooting
 
+🟡 **Intermediate**
+
 This hands-on exercise teaches you to inspect logs from Walrus components to identify key operational events, diagnose issues, and understand what's happening during uploads and retrievals.
 
 ## Learning Objectives

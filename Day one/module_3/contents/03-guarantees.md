@@ -1,5 +1,7 @@
 # System Guarantees vs. Client Responsibilities
 
+🟡 **Intermediate**
+
 Understanding what Walrus **guarantees** versus what **you must verify** is critical for building secure applications. This section draws clear lines between system guarantees and client responsibilities.
 
 ## Trust Model

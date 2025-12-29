@@ -1,5 +1,7 @@
 # Failure Modes: Where Things Go Wrong
 
+🟡 **Beginner/Intermediate**
+
 Understanding where failures occur is essential for building resilient applications on Walrus. This section covers common failure scenarios, how the system handles them, and what you need to do as a developer.
 
 ## The Reality of Distributed Systems

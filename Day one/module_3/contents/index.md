@@ -31,15 +31,15 @@ Module 2 taught you the architecture and data flows - the "happy path." But in p
 
 ## Curriculum Flow
 
-Follow this recommended learning path:
+Follow this recommended learning path (organized from beginner to advanced):
 
-### 1. **[Component Duties](./01-component-duties.md)** (15-20 min)
+### 1. **[Component Duties](./01-component-duties.md)** 🟢 **Beginner** (15-20 min)
 Learn what each component actually does in operation:
 - Publisher responsibilities (encoding, distribution, gas, certificates)
 - Aggregator responsibilities (queries, fetching, reconstruction, caching)
 - Client responsibilities (verification, retries, error handling)
 
-### 2. **[Failure Modes](./02-failure-modes.md)** (15-20 min)
+### 2. **[Failure Modes](./02-failure-modes.md)** 🟡 **Beginner/Intermediate** (15-20 min)
 Understand where things can go wrong:
 - Network failures
 - Storage node failures
@@ -47,19 +47,19 @@ Understand where things can go wrong:
 - Transaction failures
 - Byzantine behavior
 
-### 3. **[System Guarantees vs. Client Responsibilities](./03-guarantees.md)** (10-15 min)
+### 3. **[Control Boundaries](./04-control-boundaries.md)** 🟢🟡🔴 **Beginner to Advanced** (15-20 min)
+Understand what the CLI vs. SDK controls:
+- 🟢 **Beginner**: CLI - High-level operations with defaults
+- 🟡 **Intermediate**: TypeScript SDK - Programmatic web/Node.js integration
+- 🔴 **Advanced**: Rust SDK - Low-level control with maximum flexibility
+
+### 4. **[System Guarantees vs. Client Responsibilities](./03-guarantees.md)** 🟡 **Intermediate** (10-15 min)
 Know what's guaranteed and what you must check:
 - What the system guarantees (Byzantine tolerance, data integrity)
 - What the client must verify (blob ID matches, consistency checks)
 - Trust boundaries and verification
 
-### 4. **[Control Boundaries](./04-control-boundaries.md)** (10-15 min)
-Understand what the CLI vs. SDK controls:
-- CLI: High-level operations with defaults
-- SDK: Low-level control with flexibility
-- When to use which tool
-
-### 5. **[Practical Constraints](./05-practical-constraints.md)** (10-15 min)
+### 5. **[Practical Constraints](./05-practical-constraints.md)** 🟡 **Intermediate** (10-15 min)
 Learn real-world limitations:
 - Blob size limits (13.3 GiB)
 - Storage costs and epochs
@@ -67,12 +67,14 @@ Learn real-world limitations:
 - Gas and wallet management
 - Rate limiting and quotas
 
-### 6. **[Hands-On: Log Inspection](./06-hands-on.md)** (20-30 min)
+### 6. **[Hands-On: Log Inspection](./06-hands-on.md)** 🟡 **Intermediate** (20-30 min)
 Practice troubleshooting:
 - Inspect publisher logs during upload
 - Inspect aggregator logs during retrieval
 - Identify key events (encoding, distribution, errors)
 - Diagnose common failure scenarios
+
+---
 
 ## Key Concepts
 

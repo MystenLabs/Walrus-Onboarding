@@ -1,19 +1,20 @@
-# Control Boundaries: CLI vs TypeScript SDK
+# Control Boundaries: CLI vs SDKs
 
-Understanding what the CLI controls versus what the TypeScript SDK exposes is important for choosing the right tool and knowing what you're responsible for managing.
+Understanding what the CLI controls versus what the SDKs expose is important for choosing the right tool and knowing what you're responsible for managing.
 
-> **Note for this audience**: This module focuses on the **CLI** and **TypeScript SDK** as they're most relevant for fullstack and frontend developers. Walrus also provides a Rust SDK (`walrus-sdk`) for low-level systems programming, but that's outside the scope of this training.
+> **Learning Path**: This guide is organized from beginner to advanced. Start with the CLI (🟢 Beginner), then explore TypeScript SDK (🟡 Intermediate), and optionally dive into Rust SDK (🔴 Advanced) for systems programming.
 
 ## Overview
 
-Walrus provides two main ways to interact with the system that are relevant for web developers:
+Walrus provides three main ways to interact with the system:
 
-1. **Walrus CLI**: Command-line tool for high-level operations with sensible defaults
-2. **Walrus SDK (TypeScript `@mysten/walrus`)**: Official SDK for building web and Node.js applications with programmatic access
+1. 🟢 **Walrus CLI** (Beginner): Command-line tool for high-level operations with sensible defaults
+2. 🟡 **Walrus SDK (TypeScript `@mysten/walrus`)** (Intermediate): Official SDK for building web and Node.js applications with programmatic access
+3. 🔴 **Walrus SDK (Rust `walrus-sdk`)** (Advanced): Low-level systems programming SDK for maximum control and custom implementations
 
 ---
 
-## Walrus CLI
+## 🟢 Walrus CLI (Beginner)
 
 The CLI is a high-level tool that handles complete workflows with reasonable defaults.
 
@@ -192,11 +193,399 @@ sui client active-address # Shows active wallet
 
 ---
 
-## Walrus SDK (Rust Crate)
+## 🟡 Walrus SDK (TypeScript) - Intermediate
 
-The SDK provides low-level building blocks for custom applications.
+The TypeScript SDK (`@mysten/walrus`) provides programmatic access to Walrus for web and Node.js applications.
 
-### What The SDK Exposes
+### What The TypeScript SDK Exposes
+
+#### Installation
+
+```bash
+npm install @mysten/walrus @mysten/sui
+```
+
+#### 1. Client Initialization
+
+**First, initialize the Walrus client by extending a Sui JSON-RPC client:**
+
+```typescript
+import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
+import { walrus } from '@mysten/walrus';
+
+// Create a Sui client and extend it with Walrus functionality
+const client = new SuiClient({
+    url: getFullnodeUrl('testnet'),
+}).$extend(walrus());
+
+// Now you can use client.walrus.* methods
+```
+
+**What you control:**
+- Which Sui network to use (testnet, mainnet, etc.)
+- Sui RPC endpoint configuration
+
+#### 2. Store Operations
+
+**Write blobs directly:**
+
+```typescript
+// Example: Store text as a blob
+const file = new TextEncoder().encode('Hello from the TS SDK!!!\n');
+
+const { blobId } = await client.walrus.writeBlob({
+    blob: file,
+    deletable: false,
+    epochs: 3,
+    signer: keypair, // Your Sui keypair
+});
+
+console.log('Blob ID:', blobId);
+```
+
+**Write files with metadata:**
+
+```typescript
+import { WalrusFile } from '@mysten/walrus';
+
+// Create a file with identifier
+const file1 = WalrusFile.from({
+    contents: new Uint8Array([1, 2, 3]),
+    identifier: 'file1.bin',
+});
+
+// Write multiple files (creates a Quilt)
+const results = await client.walrus.writeFiles({
+    files: [file1],
+    epochs: 3,
+    deletable: true,
+    signer: keypair,
+});
+```
+
+**What you control:**
+- Blob content (Uint8Array)
+- Storage epochs (how long to store)
+- Deletable flag (whether blob can be deleted)
+- Signer (your wallet keypair)
+
+**What you must implement:**
+- Wallet/keypair management
+- Converting your data to Uint8Array
+- Error handling for upload failures
+- Retry logic for network failures
+
+#### 3. Read Operations
+
+**Read blobs directly:**
+
+```typescript
+// Read a blob by its ID
+const blob = await client.walrus.readBlob({
+    blobId: 'your-blob-id-here'
+});
+
+// blob is a Uint8Array
+const text = new TextDecoder().decode(blob);
+console.log('Blob content:', text);
+```
+
+**Read files from blobs or Quilts:**
+
+```typescript
+// Get files by ID (works with both individual blobs and Quilts)
+const [file1, file2] = await client.walrus.getFiles({
+    ids: ['blob-id-1', 'quilt-id-2']
+});
+
+// Multiple ways to extract data
+const bytes = await file1.bytes();      // Get as Uint8Array
+const text = await file1.text();        // Get as text string
+const json = await file2.json();        // Parse as JSON
+```
+
+**What you control:**
+- Which blob/file IDs to retrieve
+- How to process retrieved data (bytes, text, JSON)
+
+**What you must implement:**
+- Error handling for missing blobs
+- Caching strategy (if needed)
+- Data processing after retrieval
+- Retry logic for failed reads
+
+#### 4. Complete Working Example
+
+**Here's a full end-to-end example showing upload and retrieval:**
+
+```typescript
+import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
+import { walrus } from '@mysten/walrus';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+
+// 1. Initialize the Walrus client
+const client = new SuiClient({
+    url: getFullnodeUrl('testnet'),
+}).$extend(walrus());
+
+// 2. Set up your keypair (from environment variable or secure storage)
+const keypair = Ed25519Keypair.deriveKeypair(process.env.MNEMONIC!);
+
+async function storeAndRetrieve() {
+    try {
+        // 3. Store a blob
+        const data = new TextEncoder().encode('Hello from Walrus TS SDK!');
+
+        console.log('Storing blob...');
+        const { blobId } = await client.walrus.writeBlob({
+            blob: data,
+            deletable: false,
+            epochs: 5,
+            signer: keypair,
+        });
+
+        console.log('✓ Blob stored with ID:', blobId);
+
+        // 4. Retrieve the blob
+        console.log('Retrieving blob...');
+        const retrievedBlob = await client.walrus.readBlob({ blobId });
+
+        const retrievedText = new TextDecoder().decode(retrievedBlob);
+        console.log('✓ Retrieved content:', retrievedText);
+
+        // 5. Verify data integrity
+        if (retrievedText === 'Hello from Walrus TS SDK!') {
+            console.log('✓ Data integrity verified!');
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+storeAndRetrieve();
+```
+
+**Working with Quilts (multiple small files):**
+
+```typescript
+import { WalrusFile } from '@mysten/walrus';
+
+async function storeQuilt() {
+    // Create multiple files
+    const file1 = WalrusFile.from({
+        contents: new TextEncoder().encode('{"name": "Alice"}'),
+        identifier: 'user1.json',
+    });
+
+    const file2 = WalrusFile.from({
+        contents: new TextEncoder().encode('{"name": "Bob"}'),
+        identifier: 'user2.json',
+    });
+
+    // Store as a Quilt (batched)
+    const results = await client.walrus.writeFiles({
+        files: [file1, file2],
+        epochs: 5,
+        deletable: true,
+        signer: keypair,
+    });
+
+    console.log('✓ Quilt stored:', results);
+
+    // Retrieve files from Quilt
+    const [retrievedFile1, retrievedFile2] = await client.walrus.getFiles({
+        ids: [results.quiltId] // Or individual blob IDs
+    });
+
+    const userData1 = await retrievedFile1.json();
+    console.log('User 1:', userData1);
+}
+```
+
+**Reference:** Full examples available at https://github.com/MystenLabs/ts-sdks/tree/main/packages/walrus/examples
+
+### TypeScript SDK Advantages
+
+**What you CAN do with TypeScript SDK:**
+
+1. **Web application integration**: Use directly in React, Vue, Angular apps
+2. **Node.js backend**: Integrate into Express, NestJS servers
+3. **HTTP API access**: Leverages Publisher/Aggregator HTTP endpoints
+4. **Modern async/await**: Clean promise-based API
+5. **Browser compatibility**: Works in both browser and Node.js
+6. **TypeScript types**: Full type safety and autocomplete
+7. **Easier than Rust**: More accessible for web developers
+
+### TypeScript SDK Limitations
+
+**What you CAN'T do (compared to Rust SDK):**
+
+1. **No direct encoding**: Must use Publisher for encoding
+2. **No direct distribution**: Can't talk directly to storage nodes
+3. **HTTP dependency**: Requires Publisher/Aggregator infrastructure
+4. **Less control**: Higher-level than Rust SDK
+5. **Trust Publisher/Aggregator**: Must rely on their operations
+6. **No on-chain operations**: Can't post certificates directly to Sui (uses Publisher)
+
+### When To Use TypeScript SDK
+
+✅ **Use TypeScript SDK when:**
+- Building web applications (frontend)
+- Building Node.js backend services
+- Using JavaScript/TypeScript ecosystem
+- Publisher/Aggregator infrastructure available
+- Don't need low-level control
+- Want easier integration than Rust
+
+❌ **Don't use TypeScript SDK when:**
+- Need direct storage node access
+- Need custom encoding logic
+- Can't rely on Publisher/Aggregator
+- Need maximum performance (use Rust)
+- Building systems-level applications
+
+---
+
+## Comparison Table
+
+| Aspect | CLI | TypeScript SDK |
+|--------|-----|----------------|
+| **Use Case** | Command-line tool, scripts | Web/Node.js applications |
+| **Language** | Any (shell out) | JavaScript/TypeScript |
+| **Control Level** | High-level (complete workflows) | Mid-level (HTTP API wrapper) |
+| **Defaults** | Sensible defaults provided | Some defaults via Publisher/Aggregator |
+| **Error Handling** | Exit codes, stderr | Promises, try/catch |
+| **Retry Logic** | Built-in (not customizable) | You implement |
+| **Parallelism** | Automatic (not customizable) | You control (via async/await) |
+| **Progress Tracking** | Limited | You implement |
+| **Gas Management** | Automatic | You provide keypair (gas paid via Sui) |
+| **Wallet** | From config file | You provide signer/keypair |
+| **Encoding** | Automatic with defaults | Publisher handles |
+| **Distribution** | Automatic | Publisher handles |
+| **Retrieval** | Automatic | Aggregator handles |
+| **Verification** | Built-in (default or strict) | Limited (via Aggregator) |
+| **Infrastructure** | None required | Requires Publisher/Aggregator |
+| **Bandwidth Optimization** | `--upload-relay` flag (v1.29+) | Via Publisher (automatic) |
+| **Learning Curve** | Low | Low to Medium |
+| **Flexibility** | Low | Medium |
+
+---
+
+## Decision Tree: Which Tool to Use?
+
+```
+What are you building?
+├─ Web/Node.js application?
+│   ├─ Yes → TypeScript SDK (requires Publisher/Aggregator)
+│   └─ No → Continue
+│
+├─ Limited bandwidth or computational resources?
+│   ├─ Yes → CLI with --upload-relay flag
+│   └─ No → Continue
+│
+├─ Command-line scripts or one-off operations?
+│   ├─ Yes → CLI
+│   └─ No → Continue
+│
+├─ Need programmatic integration in web app?
+│   ├─ Yes → TypeScript SDK
+│   └─ No → Continue
+│
+└─ Need maximum control and performance (systems programming)?
+    ├─ Yes → Rust SDK (Advanced)
+    └─ No → CLI (for scripts and testing)
+```
+
+---
+
+## Hybrid Approach: Using Both
+
+You can use CLI for some operations and TypeScript SDK for others:
+
+### Example: CLI for Testing, TypeScript SDK for Production
+
+```bash
+# Development/testing: Use CLI
+walrus store test.txt
+walrus read <blob-id>
+```
+
+```typescript
+// Production: Use TypeScript SDK in your web application
+// Custom upload logic with progress tracking and retry
+const { blobId } = await client.walrus.writeBlob({
+  blob: fileData,
+  epochs: 50,
+  signer: keypair
+});
+```
+
+### Example: CLI in Scripts, TypeScript SDK in Application
+
+```bash
+# Bash script for backups (uses CLI)
+#!/bin/bash
+for file in /backups/*.tar.gz; do
+  walrus store "$file" --epochs 50
+done
+```
+
+```typescript
+// Main web application (uses TypeScript SDK)
+// Custom upload logic with progress tracking and retry
+async function uploadWithProgress(file: File) {
+  const data = new Uint8Array(await file.arrayBuffer());
+  return await uploadWithRetry(client, data);
+}
+```
+
+---
+
+## What Publishers/Aggregators Control
+
+When using Publishers/Aggregators, they handle operations on your behalf:
+
+### Publisher Controls
+
+- Encoding your blob
+- Distributing slivers to storage nodes
+- Collecting signatures
+- Posting certificate to Sui
+- Managing their own wallet and gas
+
+### Aggregator Controls
+
+- Querying Sui for metadata
+- Fetching slivers from storage nodes
+- Reconstructing blob
+- Performing consistency checks
+- Optional caching
+
+### You Control (When Using Publisher/Aggregator)
+
+- Which blob to upload/retrieve
+- Storage epochs (upload parameter)
+- Consistency level (retrieval parameter)
+
+### You Don't Control
+
+- How they manage gas (publisher's wallet)
+- Their retry logic
+- Their parallelism strategy
+- Their caching policy (aggregator)
+
+**Important:** Publishers and Aggregators are untrusted. Always verify their work (check blob IDs, consistency checks).
+
+---
+
+## 🔴 Walrus SDK (Rust) - Advanced
+
+> **Note**: This section covers the Rust SDK (`walrus-sdk`) for systems programming and low-level control. This is advanced material requiring Rust experience.
+
+The Rust SDK provides low-level building blocks for custom applications with maximum control.
+
+### What The Rust SDK Exposes
 
 #### 1. Low-Level Encoding
 
@@ -332,7 +721,7 @@ pub fn verify_consistency(blob: &[u8], blob_id: BlobId, level: ConsistencyLevel)
 
 ---
 
-## Walrus SDK (TypeScript)
+## Key Points
 
 The TypeScript SDK (`@mysten/walrus`) provides programmatic access to Walrus for web and Node.js applications.
 

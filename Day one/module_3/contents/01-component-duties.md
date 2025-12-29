@@ -1,5 +1,7 @@
 # Component Duties in Real Operation
 
+🟢 **Beginner**
+
 This section explains what Publishers, Aggregators, and Clients actually do when operating in production. Understanding these responsibilities is critical for building reliable applications and troubleshooting issues.
 
 ## System Architecture Overview
@@ -12,20 +14,20 @@ The diagram below shows how all components interact in the Walrus system using C
 C4Context
     title Walrus Storage System - Container Architecture
 
-    Person(client, "Client App", "TypeScript SDK or CLI")
+    Person(client, "Client App", "SDK or CLI")
 
     Boundary(optional, "Optional Infrastructure (Untrusted)") {
-        System(publisher, "Publisher", "Encodes blobs, distributes slivers, manages certificates")
-        System(aggregator, "Aggregator", "Fetches slivers, reconstructs blobs, serves HTTP")
+        System(publisher, "Publisher", "Encodes blobs,<br/>distributes slivers")
+        System(aggregator, "Aggregator", "Fetches slivers,<br/>reconstructs blobs")
     }
 
     Boundary(core, "Core System (Trusted)") {
-        SystemDb(blockchain, "Sui Blockchain", "Blob registry, metadata, certificates (Source of Truth)")
-        SystemQueue(storage, "Storage Nodes", "Decentralized network storing erasure-coded slivers")
+        SystemDb(blockchain, "Sui Blockchain", "Blob registry,<br/>metadata, certificates")
+        SystemQueue(storage, "Storage Nodes", "Decentralized storage<br/>network")
     }
 
     Rel(client, publisher, "Uploads blob", "HTTP PUT")
-    Rel(publisher, blockchain, "Registers blob, posts certificate", "Sui RPC")
+    Rel(publisher, blockchain, "Registers blob", "Sui RPC")
     Rel(publisher, storage, "Distributes slivers", "HTTP")
     Rel(storage, publisher, "Returns signatures", "HTTP")
 
@@ -33,9 +35,10 @@ C4Context
     Rel(aggregator, blockchain, "Queries metadata", "Sui RPC")
     Rel(aggregator, storage, "Fetches slivers", "HTTP")
 
-    Rel(client, blockchain, "Verifies on-chain state", "Sui RPC", $tags="verification")
+    Rel(client, blockchain, "Verifies state", "Sui RPC", $tags="verification")
 
     UpdateRelStyle(client, blockchain, $lineColor="green", $textColor="green")
+    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
 ```
 
 **Key Architecture Points:**
@@ -249,23 +252,23 @@ C4Component
     title Publisher Service - Internal Components
 
     Container_Boundary(publisher, "Publisher Service") {
-        Component(api, "HTTP API Handler", "REST API", "Receives blob upload requests")
-        Component(auth, "Auth & Validation", "Middleware", "Validates JWT, checks size limits")
-        Component(encoder, "Erasure Encoder", "Reed-Solomon", "Encodes blobs into slivers")
-        Component(wallet, "Wallet Manager", "Sui SDK", "Manages SUI/WAL, signs transactions")
-        Component(distributor, "Sliver Distributor", "HTTP Client", "Sends slivers to storage nodes in parallel")
-        Component(certAgg, "Certificate Aggregator", "Crypto", "Collects signatures, checks 2/3 quorum")
-        Component(chain, "Sui Chain Interface", "Sui RPC", "Registers blobs, posts certificates")
+        Component(api, "HTTP API", "REST", "Receives blob uploads")
+        Component(auth, "Auth & Validation", "Middleware", "Validates JWT,<br/>checks size limits")
+        Component(encoder, "Erasure Encoder", "Reed-Solomon", "Encodes blobs<br/>into slivers")
+        Component(wallet, "Wallet Manager", "Sui SDK", "Manages SUI/WAL,<br/>signs transactions")
+        Component(distributor, "Sliver Distributor", "HTTP Client", "Sends slivers to<br/>storage nodes")
+        Component(certAgg, "Certificate Agg", "Crypto", "Collects signatures,<br/>checks quorum")
+        Component(chain, "Sui Interface", "Sui RPC", "Registers blobs,<br/>posts certificates")
     }
 
-    Rel(api, auth, "Validates request")
-    Rel(auth, encoder, "Encodes blob")
-    Rel(encoder, distributor, "Distributes slivers")
+    Rel(api, auth, "Validates")
+    Rel(auth, encoder, "Encodes")
+    Rel(encoder, distributor, "Distributes")
     Rel(encoder, wallet, "Gets blob ID")
-    Rel(wallet, chain, "Signs transaction")
-    Rel(distributor, certAgg, "Collects signatures")
-    Rel(certAgg, chain, "Posts certificate")
-    Rel(chain, api, "Returns confirmation")
+    Rel(wallet, chain, "Signs tx")
+    Rel(distributor, certAgg, "Collects sigs")
+    Rel(certAgg, chain, "Posts cert")
+    Rel(chain, api, "Returns result")
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
@@ -448,22 +451,22 @@ C4Component
     title Aggregator Service - Internal Components
 
     Container_Boundary(aggregator, "Aggregator Service") {
-        Component(api, "HTTP API Handler", "REST API", "Receives blob read requests")
-        Component(validator, "Request Validator", "Middleware", "Validates blob ID format")
-        Component(chain, "Sui Chain Interface", "Sui RPC", "Queries blob metadata and status")
-        Component(fetcher, "Sliver Fetcher", "HTTP Client", "Fetches slivers from storage nodes (≥334 needed)")
-        Component(decoder, "Erasure Decoder", "Reed-Solomon", "Reconstructs blob from slivers")
-        Component(checker, "Consistency Checker", "Crypto", "Verifies blob integrity (default/strict)")
-        Component(cache, "Cache Manager", "In-Memory/Redis", "Optionally caches reconstructed blobs")
+        Component(api, "HTTP API", "REST", "Receives blob<br/>read requests")
+        Component(validator, "Request Validator", "Middleware", "Validates blob ID")
+        Component(chain, "Sui Interface", "Sui RPC", "Queries blob<br/>metadata")
+        Component(fetcher, "Sliver Fetcher", "HTTP Client", "Fetches slivers<br/>(≥334 needed)")
+        Component(decoder, "Erasure Decoder", "Reed-Solomon", "Reconstructs blob<br/>from slivers")
+        Component(checker, "Consistency Check", "Crypto", "Verifies integrity")
+        Component(cache, "Cache Manager", "Memory/Redis", "Caches blobs")
     }
 
-    Rel(api, validator, "Validates blob ID")
-    Rel(validator, chain, "Queries metadata")
-    Rel(chain, fetcher, "Gets storage info")
+    Rel(api, validator, "Validates")
+    Rel(validator, chain, "Queries")
+    Rel(chain, fetcher, "Gets info")
     Rel(fetcher, decoder, "Sends slivers")
-    Rel(decoder, checker, "Verifies blob")
-    Rel(checker, cache, "Caches if enabled")
-    Rel(cache, api, "Returns blob data")
+    Rel(decoder, checker, "Verifies")
+    Rel(checker, cache, "Caches")
+    Rel(cache, api, "Returns data")
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
@@ -639,27 +642,27 @@ The diagram below shows what a well-designed client application should implement
 C4Component
     title Client Application - Components You Must Implement
 
-    Person(user, "End User", "Uses your application")
+    Person(user, "End User", "Uses your app")
 
     Container_Boundary(clientApp, "Client Application") {
-        Component(appLogic, "Application Logic", "TypeScript/JavaScript", "Your business logic for storing/retrieving blobs")
-        Component(sdk, "Walrus SDK", "@mysten/walrus", "TypeScript SDK or CLI wrapper")
-        Component(retry, "Retry Handler", "Custom Logic", "Exponential backoff for transient failures")
-        Component(verifier, "Blob ID Verifier", "Custom Logic", "Re-encodes blobs to verify integrity")
-        Component(errorHandler, "Error Handler", "Custom Logic", "Parses errors, distinguishes retryable vs fatal")
-        Component(wallet, "Wallet Manager", "Sui Keypair", "Manages keypairs, signs transactions")
-        Component(onChainValidator, "On-Chain Validator", "Sui RPC", "Queries Sui to verify blob registration")
+        Component(appLogic, "App Logic", "TS/JS", "Business logic for<br/>storing/retrieving")
+        Component(sdk, "Walrus SDK", "@mysten/walrus", "SDK or CLI wrapper")
+        Component(retry, "Retry Handler", "Custom", "Exponential backoff<br/>for failures")
+        Component(verifier, "Blob Verifier", "Custom", "Re-encodes to<br/>verify integrity")
+        Component(errorHandler, "Error Handler", "Custom", "Parses errors,<br/>retryable vs fatal")
+        Component(wallet, "Wallet Manager", "Sui Keypair", "Manages keypairs,<br/>signs transactions")
+        Component(onChainValidator, "On-Chain Check", "Sui RPC", "Queries Sui to<br/>verify registration")
     }
 
-    Rel(user, appLogic, "Uploads/reads blobs")
-    Rel(appLogic, sdk, "Calls Walrus API")
+    Rel(user, appLogic, "Uses")
+    Rel(appLogic, sdk, "Calls API")
     Rel(sdk, retry, "On failure")
-    Rel(retry, sdk, "Retries operation")
+    Rel(retry, sdk, "Retries")
     Rel(sdk, verifier, "On success")
-    Rel(verifier, onChainValidator, "Verifies on-chain")
+    Rel(verifier, onChainValidator, "Verifies")
     Rel(sdk, errorHandler, "On error")
-    Rel(wallet, sdk, "Signs transactions")
-    Rel(verifier, appLogic, "Returns validated result")
+    Rel(wallet, sdk, "Signs")
+    Rel(verifier, appLogic, "Returns result")
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
