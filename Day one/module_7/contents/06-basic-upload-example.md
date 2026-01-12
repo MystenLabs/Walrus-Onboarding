@@ -30,25 +30,9 @@ access, make targets, troubleshooting, etc.).
 ## Simple blob upload (direct path)
 
 The direct example creates a Walrus client without an upload relay, grabs a funded keypair, and calls
-`writeBlob`. The snippet below is exactly what the test harness runs:
+`writeBlob`.
 
-```ts
-const client = new SuiClient({
-  url: getFullnodeUrl("testnet"),
-  network: "testnet",
-}).$extend(walrus());
-
-const keypair = await getFundedKeypair();
-
-const data = new TextEncoder().encode("Hello, Walrus!" + Date.now());
-
-const { blobId, blobObject } = await client.walrus.writeBlob({
-  blob: data,
-  deletable: true,
-  epochs: 3,
-  signer: keypair,
-});
-```
+See the [`uploadBlob()` function](../hands-on-source-code/src/examples/basic-upload-example.ts) in `hands-on-source-code/src/examples/basic-upload-example.ts`.
 
 Running `npm run test:basic-upload` (or `make test-upload`) prints the blob ID and blob object
 reference so you can reuse it in later steps—no additional scaffolding required.
@@ -57,32 +41,9 @@ reference so you can reuse it in later steps—no additional scaffolding require
 
 To see the relay path, the same file constructs a client with `uploadRelay.host` pointing to the
 public Testnet relay. The `writeBlob` API stays the same; the relay handles chunking, fan-out, and
-certificate aggregation:
+certificate aggregation.
 
-```ts
-const client = new SuiClient({
-  url: getFullnodeUrl("testnet"),
-  network: "testnet",
-}).$extend(
-  walrus({
-    uploadRelay: {
-      host: "https://upload-relay.testnet.walrus.space",
-      sendTip: {
-        max: 1_000,
-      },
-    },
-  })
-);
-
-const data = new TextEncoder().encode("Hello, Walrus with Relay!" + Date.now());
-
-const { blobId, blobObject } = await client.walrus.writeBlob({
-  blob: data,
-  deletable: true,
-  epochs: 3,
-  signer: keypair,
-});
-```
+See the [`uploadWithRelay()` function](../hands-on-source-code/src/examples/basic-upload-example.ts) in `hands-on-source-code/src/examples/basic-upload-example.ts`.
 
 To run just this path, execute `npm run test:basic-upload -- relay`, or simply inspect
 the `uploadWithRelay()` logs in the default test run.
@@ -90,17 +51,9 @@ the `uploadWithRelay()` logs in the default test run.
 ## Running both paths together
 
 The harness exports a `main()` wrapper that exercises both uploads and surfaces any network or quorum
-failures. This is what `npm run test:basic-upload` invokes:
+failures. This is what `npm run test:basic-upload` invokes.
 
-```ts
-console.log("=== Testing Simple Blob Upload ===");
-await uploadBlob();
-
-console.log("\n=== Testing Upload with Relay ===");
-await uploadWithRelay();
-
-console.log("\n✅ All upload examples completed successfully!");
-```
+See the [`main()` function](../hands-on-source-code/src/examples/basic-upload-example.ts) in `hands-on-source-code/src/examples/basic-upload-example.ts`.
 
 Because the scripts run against live Walrus Testnet nodes, intermittent
 `RetryableWalrusClientError` exceptions are expected. When that happens, re-run the test or move to
@@ -110,40 +63,9 @@ the hands-on variation below, which already includes retry logic.
 
 For a fuller workflow—tip payment, retry loops, and post-upload verification—use the hands-on lab
 example. It wraps `writeBlob` in a retry loop, reads the blob back, and compares the payload before
-declaring success:
+declaring success.
 
-```ts
-const client = new SuiClient({
-  url: getFullnodeUrl('testnet'),
-  network: 'testnet',
-}).$extend(
-  walrus({
-    uploadRelay: {
-      host: 'https://upload-relay.testnet.walrus.space',
-      sendTip: {
-        max: 1_000,
-      },
-    },
-  }),
-);
-
-while (attempt < maxRetries) {
-  try {
-    const result = await client.walrus.writeBlob({ ... });
-    blobId = result.blobId;
-    break;
-  } catch (error) {
-    if (error instanceof RetryableWalrusClientError && attempt < maxRetries) {
-      await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
-      continue;
-    }
-    throw error;
-  }
-}
-
-const downloadedBytes = await client.walrus.readBlob({ blobId });
-const downloadedContent = new TextDecoder().decode(downloadedBytes);
-```
+See the [`hands-on-lab.ts`](../hands-on-source-code/src/examples/hands-on-lab.ts) file in `hands-on-source-code/src/examples/hands-on-lab.ts` (client initialization and main function, lines 16-87).
 
 Run it with `npm run test:hands-on` (or `make test-hands-on`). This script is ideal
 for adapting into CI jobs or demos because it proves the entire round-trip.
