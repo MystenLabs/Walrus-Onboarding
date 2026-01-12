@@ -105,18 +105,6 @@ Encoded Size = (Number of Shards × Metadata Size per Shard) + Slivers Size
 
 **Implementation:** [`encoded_blob_length_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L285-L299)
 
-```rust
-pub fn encoded_blob_length_for_n_shards(
-    n_shards: NonZeroU16,
-    unencoded_length: u64,
-    encoding_type: EncodingType,
-) -> Option<u64> {
-    let slivers_size =
-        encoded_slivers_length_for_n_shards(n_shards, unencoded_length, encoding_type)?;
-    Some(u64::from(n_shards.get()) * metadata_length_for_n_shards(n_shards) + slivers_size)
-}
-```
-
 ---
 
 #### Component Breakdown
