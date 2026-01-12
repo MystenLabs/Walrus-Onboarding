@@ -176,14 +176,6 @@ Total Source Symbols = Primary Symbols × Secondary Symbols
 
 **Implementation:** [`source_symbols_per_blob_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs#L277-L283)
 
-```rust
-fn source_symbols_per_blob_for_n_shards(n_shards: NonZeroU16) -> NonZeroU32 {
-    let (source_symbols_primary, source_symbols_secondary) = source_symbols_for_n_shards(n_shards);
-    NonZeroU32::from(source_symbols_primary)
-        .checked_mul(source_symbols_secondary.into())
-        .expect("product of two u16 always fits into a u32")
-}
-```
 
 **Primary/Secondary Symbols:** Calculated by [`source_symbols_for_n_shards`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs) based on Byzantine fault tolerance requirements.
 
