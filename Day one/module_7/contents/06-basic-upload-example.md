@@ -65,7 +65,7 @@ For a fuller workflowâ€”tip payment, retry loops, and post-upload verificationâ€
 example. It wraps `writeBlob` in a retry loop, reads the blob back, and compares the payload before
 declaring success.
 
-See the [`hands-on-lab.ts`](../hands-on-source-code/src/examples/hands-on-lab.ts) file in `hands-on-source-code/src/examples/hands-on-lab.ts` (client initialization and main function, lines 16-87).
+See the [`hands-on-lab.ts`](../hands-on-source-code/src/examples/hands-on-lab.ts) file in `hands-on-source-code/src/examples/hands-on-lab.ts` (client initialization and main function, lines.
 
 Run it with `npm run test:hands-on` (or `make test-hands-on`). This script is ideal
 for adapting into CI jobs or demos because it proves the entire round-trip.

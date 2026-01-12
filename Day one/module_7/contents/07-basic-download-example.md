@@ -36,25 +36,10 @@ the round-trip, including content verification.
 
 ## Simple blob download
 
-The harness keeps a single Walrus client and exposes `downloadBlob(blobId)` as shown below. It reads
-the slivers, reconstructs the blob, and writes the contents to the console:
+The harness keeps a single Walrus client and exposes `downloadBlob(blobId)` as mentioned below. It reads
+the slivers, reconstructs the blob, and writes the contents to the console.
 
-```ts
-const client = new SuiClient({
-  url: getFullnodeUrl("testnet"),
-  network: "testnet",
-}).$extend(walrus());
-
-async function downloadBlob(blobId: string) {
-  const blobBytes = await client.walrus.readBlob({ blobId });
-
-  const text = new TextDecoder().decode(blobBytes);
-  console.log("Blob content:", text);
-
-  const blob = new Blob([blobBytes]);
-  return blobBytes;
-}
-```
+See the [`downloadBlob()` function](../hands-on-source-code/src/examples/basic-download-example.ts) in `hands-on-source-code/src/examples/basic-download-example.ts`.
 
 Use this helper whenever you need to prove a blob is still retrievable or to inspect the payload from
 tests that created temporary data.
@@ -62,28 +47,9 @@ tests that created temporary data.
 ## Download with error handling
 
 Real networks fail, so the script also exports `downloadWithErrorHandling()` that distinguishes
-between certification problems, missing slivers, and blocked blobs:
+between certification problems, missing slivers, and blocked blobs.
 
-```ts
-async function downloadWithErrorHandling(blobId: string) {
-  try {
-    const blobBytes = await client.walrus.readBlob({ blobId });
-    return blobBytes;
-  } catch (error: any) {
-    if (error instanceof BlobNotCertifiedError) {
-      console.error('Blob is not certified or does not exist');
-    } else if (error instanceof NotEnoughSliversReceivedError) {
-      console.error('Could not retrieve enough slivers to reconstruct blob');
-      // Retry logic here
-    } else if (error instanceof BlobBlockedError) {
-      console.error('Blob is blocked by storage nodes');
-    } else {
-      console.error('Unexpected error:', error);
-    }
-    throw error;
-  }
-}
-```
+See the [`downloadWithErrorHandling()` function](../hands-on-source-code/src/examples/basic-download-example.ts) in `hands-on-source-code/src/examples/basic-download-example.ts`.
 
 Copy this function into production code when you want to classify read failures and decide whether to
 retry, alert users, or fall back to a different blob.
@@ -91,59 +57,15 @@ retry, alert users, or fall back to a different blob.
 ## Running the script end-to-end
 
 When you run `npm run test:basic-download -- <blob-id>`, the harness calls `downloadBlob()` and
-prints a success banner. 
+prints a success banner.
 
 The `<blob-id>` argument is expected to be the **on-chain numeric blob ID**
 in decimal form (the `blob_id` you see in the Sui object), or the short Walrus blob ID string.
 
 If you omit `<blob-id>`, the script will **upload a test blob first** and then download it to verify
-the round-trip. This makes it easy to test the download flow without needing an existing blob ID:
+the round-trip. This makes it easy to test the download flow without needing an existing blob ID.
 
-```ts
-// Accept either an on-chain numeric blob ID (decimal string) or the short Walrus blob ID.
-// If you pass a decimal string, we convert it to the Walrus blobId string using blobIdFromInt().
-// If you omit the argument, we upload a test blob first and then download it.
-const arg = process.argv[2];
-
-let blobId: string;
-let expectedContent: string | undefined;
-
-if (arg) {
-  // User provided a blob ID
-  const isNumeric = /^\d+$/.test(arg);
-  blobId = isNumeric ? blobIdFromInt(BigInt(arg)) : arg;
-
-  console.log(
-    `=== Downloading blob (input format: ${
-      isNumeric ? 'on-chain numeric' : 'Walrus blobId'
-    }, normalized: ${blobId}) ===`,
-  );
-} else {
-  // No blob ID provided - upload first
-  const uploadResult = await uploadTestBlob();
-  blobId = uploadResult.blobId;
-  expectedContent = uploadResult.content;
-
-  console.log(`=== Downloading the uploaded blob: ${blobId} ===`);
-}
-
-const downloadedBytes = await downloadBlob(blobId);
-
-// Verify content if we uploaded it ourselves
-if (expectedContent) {
-  const downloadedContent = new TextDecoder().decode(downloadedBytes);
-  if (downloadedContent === expectedContent) {
-    console.log('\n✅ Content verification successful! Downloaded content matches uploaded content.');
-  } else {
-    console.error('\n❌ Content mismatch!');
-    console.error(`Expected: ${expectedContent}`);
-    console.error(`Got: ${downloadedContent}`);
-    throw new Error('Content verification failed');
-  }
-}
-
-console.log('\n✅ Download example completed successfully!');
-```
+See the [`main()` function](../hands-on-source-code/src/examples/basic-download-example.ts) in `hands-on-source-code/src/examples/basic-download-example.ts`.
 
 ## Key takeaways
 
