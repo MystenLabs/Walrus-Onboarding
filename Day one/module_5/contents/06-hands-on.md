@@ -1,0 +1,576 @@
+# Hands-On Exercises
+
+This section provides practical exercises to reinforce your understanding of storage costs in Walrus. Complete these exercises to gain hands-on experience with cost estimation and optimization.
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+1. ✅ Walrus CLI installed and configured
+2. ✅ A Sui wallet with SUI and WAL tokens
+3. ✅ Network connectivity
+4. ✅ Basic understanding of the cost model (see [Cost Model](./01-cost-model.md))
+
+Verify your setup:
+
+```sh
+walrus --version
+walrus info
+```
+
+## Running in Docker (Recommended for Consistent Results)
+
+For a consistent environment across all operating systems, use the Docker setup in the `docker/` directory:
+
+```sh
+# From the storage_costs module directory
+cd docker
+make build
+SUI_WALLET_PATH=~/.sui/sui_config make run
+
+# Or run specific exercises
+make single-blob-cost   # Calculate cost for a single blob
+make compare-sizes      # Compare costs for different sizes
+make encoding-overhead  # Understand encoding overhead
+```
+
+> 💡 **Docker for Windows Users:** Docker provides the most reliable experience for Windows users, as all Unix-specific commands (`dd`, `wc`, etc.) work identically inside the container.
+
+## Exercise 1: Calculate Cost for a Single Blob
+
+In this exercise, you'll calculate the cost of storing a single blob.
+
+### Step 1: Get Current Prices
+
+Check current Walrus prices:
+
+```sh
+walrus info
+```
+
+**Tip**: For precise values, use `walrus info --json`.
+
+Record the following:
+- Price per encoded storage unit per epoch: ________ FROST (convert to WAL: divide by 1,000,000,000)
+- Write price per encoded storage unit: ________ FROST (convert to WAL: divide by 1,000,000,000)
+
+**Note**: Prices are shown in FROST (smaller unit of WAL). 1 WAL = 1,000,000,000 FROST.
+
+### Step 2: Create a Test File
+
+Create a test file of a specific size:
+
+**Mac/Linux:**
+
+```sh
+# Create a 5MB file with random data
+dd if=/dev/urandom of=test-5mb.bin bs=1M count=5
+
+# Or on macOS:
+mkfile 5m test-5mb.bin
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Create a 5MB file (filled with zeros)
+fsutil file createnew test-5mb.bin 5242880
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Create a 5MB file with random data
+$bytes = New-Object byte[] (5MB)
+(New-Object Random).NextBytes($bytes)
+[System.IO.File]::WriteAllBytes("test-5mb.bin", $bytes)
+```
+
+### Step 3: Estimate Encoded Size
+
+Use dry-run to see the encoded size:
+
+```sh
+walrus store test-5mb.bin --epochs 1 --dry-run
+```
+
+Record:
+- Encoded size: ________ bytes (or MiB as shown in output)
+- Storage units: ________ (YOU MUST CALCULATE: ceil(encoded_size / 1_MiB))
+- Estimated cost: ________ WAL (shown in dry-run output as "Cost to store as new blob")
+
+### Step 4: Calculate Storage Cost
+
+Calculate the cost for storing this blob for 10 epochs:
+
+**Storage Resource Cost**:
+```
+Storage units × Price per unit per epoch × Epochs = ________ WAL
+```
+
+**Upload Cost**:
+```
+Storage units × Write price per unit = ________ WAL
+```
+
+**Total WAL Cost**:
+```
+Storage Resource Cost + Upload Cost = ________ WAL
+```
+
+### Step 5: Verify with Actual Store
+
+Store the blob and observe actual costs:
+
+```sh
+walrus store test-5mb.bin --epochs 10
+```
+
+Check the transaction in Sui Explorer and compare:
+- Actual WAL cost: ________ WAL
+- Actual SUI cost: ________ SUI
+- How does this compare to your estimate?
+
+### Step 6: Calculate Cost per Epoch
+
+Calculate the cost per epoch:
+
+```
+Total WAL Cost / Epochs = ________ WAL per epoch
+```
+
+## Exercise 2: Compare Small vs Large Blob Costs
+
+In this exercise, you'll compare costs for small and large blobs.
+
+### Step 1: Create Test Files
+
+Create files of different sizes:
+
+**Mac/Linux:**
+
+```sh
+# Small file: 1MB
+dd if=/dev/urandom of=small-1mb.bin bs=1M count=1
+
+# Large file: 100MB
+dd if=/dev/urandom of=large-100mb.bin bs=1M count=100
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Small file: 1MB
+fsutil file createnew small-1mb.bin 1048576
+
+:: Large file: 100MB
+fsutil file createnew large-100mb.bin 104857600
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Small file: 1MB with random data
+$bytes1 = New-Object byte[] (1MB)
+(New-Object Random).NextBytes($bytes1)
+[System.IO.File]::WriteAllBytes("small-1mb.bin", $bytes1)
+
+# Large file: 100MB with random data
+$bytes100 = New-Object byte[] (100MB)
+(New-Object Random).NextBytes($bytes100)
+[System.IO.File]::WriteAllBytes("large-100mb.bin", $bytes100)
+```
+
+### Step 2: Estimate Costs for Small Blob
+
+```sh
+walrus store small-1mb.bin --epochs 1 --dry-run
+```
+
+Record:
+- Encoded size: ________ bytes
+- Storage units: ________
+- Estimated cost for 10 epochs: ________ WAL
+
+### Step 3: Estimate Costs for Large Blob
+
+```sh
+walrus store large-100mb.bin --epochs 1 --dry-run
+```
+
+Record:
+- Encoded size: ________ bytes
+- Storage units: ________
+- Estimated cost for 10 epochs: ________ WAL
+
+### Step 4: Compare Costs
+
+Calculate:
+- **Cost ratio**: Large blob cost / Small blob cost = ________
+- **Size ratio**: Large blob size / Small blob size = ________
+- **Cost efficiency**: Which is more cost-efficient per MB?
+
+**Questions to consider**:
+- Why is the cost ratio different from the size ratio?
+- What dominates costs for small blobs?
+- What dominates costs for large blobs?
+
+## Exercise 3: Calculate Cost for a Scenario
+
+In this exercise, you'll calculate costs for a realistic scenario.
+
+### Scenario: Document Storage Service
+
+**Requirements**:
+- Store 1,000 documents per month
+- Average document size: 2MB
+- Storage duration: 6 months (~13 epochs, since 1 epoch = 14 days)
+- Documents are deletable after 6 months
+
+### Step 1: Get Current Prices
+
+```sh
+walrus info
+```
+
+**Tip**: For precise values, use `walrus info --json`.
+
+Record current prices.
+
+### Step 2: Calculate Encoded Size
+
+Create a sample 2MB file and check encoded size:
+
+**Mac/Linux:**
+
+```sh
+dd if=/dev/urandom of=sample-2mb.bin bs=1M count=2
+walrus store sample-2mb.bin --epochs 1 --dry-run
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+fsutil file createnew sample-2mb.bin 2097152
+walrus store sample-2mb.bin --epochs 1 --dry-run
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$bytes = New-Object byte[] (2MB)
+(New-Object Random).NextBytes($bytes)
+[System.IO.File]::WriteAllBytes("sample-2mb.bin", $bytes)
+walrus store sample-2mb.bin --epochs 1 --dry-run
+```
+
+Record:
+- Encoded size: ________ bytes
+- Storage units: ________
+
+### Step 3: Calculate Cost per Document
+
+**Storage Resource Cost**:
+```
+Storage units × Price per unit per epoch × 13 epochs = ________ WAL
+```
+
+**Upload Cost**:
+```
+Storage units × Write price per unit = ________ WAL
+```
+
+**Total per Document**:
+```
+Storage Resource Cost + Upload Cost = ________ WAL
+```
+
+### Step 4: Calculate Monthly Cost
+
+**Monthly WAL Cost**:
+```
+1,000 documents × Cost per document = ________ WAL/month
+```
+
+**Monthly SUI Cost** (approximate estimate):
+```
+1,000 documents × 2 transactions × ~0.01 SUI = ________ SUI/month
+```
+**Note**: SUI gas costs vary with network conditions. This is a rough estimate.
+
+### Step 5: Calculate Total 6-Month Cost
+
+**Total WAL Cost**:
+```
+Monthly WAL Cost × 6 months = ________ WAL
+```
+
+**Total SUI Cost**:
+```
+Monthly SUI Cost × 6 months = ________ SUI
+```
+
+### Step 6: Optimize the Scenario
+
+Now apply optimization strategies:
+
+**Option A: Group Small Blobs Together**
+- Estimate: 60% reduction in storage costs by amortizing metadata
+- Optimized WAL cost: ________ WAL/month
+
+**Option B: Delete Early (after 3 months)**
+- Estimate: 50% reduction in storage costs
+- Optimized WAL cost: ________ WAL/month
+
+**Option C: Both Strategies**
+- Combined savings: ________ WAL/month
+- Percentage reduction: ________%
+
+## Exercise 4: Compare Storage Duration Strategies
+
+In this exercise, you'll compare different storage duration strategies.
+
+### Scenario
+
+Store a 10MB blob for 1 year (~26 epochs, since 1 epoch = 14 days).
+
+### Step 1: Calculate Upfront Cost
+
+Calculate cost for storing 26 epochs upfront:
+
+**Mac/Linux:**
+
+```sh
+# Create 10MB file
+dd if=/dev/urandom of=test-10mb.bin bs=1M count=10
+walrus store test-10mb.bin --epochs 1 --dry-run
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+:: Create 10MB file
+fsutil file createnew test-10mb.bin 10485760
+walrus store test-10mb.bin --epochs 1 --dry-run
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Create 10MB file
+$bytes = New-Object byte[] (10MB)
+(New-Object Random).NextBytes($bytes)
+[System.IO.File]::WriteAllBytes("test-10mb.bin", $bytes)
+walrus store test-10mb.bin --epochs 1 --dry-run
+```
+
+Record encoded size and calculate:
+- Cost for 26 epochs upfront: ________ WAL
+
+### Step 2: Calculate Periodic Extension Cost
+
+Calculate cost for storing ~6-7 epochs at a time, extending multiple times to reach 26 epochs:
+
+- Cost for initial 7 epochs: ________ WAL
+- Extension cost for additional epochs (3-4 extensions): ________ WAL
+- Total cost: ________ WAL
+
+**Note**: Extension costs are typically just the additional epochs. With 26 epochs total, you might do: 7 + 7 + 7 + 5 epochs across 4 transactions.
+
+### Step 3: Calculate Early Deletion Cost
+
+Calculate cost for storing 26 epochs but deleting after 13 epochs:
+
+- Cost for 26 epochs: ________ WAL
+- If deletable, can reuse remaining 13 epochs
+- Effective cost: ________ WAL (only paying for 13 epochs used)
+
+### Step 4: Compare Strategies
+
+| Strategy | Total Cost | Pros | Cons |
+|----------|------------|------|------|
+| Upfront (26 epochs) | ________ WAL | Simple, guaranteed | Higher upfront cost |
+| Periodic (6-7 epochs × 4) | ________ WAL | Lower upfront, flexible | More transactions |
+| Early deletion (26 epochs, delete at 13) | ________ WAL | Reuse resources | Requires management |
+
+**Which strategy is best for your use case?**
+
+## Exercise 5: Real-World Project Budget
+
+In this exercise, you'll create a budget plan for a real-world project.
+
+### Choose Your Project
+
+Select one of these projects or create your own:
+
+**Option A: Photo Sharing App**
+- 10,000 photos/month
+- Average size: 5MB
+- Storage duration: 1 year (~26 epochs)
+
+**Option B: Log Analytics Platform**
+- 100,000 log files/month
+- Average size: 500KB
+- Storage duration: 3 months (~6-7 epochs)
+
+**Option C: Video Archive**
+- 500 videos/month
+- Average size: 1GB
+- Storage duration: 5 years (~130 epochs)
+
+### Step 1: Define Requirements
+
+Document your project requirements:
+- Number of files per month: ________
+- Average file size: ________
+- Storage duration: ________ epochs
+- Other requirements: ________
+
+### Step 2: Get Current Prices
+
+```sh
+walrus info
+```
+
+**Tip**: For precise values, use `walrus info --json`.
+
+Record current prices.
+
+### Step 3: Calculate Base Costs
+
+Calculate costs without optimization:
+- Cost per file: ________ WAL
+- Monthly cost: ________ WAL
+- Total cost: ________ WAL
+
+### Step 4: Identify Optimization Opportunities
+
+List optimization strategies that apply:
+- [ ] Group small blobs together
+- [ ] Early deletion
+- [ ] Compression
+- [ ] Batch operations
+- [ ] Other: ________
+
+### Step 5: Calculate Optimized Costs
+
+Estimate savings from each strategy:
+- Strategy 1: ________% savings
+- Strategy 2: ________% savings
+- Combined savings: ________%
+
+Calculate optimized costs:
+- Optimized monthly cost: ________ WAL
+- Optimized total cost: ________ WAL
+
+### Step 6: Create Budget Plan
+
+Create a budget plan:
+- **Monthly budget**: ________ WAL, ________ SUI
+- **Quarterly budget**: ________ WAL, ________ SUI
+- **Annual budget**: ________ WAL, ________ SUI
+- **Buffer (20%)**: ________ WAL, ________ SUI
+
+### Step 7: Document Assumptions
+
+Document your assumptions:
+- Price stability: ________
+- Growth rate: ________
+- Optimization effectiveness: ________
+- Other assumptions: ________
+
+## Exercise 6: Cost Monitoring Practice
+
+In this exercise, you'll practice monitoring and tracking costs.
+
+### Step 1: Store Multiple Blobs
+
+Store several blobs of different sizes:
+
+```sh
+# Store small blob
+walrus store small-1mb.bin --epochs 5
+
+# Store medium blob
+walrus store test-5mb.bin --epochs 10
+
+# Store large blob
+walrus store large-100mb.bin --epochs 3
+```
+
+### Step 2: Track Costs
+
+For each blob, record:
+- Blob ID: ________
+- Size: ________
+- Epochs: ________
+- WAL cost: ________
+- SUI cost: ________
+
+### Step 3: Calculate Metrics
+
+Calculate:
+- **Average cost per blob**: ________ WAL
+- **Average cost per MB**: ________ WAL/MB
+- **Average cost per epoch**: ________ WAL/epoch
+- **Total cost**: ________ WAL, ________ SUI
+
+### Step 4: Identify Patterns
+
+Analyze your data:
+- Which blob size is most cost-efficient per MB?
+- How does storage duration affect cost per epoch?
+- What percentage of cost is storage vs. upload?
+
+### Step 5: Optimize
+
+Based on your analysis, identify optimization opportunities:
+- What would you change?
+- What savings could you achieve?
+- How would you implement the changes?
+
+## Additional Challenges
+
+### Challenge 1: Cost Comparison Tool
+
+Create a simple script or spreadsheet to compare costs for different scenarios:
+- Input: File size, epochs, current prices
+- Output: Total cost, cost breakdown, cost per MB
+
+### Challenge 2: Optimization Calculator
+
+Build a tool that suggests optimization strategies:
+- Input: Use case, file sizes, storage duration
+- Output: Recommended strategies, estimated savings
+
+### Challenge 3: Budget Tracker
+
+Create a system to track actual costs vs. budget:
+- Track costs per project
+- Compare actual vs. planned
+- Generate reports
+
+## Summary
+
+After completing these exercises, you should be able to:
+
+1. ✅ Calculate storage costs for any blob size and duration
+2. ✅ Compare costs across different scenarios
+3. ✅ Identify optimization opportunities
+4. ✅ Create budget plans for real projects
+5. ✅ Monitor and track actual costs
+
+## Key Takeaways
+
+- **Dry-run before storing**: Always use `walrus store --dry-run` to estimate costs without spending tokens
+- **Encoded size surprises**: A 1MB file costs ~67 storage units due to metadata overhead, not 1 unit
+- **Cost ratio ≠ size ratio**: Small and large blobs have different cost drivers (metadata vs. erasure coding)
+- **Verify calculations**: Compare estimates to actual stores to build intuition for cost patterns
+- **Practice reinforces learning**: Hands-on experience is essential for accurate cost estimation
+
+## Next Steps
+
+- Review the [Cost Model](./01-cost-model.md) if you need clarification
+- Explore [Cost Reduction Ideas](./04-cost-reduction.md) for more optimization strategies
+- Check [Scenarios](./05-scenarios.md) for additional real-world examples
+- Apply these skills to your own projects!
