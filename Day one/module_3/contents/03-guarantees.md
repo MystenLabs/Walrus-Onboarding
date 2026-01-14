@@ -105,7 +105,7 @@ sui client object <blob-object-id>
 BLOB_ID_1=$(walrus store --epochs 1 file.txt | grep "blob ID" | awk '{print $3}')
 
 # Upload the same file again
-BLOB_ID_2=$(walrus store file.txt | grep "blob ID" | awk '{print $3}')
+BLOB_ID_2=$(walrus store --epochs 1 file.txt | grep "blob ID" | awk '{print $3}')
 
 # Should be identical
 [ "$BLOB_ID_1" = "$BLOB_ID_2" ] && echo "Deterministic encoding verified"
