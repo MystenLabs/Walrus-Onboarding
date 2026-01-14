@@ -143,7 +143,7 @@ sui client active-address # Shows active wallet
 
 #### 4. Network Configuration
 
-**Config file** (`~/.walrus/config.yaml` or similar):
+**Config file** (`~/.config/walrus/client_config.yaml` or similar):
 
 **What it configures:**
 - Sui RPC endpoints
