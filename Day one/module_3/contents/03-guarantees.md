@@ -102,7 +102,7 @@ sui client object <blob-object-id>
 **Verification:**
 ```bash
 # Upload a file
-BLOB_ID_1=$(walrus store file.txt | grep "blob ID" | awk '{print $3}')
+BLOB_ID_1=$(walrus store --epochs 1 file.txt | grep "blob ID" | awk '{print $3}')
 
 # Upload the same file again
 BLOB_ID_2=$(walrus store file.txt | grep "blob ID" | awk '{print $3}')
