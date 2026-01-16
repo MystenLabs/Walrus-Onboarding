@@ -42,6 +42,15 @@ module_10/
     └── instructor-guide.md            # Teaching notes and solutions
 ```
 
+## Code Examples (TypeScript)
+
+Reference implementations are available in:
+- [`upload.ts`](./src/examples/upload.ts)
+- [`extend-blob.ts`](./src/examples/extend-blob.ts)
+- [`read-blob.ts`](./src/examples/read-blob.ts)
+- [`create-quilt.ts`](./src/examples/create-quilt.ts)
+- [`production-config.ts`](./src/examples/production-config.ts)
+
 ## Curriculum Sections
 
 | Section | Topic | Duration | Description |
