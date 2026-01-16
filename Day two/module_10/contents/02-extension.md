@@ -34,6 +34,10 @@ The simplest method is to pay for additional epochs directly.
     *   `payment`: Coin<WAL> to cover the cost.
 *   **Use Case**: Ad-hoc extension of a single blob when you simply want to pay to keep it longer.
 
+> **💡 Cost Calculation**: Extension costs follow the same pricing model as initial storage. To estimate costs before committing:
+> - **CLI**: Use `walrus store --context <NETWORK> --dry-run <FILE> --epochs <N>` to preview costs for equivalent storage duration.
+> - **Web**: Use the [Walrus Cost Calculator](https://costcalculator.wal.app/) to estimate costs based on size and epochs.
+
 ### 2. Extend with Resource (`extend_blob_with_resource`)
 You can also extend a blob by merging it with an existing, longer-lived `Storage` resource.
 *   **Function**: `walrus::system::extend_blob_with_resource`
