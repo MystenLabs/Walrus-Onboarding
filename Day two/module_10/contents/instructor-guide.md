@@ -17,6 +17,13 @@
 - **Quilts change the unit of transaction:** One on-chain blob represents many small files. Operations (delete/extend) apply to the *whole quilt*, not individual patches.
 - **SharedBlob enables community funding:** Allows multiple parties to pay for extensions.
 
+**Code Examples (TypeScript):**
+- [`upload.ts`](../src/examples/upload.ts)
+- [`extend-blob.ts`](../src/examples/extend-blob.ts)
+- [`read-blob.ts`](../src/examples/read-blob.ts)
+- [`create-quilt.ts`](../src/examples/create-quilt.ts)
+- [`production-config.ts`](../src/examples/production-config.ts)
+
 ## Prerequisites
 
 ### For Students

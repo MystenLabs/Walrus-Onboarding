@@ -45,29 +45,7 @@ flowchart TD
 
 When running in production, ensure you configure timeouts to handle network variance and large files.
 
-```typescript
-import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
-import { walrus } from '@mysten/walrus';
-import { Agent, setGlobalDispatcher } from 'undici';
-
-// 1. Configure global HTTP agent for better performance/timeouts
-setGlobalDispatcher(new Agent({
-    connectTimeout: 60_000,
-    connect: { timeout: 60_000 },
-}));
-
-// 2. Configure Walrus Client with specific timeouts
-const client = new SuiClient({
-    url: getFullnodeUrl('mainnet'),
-    network: 'mainnet',
-}).$extend(
-    walrus({
-        storageNodeClientOptions: {
-            timeout: 60_000, // Wait up to 60s for storage nodes
-        },
-    })
-);
-```
+See [`production-config.ts`](../src/examples/production-config.ts) for the full example.
 
 ## Key Takeaways
 

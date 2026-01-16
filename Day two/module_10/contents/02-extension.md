@@ -56,20 +56,7 @@ Extensions **must** happen before the blob expires. Once the `end_epoch` is reac
 
 Extending a blob requires the `blobObjectId` (the Sui object), not just the `blobId` (the content hash).
 
-```typescript
-// Create an extension transaction
-const tx = await client.walrus.extendBlobTransaction({
-    blobObjectId: '0x123...abc', // The Sui Object ID of the Blob
-    epochs: 10,                  // Extend by 10 epochs
-    // endEpoch: 100,            // OR specify target end epoch
-});
-
-// Sign and execute the transaction
-const result = await client.signAndExecuteTransaction({
-    transaction: tx,
-    signer: keypair,
-});
-```
+See [`extend-blob.ts`](../src/examples/extend-blob.ts) for the full example.
 
 ### Walrus CLI
 

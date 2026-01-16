@@ -54,32 +54,7 @@ A Quilt is an atomic unit on-chain.
 
 Use `writeFiles` to create a Quilt from multiple files.
 
-```typescript
-import { WalrusFile } from '@mysten/walrus';
-
-async function createQuilt() {
-    // Define the files to batch
-    const files = [
-        WalrusFile.from({
-            contents: new TextEncoder().encode('User config data'),
-            identifier: 'config.json',
-        }),
-        WalrusFile.from({
-            contents: new TextEncoder().encode('User avatar image data...'),
-            identifier: 'avatar.png',
-        }),
-    ];
-
-    // Upload as a single Quilt blob
-    const quiltInfo = await client.walrus.writeFiles({
-        files: files,
-        epochs: 5,
-        signer: keypair,
-    });
-
-    console.log(`Quilt Blob ID: ${quiltInfo.blobId}`);
-}
-```
+See [`create-quilt.ts`](../src/examples/create-quilt.ts) for the full example.
 
 ### Walrus CLI
 

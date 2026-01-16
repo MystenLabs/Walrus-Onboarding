@@ -52,18 +52,7 @@ These are "read-only" RPC calls to Sui nodes, not state-changing transactions.
 
 Standard retrieval fetches the data and reconstructs it.
 
-```typescript
-async function retrieve() {
-    const blobId = 'w_8...'; // Your Blob ID
-
-    // Fetches shards, reconstructs, and verifies hash
-    const blobBytes = await client.walrus.readBlob({ blobId });
-    
-    // Convert to text or appropriate format
-    const text = new TextDecoder().decode(blobBytes);
-    console.log(text);
-}
-```
+See [`read-blob.ts`](../src/examples/read-blob.ts) for the full example.
 
 ### Walrus CLI
 

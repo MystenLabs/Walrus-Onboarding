@@ -74,30 +74,7 @@ Clients (like the Walrus CLI/SDK) often bundle `reserve_space` and `register_blo
 
 The `writeBlob` method handles the entire flow (reservation, registration, upload, certification) for you.
 
-```typescript
-import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
-import { walrus } from '@mysten/walrus';
-
-const client = new SuiClient({
-    url: getFullnodeUrl('testnet'),
-    network: 'testnet',
-}).$extend(walrus());
-
-async function upload() {
-    // ... get funded keypair ...
-    const fileData = new TextEncoder().encode('Hello Walrus!');
-    
-    // High-level method: Handles reserve, register, upload, certify
-    const { blobId, blobObject } = await client.walrus.writeBlob({
-        blob: fileData,
-        epochs: 5,        // Store for 5 epochs
-        deletable: true,  // Allow early deletion
-        signer: keypair,
-    });
-    
-    console.log(`Uploaded Blob ID: ${blobId}`);
-}
-```
+See [`upload.ts`](../src/examples/upload.ts) for the full example.
 
 ### Walrus CLI
 

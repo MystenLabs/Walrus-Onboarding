@@ -47,6 +47,15 @@ This curriculum is organized into the following sections:
    - Identify appropriate transaction types
    - Apply production decision-making
 
+## Code Examples (TypeScript)
+
+Reference implementations are available in:
+- [`upload.ts`](../src/examples/upload.ts)
+- [`extend-blob.ts`](../src/examples/extend-blob.ts)
+- [`read-blob.ts`](../src/examples/read-blob.ts)
+- [`create-quilt.ts`](../src/examples/create-quilt.ts)
+- [`production-config.ts`](../src/examples/production-config.ts)
+
 ## Prerequisites
 
 Before starting this module, you should have:

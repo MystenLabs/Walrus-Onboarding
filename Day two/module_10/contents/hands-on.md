@@ -41,5 +41,5 @@ A user wants to download a file and cryptographically prove it hasn't been tampe
 
 ## Next Steps
 
-Review solutions in the [Instructor Guide](./instructor-guide.md) and then apply the patterns to your own use case or proceed to the production guidance.
+Review solutions in the [Instructor Guide](./instructor-guide.md), browse the SDK examples in [`../src/examples`](../src/examples), and then apply the patterns to your own use case or proceed to the production guidance.
 
