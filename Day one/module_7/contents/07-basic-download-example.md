@@ -11,10 +11,13 @@ pass it to the download command:
 
 ```bash
 # Docker workflow
-cd docker
+cd hands-on-source-code
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase here"
+cd ../docker
 make build
-PASSPHRASE="your passphrase here" make test-upload # produces a blobId
-PASSPHRASE="your passphrase here" make test-download BLOB_ID=<copied id>
+make test-upload # produces a blobId
+make test-download BLOB_ID=<copied id>
 
 # Local Node.js workflow
 cd hands-on-source-code

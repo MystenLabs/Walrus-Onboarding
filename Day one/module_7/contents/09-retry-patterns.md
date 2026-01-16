@@ -10,15 +10,20 @@ here.
 ### Docker workflow (this module)
 
 ```bash
-cd docker
+cd hands-on-source-code
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase here"
+cd ../docker
 make build
-PASSPHRASE="your passphrase here" make test-retry
+make test-retry
 ```
 
 ### Local Node.js workflow (this module)
 
 ```bash
 cd hands-on-source-code
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase here"
 npm run test:retry
 ```
 

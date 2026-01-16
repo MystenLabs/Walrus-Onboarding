@@ -8,8 +8,12 @@ Docker environment for SDK Upload Relay hands-on exercises.
 # Build the Docker image
 make build
 
-# Run all tests (requires passphrase)
-PASSPHRASE='your passphrase here' make test
+# Run all tests (requires passphrase in .env)
+cd ../hands-on-source-code
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase here"
+cd ../docker
+make test
 ```
 
 ## Available Commands
@@ -33,14 +37,13 @@ PASSPHRASE='your passphrase here' make test
 
 The passphrase is used to derive your keypair for SDK operations.
 
-**Option 1: Pass directly to commands**
-```sh
-PASSPHRASE='your passphrase here' make test
-```
+**Recommended: Use a `.env` file (shared with Docker via volume mount)**
 
-**Option 2: Export as environment variable**
 ```sh
-export PASSPHRASE='your passphrase here'
+cd ../hands-on-source-code
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase here"
+cd ../docker
 make test
 ```
 

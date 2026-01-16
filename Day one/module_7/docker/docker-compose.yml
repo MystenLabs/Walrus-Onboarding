@@ -8,6 +8,9 @@ services:
       # Mount source code for live editing
       - ../hands-on-source-code/src:/app/src:ro
       - ../hands-on-source-code/package.json:/app/package.json:ro
+      # Mount .env file so container can load secrets via dotenv.
+      # Override with ENV_FILE=/path/to/.env (defaults to ../hands-on-source-code/.env)
+      - ${ENV_FILE:-../hands-on-source-code/.env}:/app/.env:ro
       # Optional: Mount results directory if you want to persist outputs
       - ./results:/app/results
     working_dir: /app
@@ -15,6 +18,5 @@ services:
     tty: true
     environment:
       - NODE_ENV=production
-      # Passphrase for keypair derivation - students must set this!
-      - PASSPHRASE=${PASSPHRASE:-}
+      # PASSPHRASE is loaded from /app/.env (mounted from ../hands-on-source-code/.env)
 

@@ -11,14 +11,17 @@ ships with the repo:
 
 ```bash
 # Build & run inside Docker (recommended)
-cd docker
+cd hands-on-source-code
+cp .env.example .env
+# Edit .env and add your passphrase: PASSPHRASE="your passphrase here"
+cd ../docker
 make build
-PASSPHRASE="your passphrase here" make test-upload
+make test-upload  # Uses .env file automatically (Docker shares the same .env as parent)
 
 # …or run locally with Node.js 20+
 cd hands-on-source-code
 cp .env.example .env
-echo 'PASSPHRASE="your passphrase here"' >> .env
+# Edit .env and add your passphrase: PASSPHRASE="your passphrase here"
 npm install
 npm run test:basic-upload
 ```

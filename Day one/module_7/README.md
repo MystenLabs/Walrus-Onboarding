@@ -83,15 +83,19 @@ cd docker
 # Build the Docker image
 make build
 
-# Run all tests (requires your passphrase)
-PASSPHRASE='your passphrase here' make test
+# Run all tests (requires your passphrase in .env)
+cd ../hands-on-source-code
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase here"
+cd ../docker
+make test
 
 # Run specific tests
-PASSPHRASE='your passphrase' make test-upload
-PASSPHRASE='your passphrase' make test-hands-on
+make test-upload
+make test-hands-on
 
 # Download test: requires passphrase if no blob ID provided (uploads first)
-PASSPHRASE='your passphrase' make test-download
+make test-download
 # Or with existing blob ID (no passphrase needed)
 BLOB_ID='your blob id' make test-download
 ```
@@ -130,7 +134,11 @@ The `hands-on-source-code/` directory contains runnable TypeScript examples for 
 ```bash
 cd docker
 make build
-PASSPHRASE='your passphrase' make test
+cd ../hands-on-source-code
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase"
+cd ../docker
+make test
 ```
 
 #### Option 2: Local Setup

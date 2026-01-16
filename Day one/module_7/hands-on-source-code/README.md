@@ -31,7 +31,7 @@ For a consistent Docker-based environment, see the `../docker/` folder:
 ```sh
 cd ../docker
 make build
-PASSPHRASE='your passphrase' make test
+make test
 ```
 
 ## Local Setup
@@ -52,10 +52,11 @@ npm install
 
 **⚠️ REQUIRED:** The examples need a keypair to sign transactions. Set your passphrase:
 
-pass it inline when running commands:
+Create a `.env` file (recommended):
 
 ```sh
-PASSPHRASE='your passphrase' npm run test:hands-on
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase"
 ```
 
 ## Running Examples
@@ -63,32 +64,32 @@ PASSPHRASE='your passphrase' npm run test:hands-on
 ### Run All Examples
 
 ```sh
-PASSPHRASE='your passphrase' npm test
+npm test
 ```
 
 ### Run Individual Examples
 
 ```sh
 # Basic upload example
-PASSPHRASE='your passphrase' npm run test:basic-upload
+npm run test:basic-upload
 
 # Basic download example (uploads first if no blob ID provided)
-PASSPHRASE='your passphrase' npm run test:basic-download
+npm run test:basic-download
 
 # Or download a specific blob by ID
-PASSPHRASE='your passphrase' npm run test:basic-download -- <blob-id>
+npm run test:basic-download -- <blob-id>
 
 # Hands-on lab
-PASSPHRASE='your passphrase' npm run test:hands-on
+npm run test:hands-on
 
 # Retry patterns
-PASSPHRASE='your passphrase' npm run test:retry
+npm run test:retry
 
 # Partial failures
-PASSPHRASE='your passphrase' npm run test:partial-failures
+npm run test:partial-failures
 
 # Integrity checks
-PASSPHRASE='your passphrase' npm run test:integrity-checks
+npm run test:integrity-checks
 ```
 
 ## Code Examples Included

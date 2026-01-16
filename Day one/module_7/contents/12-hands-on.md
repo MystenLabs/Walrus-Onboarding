@@ -34,12 +34,15 @@ For a consistent environment across all operating systems, use the Docker setup 
 
 ```sh
 # From this module's root directory
-cd docker
+cd hands-on-source-code
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your testnet passphrase"
+cd ../docker
 make build
-PASSPHRASE='your testnet passphrase' make test-hands-on
+make test-hands-on
 
 # Or run all tests
-PASSPHRASE='your testnet passphrase' make test
+make test
 
 # Interactive shell
 make shell
@@ -171,22 +174,29 @@ Working inside the verification harness? You can run the maintained solution wit
 **Mac/Linux:**
 
 ```bash
-# Docker path
-cd docker
-PASSPHRASE="your passphrase" make test-hands-on
+# Docker path (recommended: use .env, shared with Docker via volume)
+cd hands-on-source-code
+cp .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase"
+cd ../docker
+docker-compose build
+docker-compose run --rm sdk-relay-lab npm run test:hands-on
 
 # Local Node path
-cd hands-on-source-code
+cd ../hands-on-source-code
 npm run test:hands-on
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-# Docker path (using environment variable)
-cd docker
-$env:PASSPHRASE = "your passphrase"
-docker-compose run --rm -e PASSPHRASE="$env:PASSPHRASE" sdk-relay-lab npm run test:hands-on
+# Docker path (recommended: use .env, shared with Docker via volume)
+cd hands-on-source-code
+Copy-Item .env.example .env
+# Edit .env and set: PASSPHRASE="your passphrase"
+cd ..\docker
+docker-compose build
+docker-compose run --rm sdk-relay-lab npm run test:hands-on
 
 # Local Node path
 cd ..\hands-on-source-code
@@ -196,10 +206,13 @@ npm run test:hands-on
 **Windows (Command Prompt):**
 
 ```cmd
-:: Docker path
-cd docker
-set PASSPHRASE=your passphrase
-docker-compose run --rm -e PASSPHRASE=%PASSPHRASE% sdk-relay-lab npm run test:hands-on
+:: Docker path (recommended: use .env, shared with Docker via volume)
+cd hands-on-source-code
+copy .env.example .env
+REM Edit .env and set: PASSPHRASE="your passphrase"
+cd ..\docker
+docker-compose build
+docker-compose run --rm sdk-relay-lab npm run test:hands-on
 
 :: Local Node path
 cd ..\hands-on-source-code

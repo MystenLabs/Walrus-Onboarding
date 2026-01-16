@@ -11,7 +11,7 @@ config();
 
 /**
  * Gets the passphrase from environment variable or .env file.
- * Students must set PASSPHRASE environment variable or create a .env file.
+ * Students must set PASSPHRASE via a .env file.
  * 
  * @throws Error if PASSPHRASE is not set
  */
@@ -19,15 +19,12 @@ function getPassphrase(): string {
   const envPassphrase = process.env.PASSPHRASE;
   if (!envPassphrase || envPassphrase.trim() === '') {
     console.error('\n❌ ERROR: PASSPHRASE environment variable is not set!\n');
-    console.error('Please set your wallet passphrase using one of these methods:\n');
-    console.error('  Option 1: Export in your shell');
-    console.error('    export PASSPHRASE="your twelve word passphrase here"\n');
-    console.error('  Option 2: Create a .env file in the project root');
-    console.error('    echo \'PASSPHRASE="your twelve word passphrase here"\' > .env\n');
-    console.error('  Option 3: Pass inline when running commands');
-    console.error('    PASSPHRASE="your passphrase" npm run test:hands-on\n');
-    console.error('  For Docker:');
-    console.error('    PASSPHRASE="your passphrase" make test-hands-on\n');
+    console.error('Please set your wallet passphrase using a .env file:\n');
+    console.error('  1) Copy the template');
+    console.error('     cp .env.example .env\n');
+    console.error('  2) Edit .env and set your passphrase');
+    console.error('     PASSPHRASE="your twelve word passphrase here"\n');
+    console.error('For Docker, the container mounts and reads the same .env file.\n');
     throw new Error('PASSPHRASE environment variable is required');
   }
   console.log('Using passphrase from environment variable');
@@ -41,9 +38,8 @@ function getPassphrase(): string {
  * @throws Error if PASSPHRASE environment variable is not set
  * 
  * To set your passphrase:
- *   export PASSPHRASE="your passphrase here"
- * Or in Docker:
- *   docker-compose run -e PASSPHRASE="your passphrase here" sdk-relay-lab npm test
+ *   cp .env.example .env
+ *   # edit .env and set: PASSPHRASE="your passphrase here"
  */
 export async function getFundedKeypair(): Promise<Ed25519Keypair> {
   // Get passphrase from environment (required)
