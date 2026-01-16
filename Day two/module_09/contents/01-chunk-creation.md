@@ -86,47 +86,46 @@ The encoding pipeline executes the following steps for each blob:
 The encoding logic resides primarily in `crates/walrus-core` and is orchestrated by the SDK.
 
 ### 1. SDK Entry Point
-The process starts in `ts-sdks/packages/walrus/src/client.ts` with `encodeBlob`.
+The process starts in `ts-sdks/packages/walrus/src/client.ts` with the `encodeBlob` method.
 
-```typescript
-// ts-sdks/packages/walrus/src/client.ts
-
-async encodeBlob(blob: Uint8Array) {
-    const systemState = await this.systemState();
-    // ...
-    const numShards = systemState.committee.n_shards;
-    const bindings = await this.#wasmBindings();
-    const { blobId, metadata, sliverPairs, rootHash } = bindings.encodeBlob(numShards, blob);
-
-    // ... reorganizes slivers by node ...
-
-    return { blobId, metadata, rootHash, sliversByNode };
-}
-```
+> **📖 Source Reference**: [`WalrusClient.encodeBlob()` (line ~1690)](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/client.ts#L1690) — This method retrieves the system state, extracts the shard count from the current committee, and calls the WASM bindings to perform the actual Reed-Solomon encoding. It returns the blob ID, metadata, root hash, and slivers organized by storage node.
 
 ### 2. Core Encoding Logic
 The actual Reed-Solomon encoding happens via WASM bindings to the Rust `walrus-core` crate.
 
-```rust
-// crates/walrus-core/src/encoding/blob_encoding.rs
+> **📖 Source Reference**: [`BlobEncoder.encode_with_metadata()`](https://github.com/MystenLabs/walrus/blob/9458057a23d89eaf9eccfa7b81bad93595d76988/crates/walrus-core/src/encoding/blob_encoding.rs#L277) — Core encoding function that transforms raw blob data into slivers with metadata.
 
-pub fn encode_with_metadata(&self) -> (Vec<SliverPair>, VerifiedBlobMetadataWithId) {
-    // ...
-    tracing::debug!("starting to encode blob with metadata");
-    
-    // Matrix operations for RS encoding
-    let mut expanded_matrix = self.get_expanded_matrix();
-    let metadata = expanded_matrix.get_metadata();
+**Pseudo Code**:
+```
+function encode_with_metadata(blob_data):
+    // Step 1: Allocate systematic slivers based on encoding config
+    primary_slivers = init_primary_slivers(n_shards)
+    secondary_slivers = init_secondary_slivers(n_shards)
 
-    // ...
-    
-    tracing::debug!(
-        blob_id = %metadata.blob_id(),
-        "successfully encoded blob"
-    );
+    // Step 2: Fill systematic slivers from the blob
+    for each row in blob_rows(blob_data, n_columns):
+        primary_slivers[row_index].symbols = row
+    for each column in blob_columns(blob_data, n_rows):
+        secondary_slivers[column_index].symbols = column
 
-    (sliver_pairs, metadata)
-}
+    // Step 3: Encode rows to generate non-systematic secondary slivers
+    for each row in primary_slivers[0..n_rows]:
+        parity_symbols = secondary_encoder.encode(row.symbols)
+        write parity_symbols into secondary_slivers[n_columns..]
+
+    // Step 4: Encode columns to generate non-systematic primary slivers
+    //         and compute symbol hashes for metadata
+    symbol_hashes = []
+    for each column in secondary_slivers:
+        encoded_symbols = primary_encoder.encode_all(column.symbols)
+        update symbol_hashes with encoded_symbols
+        if column is systematic:
+            write recovery symbols into primary_slivers[n_rows..]
+
+    // Step 5: Build metadata (includes blob_id) and return sliver pairs
+    metadata = compute_metadata_from_symbol_hashes(symbol_hashes, unencoded_length)
+    sliver_pairs = pair_primary_secondary(primary_slivers, secondary_slivers)
+    return (sliver_pairs, metadata)
 ```
 
 ## Log Tracing

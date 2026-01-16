@@ -66,45 +66,13 @@ The Walrus SDK constructs a Move call to the `register_blob` function in the Wal
 
 ### SDK Implementation
 
-In `ts-sdks/packages/walrus/src/client.ts`, the `registerBlob` function handles this interaction.
+In `ts-sdks/packages/walrus/src/client.ts`, the `registerBlob` method handles this interaction.
 
-```typescript
-// ts-sdks/packages/walrus/src/client.ts
-
-registerBlob({
-    size,
-    epochs,
-    blobId,
-    rootHash,
-    deletable,
-    walCoin,
-    attributes,
-}: RegisterBlobOptions) {
-    return async (tx: Transaction) => {
-        // ... calculates cost ...
-        
-        return tx.add(
-            this.#withWal(writeCost, walCoin ?? null, async (writeCoin, tx) => {
-                const blob = tx.add(
-                    registerBlob({
-                        package: walrusPackageId,
-                        arguments: {
-                            // ...
-                            storage: this.createStorage({ size, epochs, walCoin }),
-                            blobId: blobIdToInt(blobId),
-                            rootHash: BigInt(bcs.u256().parse(rootHash)),
-                            // ...
-                            writePayment: writeCoin,
-                        },
-                    }),
-                );
-                // ...
-                return blob;
-            }),
-        );
-    };
-}
-```
+> **📖 Source Reference**: [`WalrusClient.registerBlob()` (line ~899)](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/client.ts#L899) — This method constructs a Sui transaction that:
+> - Calculates the storage cost based on size and epochs
+> - Creates or uses an existing storage resource via `createStorage()`
+> - Converts the blob ID to an integer and parses the root hash
+> - Adds the `registerBlob` Move call to the transaction with the appropriate WAL payment
 
 ### Transaction Arguments
 

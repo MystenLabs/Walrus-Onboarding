@@ -63,37 +63,15 @@ This phase transforms "stored data" into "proven data".
 
 In `ts-sdks/packages/walrus/src/client.ts`, the client requests confirmations from nodes and then aggregates them.
 
-```typescript
-// ts-sdks/packages/walrus/src/client.ts
+> **📖 Source Reference**: [`WalrusClient.getStorageConfirmationFromNode()` (line ~1659)](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/client.ts#1659) — This method:
+> - Retrieves the active committee and looks up the node by index
+> - Calls either `getDeletableBlobConfirmation()` or `getPermanentBlobConfirmation()` depending on the blob type
+> - Returns the signed confirmation from the node's response
 
-async getStorageConfirmationFromNode({
-    nodeIndex,
-    blobId,
-    // ...
-}: GetStorageConfirmationOptions) {
-    const committee = await this.#getActiveCommittee();
-    const node = committee.nodes[nodeIndex];
-
-    const result = deletable
-        ? await this.#storageNodeClient.getDeletableBlobConfirmation(...)
-        : await this.#storageNodeClient.getPermanentBlobConfirmation(...);
-
-    return result?.success?.data?.signed ?? null;
-}
-
-// Aggregation logic
-async certificateFromConfirmations({ confirmations, ... }) {
-    // ... validates signatures ...
-    if (!isQuorum(filteredConfirmations.length, systemState.committee.members.length)) {
-        throw new NotEnoughBlobConfirmationsError(...);
-    }
-
-    return bindings.combineSignatures(
-        filteredConfirmations,
-        filteredConfirmations.map(({ index }) => index),
-    );
-}
-```
+> **📖 Source Reference**: [`WalrusClient.certificateFromConfirmations()` (line ~1154)](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/client.ts#L1154) — This method:
+> - Validates and filters the collected signatures
+> - Checks if quorum is reached using `isQuorum()` (throws `NotEnoughBlobConfirmationsError` if not)
+> - Combines the individual BLS signatures into an aggregated certificate using WASM bindings
 
 ### Storage Node Logic
 
@@ -103,29 +81,41 @@ When a storage node receives this request, it checks its local database (embedde
 2.  **Storage Check**: verifies it has all the required slivers for its assigned shards.
 3.  **Signing**: If checks pass, it signs a confirmation message with its private key.
 
-```rust
-// crates/walrus-service/src/node.rs
+> **📖 Source Reference**: [`compute_storage_confirmation()`](https://github.com/MystenLabs/walrus/blob/9458057a23d89eaf9eccfa7b81bad93595d76988/crates/walrus-service/src/node.rs#L308) — Storage node logic for generating signed storage confirmations.
 
-async fn compute_storage_confirmation(...) {
-    // 1. Check Registration (On-Chain/Local Index)
-    ensure!(
-        self.is_blob_registered(blob_id)?,
-        ComputeStorageConfirmationError::NotCurrentlyRegistered,
-    );
+**Pseudo Code**:
+```
+async function compute_storage_confirmation(blob_id, persistence_type):
+    // Step 1: Verify blob is registered on-chain (via local synced state)
+    if not this_node.is_blob_registered(blob_id):
+        return Error("Blob not currently registered")
 
-    // 2. Check Storage (Slivers Present)
-    ensure!(
-        self.is_stored_at_all_shards_at_latest_epoch(blob_id).await?,
-        ComputeStorageConfirmationError::NotFullyStored,
-    );
-    
-    // Sign the confirmation
-    let signed = sign_message(confirmation, self.protocol_key_pair.clone()).await?;
-    
-    self.metrics.storage_confirmations_issued_total.inc();
-    
-    Ok(StorageConfirmation::Signed(signed))
-}
+    // Step 2: Flush any pending metadata/slivers for this blob
+    flush_pending_caches(blob_id)
+
+    // Step 3: Verify all slivers are stored for the latest shard assignment
+    if not await this_node.is_stored_at_all_shards_at_latest_epoch(blob_id):
+        return Error("Blob not fully stored on this node")
+
+    // Step 4: If deletable, verify the per-object registration is current
+    if persistence_type is Deletable(object_id):
+        if not per_object_info(object_id).is_registered(current_committee_epoch):
+            return Error("Blob not currently registered")
+
+    // Step 5: Construct confirmation message
+    confirmation = Confirmation {
+        epoch: current_committee_epoch,
+        blob_id: blob_id,
+        persistence_type: persistence_type  // Permanent or Deletable{object_id}
+    }
+
+    // Step 6: Sign with node's BLS private key
+    signature = await sign_message(confirmation, this_node.protocol_key_pair)
+
+    // Step 7: Update metrics
+    metrics.storage_confirmations_issued_total.increment()
+
+    return StorageConfirmation::Signed(signature)
 ```
 
 ## Aggregating Signatures

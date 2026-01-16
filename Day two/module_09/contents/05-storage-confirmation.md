@@ -77,31 +77,12 @@ This is the moment the file becomes "permanent" in the eyes of the network.
 
 ### SDK Implementation
 
-In `ts-sdks/packages/walrus/src/client.ts`, the `certifyBlob` helper handles this:
+In `ts-sdks/packages/walrus/src/client.ts`, the `certifyBlob` method handles this:
 
-```typescript
-// ts-sdks/packages/walrus/src/client.ts
-
-certifyBlob({ blobId, blobObjectId, confirmations, certificate, deletable }: CertifyBlobOptions) {
-    return async (tx: Transaction) => {
-        // ... combines signatures ...
-        const combinedSignature = await this.certificateFromConfirmations({ ... });
-
-        tx.add(
-            certifyBlob({
-                package: walrusPackageId,
-                arguments: {
-                    // ...
-                    blob: blobObjectId,
-                    signature: tx.pure.vector('u8', combinedSignature.signature),
-                    signersBitmap: tx.pure.vector('u8', ...),
-                    message: tx.pure.vector('u8', combinedSignature.serializedMessage),
-                },
-            }),
-        );
-    };
-}
-```
+> **📖 Source Reference**: [`WalrusClient.certifyBlobTransaction()` (line ~1230)](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/client.ts#L1230) — This method constructs a Sui transaction that:
+> - Combines individual storage confirmations into an aggregated signature using `certificateFromConfirmations()`
+> - Adds the `certifyBlob` Move call with the blob object ID, aggregated signature, signers bitmap, and serialized message
+> - Handles both deletable and permanent blob certification paths
 
 ## System Response: Synchronization
 
@@ -110,15 +91,36 @@ Once the `BlobCertified` event is emitted on Sui, the storage nodes (which index
 -   **Event Processing**: Nodes process `BlobCertified`.
 -   **Syncing**: Any node that missed slivers (e.g., if it was down during the upload) will now see the blob is certified and attempt to pull the missing slivers from its peers.
 
-```rust
-// crates/walrus-service/src/node/blob_event_processor.rs
+> **📖 Source Reference**: [`process_blob_certified_event()`](https://github.com/MystenLabs/walrus/blob/9458057a23d89eaf9eccfa7b81bad93595d76988/crates/walrus-service/src/node/blob_event_processor.rs#L148) — Event handler for processing `BlobCertified` events from the Sui blockchain.
 
-async fn process_blob_certified_event(...) {
-    // ...
-    // If the node is missing data for this certified blob, initiate sync
-    self.process_blob_certified_event(event_handle, event).await?;
-    // ...
-}
+**Pseudo Code**:
+```
+async function process_blob_certified_event(event_handle, event, checkpoint_position):
+    blob_id = event.blob_id
+    epoch = event.epoch
+
+    current_event_epoch = this_node.try_get_current_event_epoch()
+
+    // Step 1: Skip if the blob isn't certified locally or the node is catching up
+    if not this_node.is_blob_certified(blob_id):
+        event_handle.mark_as_complete()
+        return
+    if this_node.status.is_catching_up():
+        event_handle.mark_as_complete()
+        return
+
+    // Step 2: Skip if data is already stored for the latest event epoch (when available)
+    if current_event_epoch is not None:
+        if await this_node.is_stored_at_all_shards_at_epoch(blob_id, current_event_epoch):
+            event_handle.mark_as_complete()
+            return
+
+    // Step 3: Apply any live-upload deferral (optional)
+    this_node.maybe_apply_live_upload_deferral(blob_id, checkpoint_position.sequence_number)
+
+    // Step 4: Missing slivers detected - initiate peer sync
+    await blob_sync_handler.start_sync(blob_id, epoch, event_handle)
+    // Sync will fetch missing slivers from peer nodes
 ```
 
 ## Log Tracing

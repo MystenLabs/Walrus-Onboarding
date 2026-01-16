@@ -75,61 +75,66 @@ This process is identical for **Quilts**. A Quilt is simply a Walrus Blob that c
 ### Client Side
 The logic for sending slivers is in `ts-sdks/packages/walrus/src/client.ts`.
 
-```typescript
-// ts-sdks/packages/walrus/src/client.ts
-
-async writeSliver({ blobId, sliverPairIndex, sliverType, sliver, signal }: WriteSliverOptions) {
-    const systemState = await this.systemState();
-    const committee = await this.#getActiveCommittee();
-
-    const shardIndex = toShardIndex(sliverPairIndex, blobId, systemState.committee.n_shards);
-    const node = await this.#getNodeByShardIndex(committee, shardIndex);
-
-    return this.#storageNodeClient.storeSliver(
-        { blobId, sliverPairIndex, sliverType, sliver },
-        { nodeUrl: node.networkUrl, signal },
-    );
-}
-```
+> **📖 Source Reference**: [`WalrusClient.writeSliver()` (line ~1612)](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/client.ts#L1612) — This method:
+> - Retrieves the current system state and active committee
+> - Calculates the shard index from the sliver pair index using `toShardIndex()`
+> - Looks up the responsible storage node by shard index
+> - Delegates to the storage node client to perform the actual HTTP `PUT` request
 
 ### Storage Node Side
 The storage node receives the request and stores it. See `crates/walrus-service/src/node/server/routes.rs` (handler) and `crates/walrus-service/src/node.rs` (logic).
 
-```rust
-// crates/walrus-service/src/node/server/routes.rs
+> **📖 Source Reference**: [`put_sliver()` HTTP Handler](https://github.com/MystenLabs/walrus/blob/9458057a23d89eaf9eccfa7b81bad93595d76988/crates/walrus-service/src/node/server/routes.rs#L295) — Axum route handler that receives sliver upload requests.
 
-pub async fn put_sliver<S: SyncServiceState>(
-    State(state): State<RestApiState<S>>,
-    Path((blob_id, sliver_pair_index, sliver_type)): Path<(BlobIdString, SliverPairIndex, SliverType)>,
-    body: axum::body::Bytes,
-) -> Result<ApiSuccess<&'static str>, OrRejection<StoreSliverError>> {
-    // ...
-    state.service.store_sliver(blob_id, sliver_pair_index, sliver).await?;
-    Ok(ApiSuccess::ok("sliver stored successfully"))
-}
+**Pseudo Code**:
+```
+// HTTP PUT /v1/blobs/{blob_id}/slivers/{sliver_pair_index}/{sliver_type}
+async function put_sliver(request):
+    // Extract path parameters
+    blob_id = request.path.blob_id
+    sliver_pair_index = request.path.sliver_pair_index
+    sliver_type = request.path.sliver_type  // "primary" or "secondary"
+
+    // Optional upload intent (defaults to immediate)
+    intent = request.query.pending ? "pending" : "immediate"
+
+    // Decode sliver from request body (BCS encoded)
+    sliver = decode_bcs(request.body, sliver_type)
+
+    // Delegate to storage service
+    stored = await service.store_sliver(blob_id, sliver_pair_index, sliver, intent)
+
+    if stored:
+        if intent == "pending":
+            return HTTP_202("sliver buffered pending registration")
+        return HTTP_201("sliver stored successfully")
+    return HTTP_200("sliver already stored")
 ```
 
-```rust
-// crates/walrus-service/src/node.rs
+> **📖 Source Reference**: [`store_sliver_unchecked()`](https://github.com/MystenLabs/walrus/blob/9458057a23d89eaf9eccfa7b81bad93595d76988/crates/walrus-service/src/node.rs#L2920) — Core sliver storage logic with integrity verification.
 
-pub(crate) async fn store_sliver_unchecked(
-    &self,
-    metadata: VerifiedBlobMetadataWithId,
-    sliver_pair_index: SliverPairIndex,
-    sliver: Sliver,
-) -> Result<bool, StoreSliverError> {
-    // ... checks shard assignment ...
-    
-    // Verifies the sliver against the metadata (integrity check)
-    sliver.verify(&encoding_config, metadata.as_ref())?;
-    
-    // Stores the sliver in the database
-    shard_storage.put_sliver(*metadata.blob_id(), sliver).await?;
-    
-    walrus_utils::with_label!(self.metrics.slivers_stored_total, sliver_type).inc();
-    
-    Ok(true)
-}
+**Pseudo Code**:
+```
+async function store_sliver_unchecked(metadata, sliver_pair_index, sliver):
+    // Step 1: Resolve shard storage and verify shard assignment
+    shard_storage = get_shard_for_sliver_pair(sliver_pair_index, metadata.blob_id)
+    if not shard_storage.is_owned_by_node():
+        return Error("Not responsible for this shard")
+
+    // Step 2: Skip if sliver already stored
+    if shard_storage.is_sliver_type_stored(metadata.blob_id, sliver.type):
+        return false
+
+    // Step 3: Verify sliver integrity against metadata
+    verified_sliver = verify_sliver_against_metadata(metadata, sliver)
+
+    // Step 4: Persist sliver to local database (RocksDB)
+    await shard_storage.put_sliver(metadata.blob_id, verified_sliver)
+
+    // Step 5: Update metrics
+    metrics.slivers_stored_total.increment(verified_sliver.type)
+
+    return true
 ```
 
 ## Log Tracing

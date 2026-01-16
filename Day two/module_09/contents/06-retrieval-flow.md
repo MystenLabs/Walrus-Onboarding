@@ -74,42 +74,11 @@ The read path is designed for speed and resilience.
 
 The `readBlob` function in `ts-sdks/packages/walrus/src/client.ts` handles this.
 
-```typescript
-// ts-sdks/packages/walrus/src/client.ts
-
-async #internalReadBlob({ blobId, signal }: ReadBlobOptions) {
-    const systemState = await this.systemState();
-    const numShards = systemState.committee.n_shards;
-
-    // 1. Metadata Lookup
-    const blobMetadata = await this.getBlobMetadata({ blobId, signal });
-
-    // 2. Fetch Slivers
-    const slivers = await this.getSlivers({ blobId, signal });
-
-    const bindings = await this.#wasmBindings();
-
-    // 3. Reconstruction
-    const blobBytes = bindings.decodePrimarySlivers(
-        blobId,
-        numShards,
-        blobMetadata.metadata.V1.unencoded_length,
-        slivers,
-    );
-
-    // 4. Integrity Check (recompute metadata/ID)
-    const reconstructedBlobMetadata = bindings.computeMetadata(
-        systemState.committee.n_shards,
-        blobBytes,
-    );
-
-    if (reconstructedBlobMetadata.blobId !== blobId) {
-        throw new InconsistentBlobError('The specified blob was encoded incorrectly.');
-    }
-
-    return blobBytes;
-}
-```
+> **📖 Source Reference**: [`WalrusClient.readBlob()` (line ~327)](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/client.ts#L327) — This method performs the full retrieval flow:
+> 1. **Metadata Lookup**: Calls `getBlobMetadata()` to retrieve the blob's encoding parameters
+> 2. **Fetch Slivers**: Calls `getSlivers()` to fetch the required slivers from storage nodes in parallel
+> 3. **Reconstruction**: Uses WASM bindings `decodePrimarySlivers()` to perform Reed-Solomon decoding
+> 4. **Integrity Check**: Recomputes the blob metadata using `computeMetadata()` and verifies the blob ID matches; throws `InconsistentBlobError` if verification fails
 
 ## Aggregator
 
