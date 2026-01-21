@@ -62,7 +62,7 @@ npm test
 ### Directory Structure
 
 ```
-module_7/
+07-Walrus-SDK-upload-relay/
 ├── docker/                    # Docker environment (this folder)
 │   ├── Dockerfile
 │   ├── docker-compose.yml

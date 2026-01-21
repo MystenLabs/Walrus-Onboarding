@@ -14,7 +14,7 @@ Walrus is a decentralized storage system built on Sui that provides verifiable, 
 ## Module Structure
 
 ```text
-module_2/
+02-Walrus-architecture/
 ├── README.md (this file)
 ├── contents/
 │   ├── index.md              # Module overview and curriculum flow

@@ -373,6 +373,6 @@ Congratulations on completing the Walrus Architecture module! You now have hands
 
 Continue your learning with:
 
-- **[CLI Deep Dive](../../cli/contents/index.md)** - Master advanced CLI commands and configuration
-- **[Storage Costs](../../storage_costs/contents/index.md)** - Understand pricing and cost optimization
-- **[Epochs and Continuity](../../epochs_continuity/contents/index.md)** - Learn about storage duration and extensions
+- **[CLI Deep Dive](../../06-Walrus-CLI/contents/index.md)** - Master advanced CLI commands and configuration
+- **[Storage Costs](../../05-Storage-costs/contents/index.md)** - Understand pricing and cost optimization
+- **[Epochs and Continuity](../../04-Epochs/contents/index.md)** - Learn about storage duration and extensions
