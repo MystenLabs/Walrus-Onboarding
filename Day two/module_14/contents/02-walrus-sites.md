@@ -434,7 +434,7 @@ walrus extend <blob-id> --additional-epochs 26
 - No edge caching (yet)
 
 **Functionality**:
-- Static sites only (no server-side code)
+- No server-side code
 - Need external APIs for dynamic features
 - Limited to ~50 MB practical site size
 
