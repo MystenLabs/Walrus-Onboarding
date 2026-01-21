@@ -1137,6 +1137,6 @@ Present your storage plan to the class.
 - Walrus Documentation: https://docs.walrus.site
 - Walrus GitHub: https://github.com/MystenLabs/walrus-docs
 - [Community Discord](https://discord.com/invite/sui)
-- Office Hours: [Schedule]
+- [Office Hours](https://cal.com/forms/08983b87-8001-4df6-896a-0d7b60acfd79)]
 
 **Stay curious, keep building!** 🚀
