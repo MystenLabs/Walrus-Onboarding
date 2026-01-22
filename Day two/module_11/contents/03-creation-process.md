@@ -165,11 +165,23 @@ walrus --context testnet store-quilt --epochs 25 \
           '{"path":"./config/app.json","identifier":"config","tags":{"type":"config","format":"json"}}'
 
 # Expected output:
-# Successfully stored quilt!
-# Quilt ID: 057MX9PAaUIQLliItM_khR_cp5jPHzJWf-CuJr1z1ik
-# Blob object ID: 0xabc123...
-# End epoch: 125
-# Patches: 3
+# Success: Deletable blob stored successfully.
+# Path: path(s) ignored for quilt store result
+# Blob ID: zkGU4bnBjDpgbSHqFckYtoW7GJlIKteP_HJBTkPj1sk
+# Sui object ID: 0xd95cbf452860b6f1c599fac7c8b91e0da9bf25b0618bfae9321ac2f5befde116
+# Unencoded size: 435 KiB
+# Encoded size (including replicated metadata): 63.0 MiB
+# Cost (excluding gas): 0.0017 WAL (storage was purchased, and a new blob object was registered) 
+# Expiry epoch (exclusive): 318
+# Encoding type: RedStuff/Reed-Solomon
+# 
+# -------------------------------------------------------------------------------------
+#  Index  QuiltPatchId                                        Sliver Range  Identifier 
+# -------------------------------------------------------------------------------------
+#  0      zkGU4bnBjDpgbSHqFckYtoW7GJlIKteP_HJBTkPj1skBAQACAA  [1, 2)        banner 
+#  1      zkGU4bnBjDpgbSHqFckYtoW7GJlIKteP_HJBTkPj1skBAgADAA  [2, 3)        config 
+#  2      zkGU4bnBjDpgbSHqFckYtoW7GJlIKteP_HJBTkPj1skBAwAEAA  [3, 4)        logo 
+# -------------------------------------------------------------------------------------
 ```
 
 **Source Reference**: See the implementation in [`crates/walrus-service/src/client/cli/runner.rs:982-1095`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-service/src/client/cli/runner.rs#L1035-L1331)
@@ -193,9 +205,6 @@ For more control over the registration, upload, and certification steps:
 
 See [`03-create-flow.ts`](../hands-on-source-code/03-creation-process/ts/03-create-flow.ts) for the complete example.
 
-```typescript
-{{#include ../hands-on-source-code/03-creation-process/ts/03-create-flow.ts}}
-```
 
 **Why use the flow method?**
 
@@ -287,12 +296,21 @@ walrus --context testnet store-quilt --dry-run --epochs 50 --paths ./large-colle
 **Output**:
 
 ```text
-Dry run mode: No actual storage will be performed.
-Files to store: 500
-Total size: 45.2 MB
-Estimated storage cost: 0.125 WAL
-Estimated Sui gas: ~0.005 SUI
-Estimated end epoch: 150
+Success: Store dry-run succeeded.
+Path: n/a
+Blob ID: 057XMxnkX7a5D7acJ_XJIMYAfneZrqU2VqqzDFZCYmc
+Encoding type: RedStuff/Reed-Solomon
+Unencoded size: 435 KiB
+Encoded size (including replicated metadata): 63.0 MiB
+Cost to store as new blob (excluding gas): 0.0033 WAL
+
+---------------------------------------------------------------------------------------
+ Index  QuiltPatchId                                        Sliver Range  Identifier 
+---------------------------------------------------------------------------------------
+ 0      057XMxnkX7a5D7acJ_XJIMYAfneZrqU2VqqzDFZCYmcBAQACAA  [1, 2)        file-001.txt 
+ 1      057XMxnkX7a5D7acJ_XJIMYAfneZrqU2VqqzDFZCYmcBAgADAA  [2, 3)        file-002.txt 
+ 2      057XMxnkX7a5D7acJ_XJIMYAfneZrqU2VqqzDFZCYmcBAwAEAA  [3, 4)        file-003.txt 
+---------------------------------------------------------------------------------------
 ```
 
 ## Common Creation Errors
@@ -343,13 +361,13 @@ Always verify your quilt was created successfully:
 
 ```sh
 # Check blob status
-walrus --context testnet blob-status --blob-id <QUILT_ID>
+walrus --context testnet blob-status --blob-id <BLOB_ID>
 
 # List all patches
-walrus --context testnet list-patches-in-quilt <QUILT_ID>
+walrus --context testnet list-patches-in-quilt <BLOB_ID>
 
 # Read a specific patch to verify
-walrus --context testnet read-quilt --quilt-id <QUILT_ID> --identifiers <IDENTIFIER> --out ./verify/
+walrus --context testnet read-quilt --quilt-id <BLOB_ID> --identifiers <IDENTIFIER> --out ./verify/
 ```
 
 ## Key Takeaways

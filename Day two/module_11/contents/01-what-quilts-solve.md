@@ -205,7 +205,7 @@ The quilt feature is implemented across several components:
 #### TypeScript SDK
 - **Walrus Package**: [`@mysten/walrus`](https://github.com/MystenLabs/ts-sdks/tree/main/packages/walrus)
   - [`encodeQuilt` function](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/utils/quilts.ts): Utilities for creating quilts.
-  - [`QuiltReader` class](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/files/readers/quilt.ts): Class for reading and retrieving data from quilts.
+  - [`QuiltReader` class](https://github.com/MystenLabs/ts-sdks/blob/main/packages/walrus/src/files/readers/quilt.ts#L22): Class for reading and retrieving data from quilts.
 - **WASM Bindings**: [`@mysten/walrus-wasm`](https://github.com/MystenLabs/ts-sdks/tree/main/packages/walrus-wasm)
 
 ### CLI Commands

@@ -37,12 +37,24 @@ walrus --context testnet store-quilt --epochs 1 \
 **Output**:
 
 ```text
-Successfully stored quilt!
-Quilt ID: GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc
-Blob object ID: 0x1a2b3c...
-End epoch: 101
-Patches: 4
-Storage cost: 0.012 WAL
+Success: Deletable blob stored successfully.
+Path: path(s) ignored for quilt store result
+Blob ID: DZspa25-3gJQsF5T82L91VYXoDh1gmwqwLnwlX4ZUtU
+Sui object ID: 0x4b5167a54dcf72821013e78ec854004ff21298faafaf4404a783a651298e6495
+Unencoded size: 435 KiB
+Encoded size (including replicated metadata): 63.0 MiB
+Cost (excluding gas): 0.0002 WAL (storage was purchased, and a new blob object was registered) 
+Expiry epoch (exclusive): 294
+Encoding type: RedStuff/Reed-Solomon
+
+----------------------------------------------------------------------------------------
+ Index  QuiltPatchId                                        Sliver Range  Identifier 
+----------------------------------------------------------------------------------------
+ 0      DZspa25-3gJQsF5T82L91VYXoDh1gmwqwLnwlX4ZUtUBAQACAA  [1, 2)        nft-001-image 
+ 1      DZspa25-3gJQsF5T82L91VYXoDh1gmwqwLnwlX4ZUtUBAgADAA  [2, 3)        nft-001-meta 
+ 2      DZspa25-3gJQsF5T82L91VYXoDh1gmwqwLnwlX4ZUtUBAwAEAA  [3, 4)        nft-002-image 
+ 3      DZspa25-3gJQsF5T82L91VYXoDh1gmwqwLnwlX4ZUtUBBAAFAA  [4, 5)        nft-002-meta 
+----------------------------------------------------------------------------------------
 ```
 
 ### Step 2: List All NFTs in the Collection

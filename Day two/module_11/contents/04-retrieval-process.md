@@ -75,7 +75,7 @@ The most common approach is retrieving patches by their identifier.
 
 Retrieve all patches that have a specific tag key-value pair.
 
-### CLI: `read-quilt --tag`
+### CLI: `walrus read-quilt --tag`
 
 [Source Code: 02-retrieve-by-tag.sh](../hands-on-source-code/04-retrieval-process/cli/02-retrieve-by-tag.sh)
 
@@ -129,7 +129,7 @@ First, get the list of patches and their IDs:
 
 Retrieve every patch in the quilt at once.
 
-### CLI: `read-quilt` without filters
+### CLI: `walrus read-quilt` without filters
 
 [Source Code: 05-retrieve-all.sh](../hands-on-source-code/04-retrieval-process/cli/05-retrieve-all.sh)
 
@@ -150,7 +150,7 @@ Retrieve every patch in the quilt at once.
 
 Sometimes you just want to see what's in a quilt without downloading data.
 
-### CLI: `list-patches-in-quilt`
+### CLI: `walrus list-patches-in-quilt`
 
 [Source Code: 03-list-patches.sh](../hands-on-source-code/04-retrieval-process/cli/03-list-patches.sh)
 
@@ -221,7 +221,7 @@ Retrieve all 100 files:
 
 ```sh
 walrus --context testnet read-quilt --out ./downloads/ \
-  --quilt-id <QUILT_ID> \
+  --quilt-id <BLOB_ID> \
   --identifiers nonexistent-file.txt
 
 # Error: Patch with identifier 'nonexistent-file.txt' not found in quilt
@@ -243,7 +243,7 @@ walrus --context testnet read-quilt --out ./downloads/ \
 ### Quilt Not Available
 
 ```sh
-walrus --context testnet read-quilt --out ./downloads/ --quilt-id <EXPIRED_QUILT_ID>
+walrus --context testnet read-quilt --out ./downloads/ --quilt-id <EXPIRED_BLOB_ID>
 
 # Error: Blob not available (may be expired or not yet certified)
 ```
@@ -257,7 +257,7 @@ walrus --context testnet read-quilt --out ./downloads/ --quilt-id <EXPIRED_QUILT
 Always list patches first to understand structure:
 
 ```sh
-walrus --context testnet list-patches-in-quilt <QUILT_ID>
+walrus --context testnet list-patches-in-quilt <BLOB_ID>
 # Review the output, then retrieve specific patches
 ```
 

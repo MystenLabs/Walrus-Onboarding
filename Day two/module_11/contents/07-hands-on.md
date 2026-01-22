@@ -223,39 +223,75 @@ walrus --context testnet store-quilt --epochs 10 \
 **Expected output**:
 
 ```
-Successfully stored quilt!
-Quilt ID: GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc
-Blob object ID: 0x1a2b3c4d...
-End epoch: 110
-Patches: 5
-Storage cost: 0.008 WAL
-Gas cost: 0.003 SUI
+Success: Deletable blob stored successfully.
+Path: path(s) ignored for quilt store result
+Blob ID: aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQ
+Sui object ID: 0x1e2b7236e7a65fdd0480ac8d7817ae5346cb3c9317282c4028cfe2042892e4f9
+Unencoded size: 435 KiB
+Encoded size (including replicated metadata): 63.0 MiB
+Cost (excluding gas): 0.0008 WAL (storage was purchased, and a new blob object was registered) 
+Expiry epoch (exclusive): 303
+Encoding type: RedStuff/Reed-Solomon
+
+--------------------------------------------------------------------------------------
+ Index  QuiltPatchId                                        Sliver Range  Identifier 
+--------------------------------------------------------------------------------------
+ 0      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBAQACAA  [1, 2)        config 
+ 1      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBAgADAA  [2, 3)        homepage 
+ 2      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBAwAEAA  [3, 4)        intro 
+ 3      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBBAAFAA  [4, 5)        logo 
+ 4      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBBQAGAA  [5, 6)        sample-data 
+--------------------------------------------------------------------------------------
 ```
 
 #### Step 2A.2: Save the Quilt ID
 
+**Option A: Manual copy from output above**
+
+Copy the `Blob ID` value from the output and save it. (Note: The Blob ID serves as the Quilt ID since quilts are stored as blobs):
+
 **Mac/Linux:**
 
 ```sh
-# Save for later use
-QUILT_ID="GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc"  # Replace with your actual ID
-echo "QUILT_ID=$QUILT_ID" > quilt-info.sh
+BLOB_ID="aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQ"  # Replace with your actual Blob ID
+echo "BLOB_ID=$BLOB_ID" > quilt-info.sh
+```
+
+**Option B: Automatic extraction using --json (recommended)**
+
+**Mac/Linux:**
+
+```sh
+# Store with JSON output and automatically extract Blob ID
+STORE_OUTPUT=$(walrus --context testnet store-quilt --epochs 10 --json \
+  --blobs \
+    '{"path":"test-files/introduction.txt","identifier":"intro","tags":{"type":"document"}}' \
+    '{"path":"test-files/config.json","identifier":"config","tags":{"type":"config"}}' \
+    '{"path":"test-files/index.html","identifier":"homepage","tags":{"type":"document"}}' \
+    '{"path":"test-files/data.csv","identifier":"sample-data","tags":{"type":"data"}}' \
+    '{"path":"test-files/logo.txt","identifier":"logo","tags":{"type":"image"}}' 2>&1 | grep -v "INFO\|WARN")
+
+# Extract blobId (handles newlyCreated, alreadyCertified, or alreadyExisting responses)
+BLOB_ID=$(echo "$STORE_OUTPUT" | jq -r '.blobStoreResult.newlyCreated.blobObject.blobId // .blobStoreResult.alreadyCertified.blobId // .blobStoreResult.alreadyExisting.blobId')
+
+echo "BLOB_ID=$BLOB_ID"
+echo "BLOB_ID=$BLOB_ID" > quilt-info.sh
 ```
 
 **Windows (Command Prompt):**
 
 ```cmd
-:: Save for later use (replace with your actual ID)
-set QUILT_ID=GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc
-echo QUILT_ID=%QUILT_ID% > quilt-info.txt
+:: Manual: Save for later use (replace with your actual Blob ID)
+set BLOB_ID=aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQ
+echo BLOB_ID=%BLOB_ID% > quilt-info.txt
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-# Save for later use (replace with your actual ID)
-$QUILT_ID = "GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc"
-"QUILT_ID=$QUILT_ID" | Out-File quilt-info.txt
+# Manual: Save for later use (replace with your actual Blob ID)
+$BLOB_ID = "aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQ"
+"BLOB_ID=$BLOB_ID" | Out-File quilt-info.txt
 ```
 
 ### Option B: TypeScript SDK Approach
@@ -370,55 +406,22 @@ npx tsx create-quilt.ts
 ### Step 3.1: List All Patches (CLI)
 
 ```sh
-walrus --context testnet list-patches-in-quilt $QUILT_ID
+walrus --context testnet list-patches-in-quilt $BLOB_ID
 ```
 
 **Expected output**:
 
 ```
-Patches in quilt GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6Xc:
-
-Patch 1:
-  Identifier: intro
-  QuiltPatchId: GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6XcBAAACAAA
-  Tags:
-    category: documentation
-    format: text
-    type: document
-
-Patch 2:
-  Identifier: config
-  QuiltPatchId: GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6XcBAgADAAA
-  Tags:
-    category: configuration
-    format: json
-    type: config
-
-Patch 3:
-  Identifier: homepage
-  QuiltPatchId: GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6XcBQQAEAAA
-  Tags:
-    category: web
-    format: html
-    type: document
-
-Patch 4:
-  Identifier: sample-data
-  QuiltPatchId: GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6XcBgQAFAAA
-  Tags:
-    category: dataset
-    format: csv
-    type: data
-
-Patch 5:
-  Identifier: logo
-  QuiltPatchId: GRSuRSQ_hLYR9nyo7mlBlS7MLQVSSXRrfPVOxF6n6XcBwQAGAAA
-  Tags:
-    category: assets
-    format: text
-    type: image
-
-Total patches: 5
+Quilt Metadata V1: aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQ
+--------------------------------------------------------------------------------------
+ Index  QuiltPatchId                                        Sliver Range  Identifier 
+--------------------------------------------------------------------------------------
+ 0      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBAQACAA  [1, 2)        config 
+ 1      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBAgADAA  [2, 3)        homepage 
+ 2      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBAwAEAA  [3, 4)        intro 
+ 3      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBBAAFAA  [4, 5)        logo 
+ 4      aHtgaPlXsXX-HSwAZpU1K9-4eJAcUbzt1ZDdIFtr5mQBBQAGAA  [5, 6)        sample-data 
+--------------------------------------------------------------------------------------
 ```
 
 ### Step 3.2: Questions to Answer
@@ -441,7 +444,7 @@ Total patches: 5
 ```sh
 mkdir -p downloads/by-identifier
 walrus --context testnet read-quilt --out downloads/by-identifier/ \
-  --quilt-id $QUILT_ID \
+  --quilt-id $BLOB_ID \
   --identifiers intro
 ```
 
@@ -475,7 +478,7 @@ Compare-Object (Get-Content test-files/introduction.txt) (Get-Content downloads/
 
 ```sh
 walrus --context testnet read-quilt --out downloads/by-identifier/ \
-  --quilt-id $QUILT_ID \
+  --quilt-id $BLOB_ID \
   --identifiers config homepage
 ```
 
@@ -525,7 +528,7 @@ Write-Output "All files match original: Success!"
 ```sh
 mkdir -p downloads/by-tag-documents
 walrus --context testnet read-quilt --out downloads/by-tag-documents/ \
-  --quilt-id $QUILT_ID \
+  --quilt-id $BLOB_ID \
   --tag type document
 ```
 
@@ -536,7 +539,7 @@ walrus --context testnet read-quilt --out downloads/by-tag-documents/ \
 ```sh
 mkdir -p downloads/by-tag-json
 walrus --context testnet read-quilt --out downloads/by-tag-json/ \
-  --quilt-id $QUILT_ID \
+  --quilt-id $BLOB_ID \
   --tag format json
 ```
 
@@ -547,7 +550,7 @@ walrus --context testnet read-quilt --out downloads/by-tag-json/ \
 ```sh
 mkdir -p downloads/by-category
 walrus --context testnet read-quilt --out downloads/by-category/ \
-  --quilt-id $QUILT_ID \
+  --quilt-id $BLOB_ID \
   --tag category configuration
 ```
 
@@ -575,39 +578,62 @@ Write-Output "Config files: $((Get-ChildItem downloads/by-category).Count)"     
 
 ## Part 6: Retrieve Blobs by QuiltPatchId
 
+QuiltPatchId is a unique identifier for each patch that combines the Quilt ID with sliver range information. You can see QuiltPatchIds in the table output from `list-patches-in-quilt`.
+
 ### Step 6.1: Get QuiltPatchIds
+
+```sh
+# List patches to see QuiltPatchIds
+walrus --context testnet list-patches-in-quilt $BLOB_ID
+```
+
+**Expected output:**
+
+```
+Quilt Metadata V1: pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0
+--------------------------------------------------------------------------------------
+ Index  QuiltPatchId                                        Sliver Range  Identifier 
+--------------------------------------------------------------------------------------
+ 0      pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAQACAA  [1, 2)        config 
+ 1      pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAgADAA  [2, 3)        homepage 
+ 2      pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAwAEAA  [3, 4)        intro 
+ 3      pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BBAAFAA  [4, 5)        logo 
+ 4      pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BBQAGAA  [5, 6)        sample-data 
+--------------------------------------------------------------------------------------
+```
+
+### Step 6.2: Retrieve by QuiltPatchId
+
+Copy a QuiltPatchId from the table and use `--quilt-patch-ids`:
 
 **Mac/Linux:**
 
 ```sh
-# List patches and extract IDs
-walrus --context testnet list-patches-in-quilt $QUILT_ID --json > patches.json
+# Copy the QuiltPatchId for 'intro' from the table above
+INTRO_PATCH_ID="pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAwAEAA"  # Replace with your actual QuiltPatchId
 
-# Extract specific patch ID (e.g., for 'intro') - requires jq
-INTRO_PATCH_ID=$(jq -r '.patches[] | select(.identifier == "intro") | .patch_id' patches.json)
+mkdir -p downloads/by-patch-id
+walrus --context testnet read-quilt --out downloads/by-patch-id/ --quilt-patch-ids $INTRO_PATCH_ID
+```
 
-echo "Intro Patch ID: $INTRO_PATCH_ID"
+**Windows (Command Prompt):**
+
+```cmd
+:: Copy the QuiltPatchId for 'intro' from the table above
+set INTRO_PATCH_ID=pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAwAEAA
+
+mkdir downloads\by-patch-id
+walrus --context testnet read-quilt --out downloads\by-patch-id\ --quilt-patch-ids %INTRO_PATCH_ID%
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-# List patches and extract IDs
-walrus --context testnet list-patches-in-quilt $QUILT_ID --json | Out-File patches.json
+# Copy the QuiltPatchId for 'intro' from the table above
+$INTRO_PATCH_ID = "pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAwAEAA"  # Replace with your actual QuiltPatchId
 
-# Extract specific patch ID (e.g., for 'intro')
-$patches = Get-Content patches.json | ConvertFrom-Json
-$INTRO_PATCH_ID = ($patches.patches | Where-Object { $_.identifier -eq "intro" }).patch_id
-
-Write-Output "Intro Patch ID: $INTRO_PATCH_ID"
-```
-
-### Step 6.2: Retrieve by Patch ID
-
-```sh
-mkdir -p downloads/by-patch-id
-walrus --context testnet read-quilt --out downloads/by-patch-id/ \
-  --quilt-patch-ids $INTRO_PATCH_ID
+New-Item -ItemType Directory -Force -Path downloads/by-patch-id
+walrus --context testnet read-quilt --out downloads/by-patch-id/ --quilt-patch-ids $INTRO_PATCH_ID
 ```
 
 ### Step 6.3: Verify
@@ -615,45 +641,43 @@ walrus --context testnet read-quilt --out downloads/by-patch-id/ \
 **Mac/Linux:**
 
 ```sh
-diff test-files/introduction.txt downloads/by-patch-id/intro
-echo "Patch ID retrieval: Success!"
+cat downloads/by-patch-id/intro
+echo "QuiltPatchId retrieval: Success!"
 ```
 
 **Windows (Command Prompt):**
 
 ```cmd
-fc test-files\introduction.txt downloads\by-patch-id\intro
-echo Patch ID retrieval: Success!
+type downloads\by-patch-id\intro
+echo QuiltPatchId retrieval: Success!
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-Compare-Object (Get-Content test-files/introduction.txt) (Get-Content downloads/by-patch-id/intro)
-Write-Output "Patch ID retrieval: Success!"
+Get-Content downloads/by-patch-id/intro
+Write-Output "QuiltPatchId retrieval: Success!"
 ```
 
-### Step 6.4: Retrieve Multiple Patches by ID
+### Step 6.4: Retrieve Multiple Patches by QuiltPatchId
 
 **Mac/Linux:**
 
 ```sh
-CONFIG_PATCH_ID=$(jq -r '.patches[] | select(.identifier == "config") | .patch_id' patches.json)
-HOMEPAGE_PATCH_ID=$(jq -r '.patches[] | select(.identifier == "homepage") | .patch_id' patches.json)
+# Copy multiple QuiltPatchIds from the table
+CONFIG_PATCH_ID="pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAQACAA"
+HOMEPAGE_PATCH_ID="pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAgADAA"
 
-walrus --context testnet read-quilt --out downloads/by-patch-id/ \
-  --quilt-patch-ids $CONFIG_PATCH_ID $HOMEPAGE_PATCH_ID
+walrus --context testnet read-quilt --out downloads/by-patch-id/ --quilt-patch-ids $CONFIG_PATCH_ID $HOMEPAGE_PATCH_ID
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-$patches = Get-Content patches.json | ConvertFrom-Json
-$CONFIG_PATCH_ID = ($patches.patches | Where-Object { $_.identifier -eq "config" }).patch_id
-$HOMEPAGE_PATCH_ID = ($patches.patches | Where-Object { $_.identifier -eq "homepage" }).patch_id
+$CONFIG_PATCH_ID = "pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAQACAA"
+$HOMEPAGE_PATCH_ID = "pGjior6pan7Mx6x2GvfdUCGbh1iiuotyO6CdxE58NO0BAgADAA"
 
-walrus --context testnet read-quilt --out downloads/by-patch-id/ `
-  --quilt-patch-ids $CONFIG_PATCH_ID $HOMEPAGE_PATCH_ID
+walrus --context testnet read-quilt --out downloads/by-patch-id/ --quilt-patch-ids $CONFIG_PATCH_ID $HOMEPAGE_PATCH_ID
 ```
 
 ## Part 7: Retrieve All Patches at Once
@@ -663,7 +687,7 @@ walrus --context testnet read-quilt --out downloads/by-patch-id/ `
 ```sh
 mkdir -p downloads/full-quilt
 walrus --context testnet read-quilt --out downloads/full-quilt/ \
-  --quilt-id $QUILT_ID
+  --quilt-id $BLOB_ID
 ```
 
 ### Step 7.2: Verify All Files
@@ -774,26 +798,26 @@ Create a verification script to check everything:
 
 set -e
 
-QUILT_ID="$1"
+BLOB_ID="$1"
 
-if [ -z "$QUILT_ID" ]; then
-  echo "Usage: $0 <QUILT_ID>"
+if [ -z "$BLOB_ID" ]; then
+  echo "Usage: $0 <BLOB_ID>"
   exit 1
 fi
 
 echo "=== Lab 4 Verification ==="
-echo "Quilt ID: $QUILT_ID"
+echo "Blob ID: $BLOB_ID"
 echo ""
 
 # Test 1: List patches
 echo "[1/5] Listing patches..."
-PATCH_COUNT=$(walrus --context testnet list-patches-in-quilt $QUILT_ID --json | jq '.patches | length')
+PATCH_COUNT=$(walrus --context testnet list-patches-in-quilt $BLOB_ID --json 2>&1 | grep -v "INFO\|WARN" | jq '.V1.index.quiltPatches | length')
 echo "  ✓ Found $PATCH_COUNT patches (expected: 5)"
 
 # Test 2: Retrieve by identifier
 echo "[2/5] Testing retrieval by identifier..."
 mkdir -p verify-downloads
-walrus --context testnet read-quilt --out verify-downloads/ --quilt-id $QUILT_ID --identifiers intro > /dev/null 2>&1
+walrus --context testnet read-quilt --out verify-downloads/ --quilt-id $BLOB_ID --identifiers intro > /dev/null 2>&1
 if [ -f verify-downloads/intro ]; then
   echo "  ✓ Successfully retrieved by identifier"
 else
@@ -803,9 +827,10 @@ fi
 
 # Test 3: Retrieve by tag
 echo "[3/5] Testing retrieval by tag..."
-walrus --context testnet read-quilt --out verify-downloads/ --quilt-id $QUILT_ID --tag type document > /dev/null 2>&1
-DOC_COUNT=$(ls verify-downloads/ | grep -v intro | wc -l)
-echo "  ✓ Retrieved $DOC_COUNT documents by tag"
+rm -rf verify-downloads/*
+walrus --context testnet read-quilt --out verify-downloads/ --quilt-id $BLOB_ID --tag type document > /dev/null 2>&1
+DOC_COUNT=$(ls verify-downloads/ | wc -l | tr -d ' ')
+echo "  ✓ Retrieved $DOC_COUNT documents by tag (expected: 2)"
 
 # Test 4: Verify content integrity
 echo "[4/5] Verifying content integrity..."
@@ -815,9 +840,9 @@ echo "  ✓ Content matches original"
 # Test 5: Retrieve all
 echo "[5/5] Testing full quilt retrieval..."
 rm -rf verify-downloads/*
-walrus --context testnet read-quilt --out verify-downloads/ --quilt-id $QUILT_ID > /dev/null 2>&1
-TOTAL_FILES=$(ls verify-downloads/ | wc -l)
-echo "  ✓ Retrieved all $TOTAL_FILES files"
+walrus --context testnet read-quilt --out verify-downloads/ --quilt-id $BLOB_ID > /dev/null 2>&1
+TOTAL_FILES=$(ls verify-downloads/ | wc -l | tr -d ' ')
+echo "  ✓ Retrieved all $TOTAL_FILES files (expected: 5)"
 
 echo ""
 echo "=== All tests passed! ==="
@@ -831,7 +856,7 @@ Run verification:
 
 ```sh
 chmod +x verify-lab.sh
-./verify-lab.sh $QUILT_ID
+./verify-lab.sh $BLOB_ID
 ```
 
 ## Part 10: Cleanup (Optional)
@@ -842,7 +867,7 @@ If you want to clean up after the lab:
 
 ```sh
 # Delete the quilt (if deletable)
-walrus --context testnet delete --blob-id $QUILT_ID
+walrus --context testnet delete --blob-id $BLOB_ID
 
 # Remove local files
 rm -rf walrus-quilt-lab/
@@ -851,7 +876,7 @@ rm -rf walrus-quilt-lab/
 **Windows (Command Prompt):**
 
 ```cmd
-walrus --context testnet delete --blob-id %QUILT_ID%
+walrus --context testnet delete --blob-id %BLOB_ID%
 
 rmdir /s /q walrus-quilt-lab
 ```
@@ -859,7 +884,7 @@ rmdir /s /q walrus-quilt-lab
 **Windows (PowerShell):**
 
 ```powershell
-walrus --context testnet delete --blob-id $QUILT_ID
+walrus --context testnet delete --blob-id $BLOB_ID
 
 Remove-Item -Recurse -Force walrus-quilt-lab
 ```
