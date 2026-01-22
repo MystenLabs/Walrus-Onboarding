@@ -13,7 +13,8 @@ This repository contains the training materials for the Walrus Training Program.
 - [Module 7: Walrus SDK with Upload Relay](./07-Walrus-SDK-upload-relay/README.md)
 - [Module 8: Setup and Operation of Publishers and Aggregators](./08-Setup-publishers-aggregators/README.md)
 - [Module 9: Walrus Upload Transaction Lifecycle](./09-Upload-lifecycle/README.md)
-
+- [Module 10: Transaction Types](./10-Transaction-types/README.md)
+- [Module 11: Quilts, Batch storage in Walrus](./11-Batch-storage/README.md)
 - [Module 12: Failure Handling & Robustness](./12-Failure-handling/README.md)
 - [Module 13: Performance Optimization](./13-Performance-optimization/README.md)
 - [Module 14: Use Cases and Design Patterns](./14-Use-cases/README.md)
