@@ -4,7 +4,7 @@ This repository contains the training materials for the Walrus Training Program.
 
 ## Modules
 
-- [Module 1: Introduction to Walrus](./01-Introduction/README.md)
+- [Module 1: Introduction to Walrus](./01-Introduction/Module1.md)
 - [Module 2: Walrus Architecture](./02-Walrus-architecture/README.md)
 - [Module 3: Operational Responsibilities and Failure Modes](./03-Operational-responsibilities/README.md)
 - [Module 4: Epochs, Continuity, and Extension](./04-Epochs/README.md)
