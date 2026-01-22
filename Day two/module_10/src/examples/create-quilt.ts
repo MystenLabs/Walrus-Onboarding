@@ -11,11 +11,11 @@ const client = new SuiClient({
     network: 'testnet',
 }).$extend(walrus());
 
-const mnemonic = process.env.SUI_MNEMONIC;
-if (!mnemonic) {
-    throw new Error('Set SUI_MNEMONIC in your environment before running.');
+const privateKey = process.env.WALLET_PRIVATE_KEY;
+if (!privateKey) {
+    throw new Error('Set WALLET_PRIVATE_KEY in your environment before running.');
 }
-const keypair = Ed25519Keypair.deriveKeypair(mnemonic);
+const keypair = Ed25519Keypair.fromSecretKey(privateKey);
 
 async function createQuilt() {
     const configPath = resolve(process.cwd(), 'config.json');

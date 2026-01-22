@@ -5,26 +5,26 @@ This directory contains runnable TypeScript examples demonstrating Walrus SDK op
 ## Prerequisites
 
 - Node.js v18+
-- Access to `@mysten/sui` and `@mysten/walrus` packages (via `NODE_PATH` or local install)
 - A funded Sui testnet wallet (SUI + WAL tokens)
 
 ## Setup
 
-1. **Create a `.env` file** in this directory with your mnemonic:
-
-   ```
-   SUI_MNEMONIC="your twelve word mnemonic phrase here"
-   ```
-
-2. **Set `NODE_PATH`** to a directory containing the required packages, or install them locally:
+1. **Install dependencies:**
 
    ```bash
-   # Option A: Use existing node_modules (e.g., from module_13)
-   export NODE_PATH="/path/to/walrus_training_program/Day two/module_13/hands-on-source-code/node_modules"
+   npm install
+   ```
 
-   # Option B: Install locally
-   npm init -y
-   npm install @mysten/sui @mysten/walrus dotenv undici
+2. **Create a `.env` file** by copying the template:
+
+   ```bash
+   cp .env.template .env
+   ```
+
+3. **Add your private key** to the `.env` file:
+
+   ```
+   WALLET_PRIVATE_KEY=your_private_key_here
    ```
 
 ## Running Examples
@@ -102,14 +102,15 @@ npx tsx production-config.ts
 
 ### "Cannot find module '@mysten/sui/client'"
 
-Ensure `NODE_PATH` is set or packages are installed locally.
+Run `npm install` to install dependencies.
 
-### "Set SUI_MNEMONIC in your environment"
+### "Set WALLET_PRIVATE_KEY in your environment"
 
-Create a `.env` file with your mnemonic or export it directly:
+Create a `.env` file with your private key:
 
 ```bash
-export SUI_MNEMONIC="your mnemonic here"
+cp .env.template .env
+# Then edit .env and add your private key
 ```
 
 ### Insufficient balance errors
