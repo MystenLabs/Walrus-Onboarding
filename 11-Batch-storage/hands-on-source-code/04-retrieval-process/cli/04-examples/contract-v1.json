@@ -1,0 +1,10 @@
+{
+  "name": "Service Contract v1",
+  "version": "1.0.0",
+  "description": "Initial contract version for patch ID retrieval demo",
+  "terms": {
+    "duration": "12 months",
+    "value": 50000
+  }
+}
+

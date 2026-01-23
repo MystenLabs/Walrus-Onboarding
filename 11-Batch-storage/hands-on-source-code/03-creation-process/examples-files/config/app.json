@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "name": "CLI Quilt Example App",
+  "environment": "test",
+  "features": {
+    "quilts": true
+  }
+}

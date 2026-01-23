@@ -1,0 +1,1 @@
+Sample file C in directory2 for CLI quilt examples.

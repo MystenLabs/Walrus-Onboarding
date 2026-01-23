@@ -1,0 +1,8 @@
+Quarterly Report Q3 2024
+========================
+
+Summary of activities for the third quarter.
+Use list-patches-in-quilt to see all patches.
+
+Revenue: $1.8M
+Growth: 20%

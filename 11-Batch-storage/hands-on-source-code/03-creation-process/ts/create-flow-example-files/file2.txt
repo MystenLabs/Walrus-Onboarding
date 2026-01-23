@@ -1,0 +1,2 @@
+This is file2.txt used in the 03-create-flow.ts example.
+You can edit this file independently from file1.txt.
