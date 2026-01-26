@@ -9,7 +9,7 @@ This module teaches you how to optimize your Walrus applications for production 
 ## Module Structure
 
 ```text
-module_13/
+13-Performance-optimization/
 ├── contents/              # Curriculum materials and documentation
 │   ├── index.md          # Module overview and learning objectives
 │   ├── 01-parallel-chunking.md

@@ -23,7 +23,7 @@ By completing this lab, you will:
 1. Navigate to the hands-on directory:
 
 ```bash
-cd "Day two/module_13/hands-on-source-code"
+cd "13-Performance-optimization/hands-on-source-code"
 ```
 
 2. Install dependencies:

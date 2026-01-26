@@ -32,12 +32,12 @@ Module3/
 ## Getting Started
 
 1. **Start with the [Module Index](./contents/index.md)** - Overview and learning path
-2. **Read [Component Duties](./contents/component-duties.md)** - Understand operational responsibilities
-3. **Study [Failure Modes](./contents/failure-modes.md)** - Learn where things can go wrong
-4. **Review [System Guarantees](./contents/guarantees.md)** - Know what's guaranteed vs. what to verify
-5. **Understand [Control Boundaries](./contents/control-boundaries.md)** - CLI vs SDK responsibilities
-6. **Learn [Practical Constraints](./contents/practical-constraints.md)** - Real-world limitations
-7. **Complete [Hands-On Exercise](./contents/hands-on.md)** - Inspect logs and identify events
+2. **Read [Component Duties](./contents/01-component-duties.md)** - Understand operational responsibilities
+3. **Study [Failure Modes](./contents/02-failure-modes.md)** - Learn where things can go wrong
+4. **Review [System Guarantees](./contents/03-guarantees.md)** - Know what's guaranteed vs. what to verify
+5. **Understand [Control Boundaries](./contents/04-control-boundaries.md)** - CLI vs SDK responsibilities
+6. **Learn [Practical Constraints](./contents/05-practical-constraints.md)** - Real-world limitations
+7. **Complete [Hands-On Exercise](./contents/06-hands-on.md)** - Inspect logs and identify events
 
 ## Learning Objectives
 
