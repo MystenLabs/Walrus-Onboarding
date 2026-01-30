@@ -1,6 +1,6 @@
 # Walrus Training Program
 
-This repository contains the training materials for the Walrus Training Program.
+A self-paced, asynchronous training program designed to take you from zero to proficient with [Walrus](https://walrus.xyz), the decentralized storage network built on Sui. The curriculum spans 14 modules covering everything from core architecture and storage economics to hands-on CLI usage, SDK integration, performance optimization, and real-world design patterns. Each module includes reading materials and guided content, several include hands-on source code and exercises, and quizzes are provided to test your understanding along the way.
 
 ## Modules
 
