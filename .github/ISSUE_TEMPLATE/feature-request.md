@@ -2,7 +2,7 @@
 name: Content Request
 about: Suggest new content, improvements, or additional examples
 title: '[Request] Brief description'
-labels: enhancement
+labels: enhancement, walrus-trainning
 assignees: ''
 ---
 
