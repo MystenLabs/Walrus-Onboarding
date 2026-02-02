@@ -2,7 +2,7 @@
 name: Report an Issue
 about: Report broken links, code errors, typos, or unclear explanations
 title: '[Module X] Brief description'
-labels: fix
+labels: walrus-trainning
 assignees: ''
 ---
 
