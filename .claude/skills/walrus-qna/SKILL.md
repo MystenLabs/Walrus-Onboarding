@@ -1,5 +1,5 @@
 ---
-name: walrus-qa
+name: walrus-qna
 description: |
   Answer questions about the Walrus Training Program course content.
   Uses multi-agent search and AskUserQuestion for question refinement.
@@ -43,7 +43,7 @@ When refining, present **2-4 focused angles** as AskUserQuestion options. Exampl
 
 ### Step 2: Content Map Lookup
 
-Read the file `CONTENT_MAP.md` located in the same directory as this skill file (`.claude/skills/walrus-qa/CONTENT_MAP.md`).
+Read the file `CONTENT_MAP.md` located in the same directory as this skill file (`.claude/skills/walrus-qna/CONTENT_MAP.md`).
 
 Identify the **2-4 most relevant modules** and their specific chapter files based on the (refined) question. Note the exact file paths for the agents in Step 3.
 

@@ -1,7 +1,7 @@
 # Walrus Training Program — Topic Index
 
 > This file maps topics to their source module/chapter files.
-> Used by the walrus-qa skill to target searches efficiently.
+> Used by the walrus-qna skill to target searches efficiently.
 > Regenerate when modules are added or significantly changed.
 
 ## How to Use This Index
