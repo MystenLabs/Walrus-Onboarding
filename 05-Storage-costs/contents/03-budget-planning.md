@@ -245,6 +245,9 @@ Always include a buffer in your budget:
 2. **Get prices** (mainnet snapshot, Feb 2026):
    - Storage price: 11,000 FROST per unit per epoch (= 0.000011 WAL)
    - Write price: 20,000 FROST per unit (= 0.00002 WAL)
+   - Source of this snapshot:
+     - CLI output from `walrus info --context mainnet`
+     - Mainnet explorer reference: [Walruscan](https://walruscan.com/mainnet/home)
 
 3. **Calculate costs per blob**:
    - Storage resource: 64 × 0.000011 × 12 = 0.008448 WAL
