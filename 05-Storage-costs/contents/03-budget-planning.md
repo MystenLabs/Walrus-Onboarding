@@ -242,17 +242,17 @@ Always include a buffer in your budget:
    - Average size: 2MB (small blob, so encoded size ≈ 64MB)
    - Storage units: ceil(64MB / 1MB) = 64 units per blob
 
-2. **Get prices** (example):
-   - Storage price: 1000 WAL per unit per epoch
-   - Write price: 100 WAL per unit
+2. **Get prices** (mainnet snapshot, Feb 2026):
+   - Storage price: 11,000 FROST per unit per epoch (= 0.000011 WAL)
+   - Write price: 20,000 FROST per unit (= 0.00002 WAL)
 
 3. **Calculate costs per blob**:
-   - Storage resource: 64 × 1000 × 12 = 768,000 WAL
-   - Upload cost: 64 × 100 = 6,400 WAL
-   - Total WAL per blob: 774,400 WAL
+   - Storage resource: 64 × 0.000011 × 12 = 0.008448 WAL
+   - Upload cost: 64 × 0.00002 = 0.00128 WAL
+   - Total WAL per blob: 0.009728 WAL
 
 4. **Total WAL cost**:
-   - 120,000 blobs × 774,400 WAL = 92,928,000,000 WAL
+   - 120,000 blobs × 0.009728 WAL = 1,167.36 WAL/year
 
 5. **Transaction costs** (estimate):
    - 2 transactions per blob × 120,000 blobs = 240,000 transactions
@@ -260,15 +260,15 @@ Always include a buffer in your budget:
    - Total SUI: 2,400 SUI
 
 6. **Budget allocation**:
-   - Monthly WAL budget: 92,928,000,000 / 12 = 7,744,000,000 WAL/month
+   - Monthly WAL budget: 1,167.36 / 12 = 97.28 WAL/month
    - Monthly SUI budget: 2,400 / 12 = 200 SUI/month
-   - Add 20% buffer: 9,292,800,000 WAL/month, 240 SUI/month
+   - Add 20% buffer: 116.74 WAL/month, 240 SUI/month
 
 ### Optimization Opportunities
 
 - Group small documents together to reduce metadata overhead
 - Delete documents early when possible (reuse storage resources)
-- Batch uploads to reduce transaction costs
+- Batch operations to reduce transaction costs
 - Burn blob objects after 6 months to reclaim SUI
 
 ## Key Takeaways
