@@ -10,36 +10,7 @@ This section explains what Publishers, Aggregators, and Clients actually do when
 
 The diagram below shows how all components interact in the Walrus system using C4 Context diagram:
 
-```mermaid
-C4Context
-    title Walrus Storage System - Container Architecture
-
-    Person(client, "Client App", "SDK or CLI")
-
-    Boundary(optional, "Optional Infrastructure (Untrusted)") {
-        System(publisher, "Publisher", "Encodes blobs,<br/>distributes slivers")
-        System(aggregator, "Aggregator", "Fetches slivers,<br/>reconstructs blobs")
-    }
-
-    Boundary(core, "Core System (Trusted)") {
-        SystemDb(blockchain, "Sui Blockchain", "Blob registry,<br/>metadata, certificates")
-        SystemQueue(storage, "Storage Nodes", "Decentralized storage<br/>network")
-    }
-
-    Rel(client, publisher, "Uploads blob", "HTTP PUT")
-    Rel(publisher, blockchain, "Registers blob", "Sui RPC")
-    Rel(publisher, storage, "Distributes slivers", "HTTP")
-    Rel(storage, publisher, "Returns signatures", "HTTP")
-
-    Rel(client, aggregator, "Reads blob", "HTTP GET")
-    Rel(aggregator, blockchain, "Queries metadata", "Sui RPC")
-    Rel(aggregator, storage, "Fetches slivers", "HTTP")
-
-    Rel(client, blockchain, "Verifies state", "Sui RPC", $tags="verification")
-
-    UpdateRelStyle(client, blockchain, $lineColor="green", $textColor="green")
-    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
-```
+![walrus component duties diagram](diagrams/walrus-component-duties.png)
 
 **Key Architecture Points:**
 - **Client** (your application): Uses TypeScript SDK or CLI to interact with the system
