@@ -51,7 +51,7 @@ See [Docker README](./docker/README.md) for all available commands.
 
 **Option 2: Local Installation**
 
-Install Walrus CLI locally following the [Getting Started guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/started.md).
+Install Walrus CLI locally following the [Getting Started guide](https://docs.wal.app/docs/getting-started).
 
 ### Learning Path
 
