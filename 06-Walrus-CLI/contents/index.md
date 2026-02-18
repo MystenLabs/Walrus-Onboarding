@@ -68,10 +68,10 @@ This curriculum is organized into the following sections:
 Before starting this curriculum, you should have:
 
 - Basic command-line interface (CLI) experience
-- A Sui wallet with SUI and WAL tokens (see [Setup](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/setup.md) for details)
+- A Sui wallet with SUI and WAL tokens (see [Setup](https://docs.wal.app/docs/usage/setup.md) for details)
 
 
-For more information on setting up your wallet and obtaining tokens, see the [Setup guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/setup.md#prerequisites).
+For more information on setting up your wallet and obtaining tokens, see the [Setup guide](https://docs.wal.app/docs/usage/setup.md#prerequisites).
 
 ## For Instructors
 

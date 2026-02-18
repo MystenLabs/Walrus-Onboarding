@@ -96,7 +96,7 @@ The `walrus store` command performs several automatic optimizations:
 
 3. **Certificate collection**: If the blob is already certified but as deletable or for insufficient epochs, the command skips uploading data and just collects the availability certificate.
 
-For more details on how blobs are encoded and stored, see the [encoding documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/design/encoding.md). The encoding implementation uses Reed-Solomon erasure coding with primary and secondary encodings (see the [encoding configuration](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs) for technical details). For information about storage costs and optimization strategies, see the [costs guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/costs.md).
+For more details on how blobs are encoded and stored, see the [encoding documentation](https://docs.wal.app/docs/design/encoding.md). The encoding implementation uses Reed-Solomon erasure coding with primary and secondary encodings (see the [encoding configuration](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/config.rs) for technical details). For information about storage costs and optimization strategies, see the [costs guide](https://docs.wal.app/docs/dev-guide/costs.md).
 
 ### Force Re-upload
 
@@ -182,7 +182,7 @@ To skip the tip confirmation prompt:
 walrus store file.txt --epochs 10 --upload-relay https://relay.example.com --skip-tip-confirmation
 ```
 
-For detailed information about upload relays, including how they work and how to operate one, see the [upload relay guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/operator-guide/upload-relay.md).
+For detailed information about upload relays, including how they work and how to operate one, see the [upload relay guide](https://docs.wal.app/docs/operator-guide/upload-relay.md).
 
 ## Common Upload Scenarios
 
@@ -247,7 +247,7 @@ Use debug logging for more details:
 RUST_LOG=walrus=debug walrus store file.txt --epochs 10
 ```
 
-For more information on storage costs and how to optimize them, see the [costs guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/costs.md). For additional CLI usage details, see the [client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md#storing-blobs).
+For more information on storage costs and how to optimize them, see the [costs guide](https://docs.wal.app/docs/dev-guide/costs.md). For additional CLI usage details, see the [client CLI documentation](https://docs.wal.app/docs/usage/client-cli.md#storing-blobs).
 
 ## Storing Blobs as Quilts
 
@@ -307,7 +307,7 @@ All the same storage options apply to quilts:
 
 **Warning**: Blobs within a quilt are retrieved by a `QuiltPatchId`, not their standard `BlobId`. Standard blob operations like `delete`, `extend`, or `share` cannot target individual blobs inside a quilt; they must be applied to the entire quilt.
 
-For more information about quilts, see the [Quilt documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md).
+For more information about quilts, see the [Quilt documentation](https://docs.wal.app/docs/usage/quilt.md).
 
 ## Managing Blob Lifecycle
 

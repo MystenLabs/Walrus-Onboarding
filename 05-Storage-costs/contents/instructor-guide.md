@@ -20,7 +20,7 @@
 
 - Resource reuse (delete early, reuse epochs) is the most powerful cost optimization
 
-- [Walrus Quilt](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md) can reduce costs up to 409x for small files by batching
+- [Walrus Quilt](https://docs.wal.app/docs/usage/quilt.md) can reduce costs up to 409x for small files by batching
 
 ## Prerequisites
 
@@ -277,7 +277,7 @@
 🎯 **Key Points to Emphasize:**
 
 - **Resource reuse is the most powerful**: Deleting deletable blobs early to reclaim and reuse storage resources can dramatically reduce costs
-- **Quilt for grouping small blobs**: [Walrus Quilt](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md) can reduce costs up to 409x for 10KB files by sharing metadata overhead
+- **Quilt for grouping small blobs**: [Walrus Quilt](https://docs.wal.app/docs/usage/quilt.md) can reduce costs up to 409x for 10KB files by sharing metadata overhead
 - **Batching operations**: Combining multiple operations in PTBs reduces transaction costs and improves efficiency
 - **Strategic trade-offs**: Each optimization has trade-offs (grouping reduces individual control, burning objects removes lifecycle management)
 
@@ -416,9 +416,9 @@ Use this to gauge if the module was successful:
 
 ### For Students
 
-- [Walrus Costs Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/costs.md) - Official cost guide
-- [Quilt Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/quilt.md) - Batch storage for cost reduction
-- [Walrus CLI Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md) - CLI reference
+- [Walrus Costs Documentation](https://docs.wal.app/docs/dev-guide/costs.md) - Official cost guide
+- [Quilt Documentation](https://docs.wal.app/docs/usage/quilt.md) - Batch storage for cost reduction
+- [Walrus CLI Documentation](https://docs.wal.app/docs/usage/client-cli.md) - CLI reference
 
 ### For Instructors
 

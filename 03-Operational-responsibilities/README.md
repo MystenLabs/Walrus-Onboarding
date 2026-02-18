@@ -74,10 +74,10 @@ Before starting this module, you should have:
 
 ### For Students
 
-- [Walrus Developer Operations Guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/dev-operations.md)
-- [Properties and Guarantees](https://github.com/MystenLabs/walrus/blob/main/docs/book/design/properties.md)
+- [Walrus Developer Operations Guide](https://docs.wal.app/docs/dev-guide/dev-operations.md)
+- [Properties and Guarantees](https://docs.wal.app/docs/design/properties.md)
 - [Publisher Operator Guide](https://github.com/MystenLabs/walrus/blob/main/docs/operator-guide/auth-publisher.md)
-- [Aggregator Operator Guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/operator-guide/aggregator.md)
+- [Aggregator Operator Guide](https://docs.wal.app/docs/operator-guide/aggregator.md)
 
 ### For Instructors
 

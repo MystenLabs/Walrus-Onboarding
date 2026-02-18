@@ -510,7 +510,7 @@ Compare-Object (Get-Content default-check.txt) (Get-Content strict-check.txt)
 - Integrate Walrus CLI into your own workflows and scripts
 - Refer back to the curriculum sections as needed
 
-For more examples and use cases, see the [examples documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/examples.md) and the [client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md).
+For more examples and use cases, see the [examples documentation](https://docs.wal.app/docs/usage/examples.md) and the [client CLI documentation](https://docs.wal.app/docs/usage/client-cli.md).
 
 **Congratulations on completing the Walrus CLI Developer Curriculum!** 🎉
 
