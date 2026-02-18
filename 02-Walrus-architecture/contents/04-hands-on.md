@@ -9,7 +9,7 @@ Before starting, ensure you have:
 - Completed the [System Components](./01-components.md) section to understand the architecture
 - Reviewed the [Data Flow](./03-data-flow.md) section to understand how data moves through the system
 - Understood [Chunk Creation and Encoding](./02-chunk-creation.md) to know how blobs are encoded
-- Walrus CLI installed (see [Getting Started](https://docs.wal.app/docs/usage/started.md))
+- Walrus CLI installed (see [Getting Started](https://docs.wal.app/docs/usage/started))
 - Access to a Walrus network (testnet or mainnet)
 - A wallet with sufficient SUI and WAL tokens (for direct uploads)
 - Or access to a publisher endpoint (for HTTP uploads)
@@ -112,7 +112,7 @@ curl -X PUT http://publisher.example.com:31416/ ^
 
 This sends the blob to a publisher, which handles all the encoding and distribution.
 
-For HTTP API details, see the [Web API documentation](https://docs.wal.app/docs/usage/web-api.md).
+For HTTP API details, see the [Web API documentation](https://docs.wal.app/docs/usage/web-api).
 
 ### Step 3: Visual Sequence of Upload Flow
 
@@ -214,7 +214,7 @@ curl http://aggregator.example.com:31415/<blob-id>
 
 You should receive back: `"Hello, Walrus! This is my first blob."`
 
-For more information about reading blobs and consistency checks, see the [Developer Operations guide](https://docs.wal.app/docs/dev-guide/dev-operations.md).
+For more information about reading blobs and consistency checks, see the [Developer Operations guide](https://docs.wal.app/docs/dev-guide/dev-operations).
 
 ### Step 5: Inspect On-Chain State
 

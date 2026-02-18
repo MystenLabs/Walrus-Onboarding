@@ -275,9 +275,9 @@ RUST_LOG=info walrus info
 
 ### Official Documentation
 - [Walrus Documentation](https://docs.wal.app/)
-- [Setup Guide](https://docs.wal.app/docs/usage/setup.md)
-- [Client CLI Documentation](https://docs.wal.app/docs/usage/client-cli.md)
-- [Examples](https://docs.wal.app/docs/usage/examples.md)
+- [Setup Guide](https://docs.wal.app/docs/usage/setup)
+- [Client CLI Documentation](https://docs.wal.app/docs/usage/client-cli)
+- [Examples](https://docs.wal.app/docs/usage/examples)
 
 ## Module Completion Checklist
 

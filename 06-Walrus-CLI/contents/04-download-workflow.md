@@ -80,7 +80,7 @@ walrus read <BLOB_ID> --out file.txt --skip-consistency-check
 
 **Warning**: Skipping consistency checks should only be used when you know and trust the blob writer.
 
-For detailed information about how consistency checks work and what guarantees they provide, see the [encoding documentation](https://docs.wal.app/docs/design/encoding.md#data-integrity-and-consistency). The implementation uses the `ConsistencyCheckType` enum with three variants: `Skip`, `Default`, and `Strict` (see the [encoding common module](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/common.rs) for details).
+For detailed information about how consistency checks work and what guarantees they provide, see the [encoding documentation](https://docs.wal.app/docs/design/encoding#data-integrity-and-consistency). The implementation uses the `ConsistencyCheckType` enum with three variants: `Skip`, `Default`, and `Strict` (see the [encoding common module](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-core/src/encoding/common.rs) for details).
 
 ## Using Different RPC Endpoints
 
@@ -102,7 +102,7 @@ When you run `walrus read`:
 4. **Verification**: Consistency checks verify the data integrity
 5. **Output**: The blob is written to stdout or the specified output file
 
-For more details on the encoding and decoding process, see the [encoding documentation](https://docs.wal.app/docs/design/encoding.md). For additional CLI usage information, see the [client CLI documentation](https://docs.wal.app/docs/usage/client-cli.md#reading-blobs).
+For more details on the encoding and decoding process, see the [encoding documentation](https://docs.wal.app/docs/design/encoding). For additional CLI usage information, see the [client CLI documentation](https://docs.wal.app/docs/usage/client-cli#reading-blobs).
 
 ## Common Download Scenarios
 
@@ -248,7 +248,7 @@ This shows:
 
 **Note**: The `list-patches-in-quilt` command is also available as `resolve-quilt` (alias).
 
-For more information about quilts, see the [Quilt documentation](https://docs.wal.app/docs/usage/quilt.md).
+For more information about quilts, see the [Quilt documentation](https://docs.wal.app/docs/usage/quilt).
 
 ## Key Takeaways
 

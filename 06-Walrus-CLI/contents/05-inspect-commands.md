@@ -321,7 +321,7 @@ If you have a blob ID but need the object ID:
 walrus list-blobs | grep <BLOB_ID>
 ```
 
-For more detailed information about inspection commands and additional CLI features, see the [client CLI documentation](https://docs.wal.app/docs/usage/client-cli.md).
+For more detailed information about inspection commands and additional CLI features, see the [client CLI documentation](https://docs.wal.app/docs/usage/client-cli).
 
 ## Key Takeaways
 
