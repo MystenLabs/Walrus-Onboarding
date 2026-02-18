@@ -30,7 +30,7 @@
 
 **Technical Prerequisites (for Hands-On Exercises):**
 
-- Walrus CLI installed ([Getting Started](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/started.md))
+- Walrus CLI installed ([Getting Started](https://docs.wal.app/docs/usage/started))
 - Access to Walrus network (testnet or mainnet)
 - Wallet with sufficient SUI (gas) and WAL tokens (storage fees)
 - **OR** access to a publisher endpoint for HTTP-based uploads
@@ -410,17 +410,17 @@ Use this to gauge if the module was successful:
 
 ### For Students
 
-- [Walrus Architecture Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/design/architecture.md)
-- [Encoding Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/design/encoding.md)
-- [Properties and Guarantees](https://github.com/MystenLabs/walrus/blob/main/docs/book/design/properties.md)
-- [Client CLI Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md)
-- [Web API Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/web-api.md)
+- [Walrus Architecture Documentation](https://docs.wal.app/docs/design/architecture)
+- [Encoding Documentation](https://docs.wal.app/docs/design/encoding)
+- [Properties and Guarantees](https://docs.wal.app/docs/design/properties)
+- [Client CLI Documentation](https://docs.wal.app/docs/usage/client-cli)
+- [Web API Documentation](https://docs.wal.app/docs/usage/web-api)
 
 ### For Instructors
 
-- [Developer Operations Guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/dev-operations.md)
-- [Aggregator Operator Guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/operator-guide/aggregator.md)
-- [Authenticated Publisher Guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/operator-guide/auth-publisher.md)
+- [Developer Operations Guide](https://docs.wal.app/docs/dev-guide/dev-operations)
+- [Aggregator Operator Guide](https://docs.wal.app/docs/operator-guide/aggregator)
+- [Authenticated Publisher Guide](https://docs.wal.app/docs/operator-guide/auth-publisher)
 
 ### Diagrams
 

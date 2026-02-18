@@ -29,7 +29,7 @@ This shows:
 
 Plan your storage duration accordingly. Storing for fewer epochs when possible can save costs.
 
-For a comprehensive guide to storage costs, cost optimization strategies, and understanding the different sources of cost, see the [costs documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/costs.md).
+For a comprehensive guide to storage costs, cost optimization strategies, and understanding the different sources of cost, see the [costs documentation](https://docs.wal.app/docs/dev-guide/costs).
 
 ### Use Appropriate Blob Types
 

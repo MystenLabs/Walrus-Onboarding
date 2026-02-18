@@ -32,7 +32,7 @@ Instructors should:
 - Have a working Walrus CLI installation
 - Have test wallets with sufficient tokens (both Mainnet and Testnet recommended)
 - Be familiar with common CLI errors and troubleshooting
-- Have access to the [official Walrus documentation](https://github.com/MystenLabs/walrus/tree/main/docs/book)
+- Have access to the [official Walrus documentation](https://docs.wal.app)
 
 ## Section-by-Section Guidance
 
@@ -274,10 +274,10 @@ RUST_LOG=info walrus info
 ## Additional Resources
 
 ### Official Documentation
-- [Walrus Documentation](https://github.com/MystenLabs/walrus/tree/main/docs/book)
-- [Setup Guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/setup.md)
-- [Client CLI Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md)
-- [Examples](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/examples.md)
+- [Walrus Documentation](https://docs.wal.app/)
+- [Setup Guide](https://docs.wal.app/docs/usage/setup)
+- [Client CLI Documentation](https://docs.wal.app/docs/usage/client-cli)
+- [Examples](https://docs.wal.app/docs/usage/examples)
 
 ## Module Completion Checklist
 

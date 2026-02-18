@@ -374,11 +374,11 @@ which walrus  # Verify which binary is being used
 
 If you encounter an error not covered here:
 
-1. Check the [Troubleshooting guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/troubleshooting.md)
+1. Check the [Troubleshooting guide](https://docs.wal.app/docs/usage/troubleshooting)
 2. Enable debug logging and review the output
 3. Check [GitHub Issues](https://github.com/MystenLabs/walrus/issues) for similar problems
 4. Verify you're using the latest CLI version
-5. Review the [client CLI documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md) for additional usage details
+5. Review the [client CLI documentation](https://docs.wal.app/docs/usage/client-cli) for additional usage details
 
 ## Key Takeaways
 

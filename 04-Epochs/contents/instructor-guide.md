@@ -529,9 +529,9 @@ Use this to gauge if the module was successful:
 
 ### Official Documentation References
 
-- [Available Networks](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/networks.md) - Network parameters
-- [Storage Costs](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/costs.md) - Pricing and epochs
-- [Properties and Guarantees](https://github.com/MystenLabs/walrus/blob/main/docs/book/design/properties.md)
+- [Available Networks](https://docs.wal.app/docs/usage/networks) - Network parameters
+- [Storage Costs](https://docs.wal.app/docs/dev-guide/costs) - Pricing and epochs
+- [Properties and Guarantees](https://docs.wal.app/docs/design/properties)
 
 ---
 

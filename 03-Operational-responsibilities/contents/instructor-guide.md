@@ -406,9 +406,9 @@ Use this to gauge if the module was successful:
 
 ### For Students
 
-- [Walrus Developer Operations Guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/dev-operations.md)
-- [Properties and Guarantees Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/design/properties.md)
-- [Walrus CLI Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/client-cli.md)
+- [Walrus Developer Operations Guide](https://docs.wal.app/docs/dev-guide/dev-operations)
+- [Properties and Guarantees Documentation](https://docs.wal.app/docs/design/properties)
+- [Walrus CLI Documentation](https://docs.wal.app/docs/usage/client-cli)
 - [Walrus SDK (Rust) Documentation](https://github.com/MystenLabs/walrus) - check crates/walrus-sdk
 
 ### For Instructors

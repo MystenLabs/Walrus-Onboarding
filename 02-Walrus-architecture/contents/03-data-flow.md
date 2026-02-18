@@ -309,7 +309,7 @@ sequenceDiagram
 - Storage nodes are assigned via Sui smart contracts
 - Anyone can run a publisher or aggregator
 
-For detailed information about Walrus operations (store, read, certify availability), see the [Developer Operations guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/dev-operations.md). For formal security properties and guarantees, see the [Properties documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/design/properties.md).
+For detailed information about Walrus operations (store, read, certify availability), see the [Developer Operations guide](https://docs.wal.app/docs/dev-guide/dev-operations). For formal security properties and guarantees, see the [Properties documentation](https://docs.wal.app/docs/design/properties).
 
 ## Related Sections
 

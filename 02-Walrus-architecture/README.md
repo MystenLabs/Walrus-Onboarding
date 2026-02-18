@@ -122,7 +122,7 @@ Before starting this module, you should have:
 
 **For Hands-On Exercises:**
 - **Docker** (recommended): Docker and docker-compose installed
-- **OR Local Setup**: Walrus CLI installed following the [Getting Started guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/started.md)
+- **OR Local Setup**: Walrus CLI installed following the [Getting Started guide](https://docs.wal.app/docs/usage/started)
 
 ## Resources
 
@@ -130,7 +130,7 @@ Before starting this module, you should have:
 
 - [Walrus Documentation](https://github.com/MystenLabs/walrus)
 - [Architecture Documentation](https://github.com/MystenLabs/walrus/blob/main/docs/design/architecture.md)
-- [Developer Guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/dev-operations.md)
+- [Developer Guide](https://docs.wal.app/docs/dev-guide/dev-operations)
 
 ### For Instructors
 

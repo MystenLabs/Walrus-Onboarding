@@ -10,7 +10,7 @@ Before installing the Walrus CLI, you need:
    - Use an existing Sui wallet configured via the Sui CLI
    - Generate a new wallet using `walrus generate-sui-wallet` (after installing Walrus)
 
-2. **SUI and WAL tokens** - You'll need SUI for gas fees and WAL tokens for storage costs. See the [Setup guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/setup.md#prerequisites) for details on obtaining tokens.
+2. **SUI and WAL tokens** - You'll need SUI for gas fees and WAL tokens for storage costs. See the [Setup guide](https://docs.wal.app/docs/usage/setup#prerequisites) for details on obtaining tokens.
 
 3. **Network access** - The CLI needs to connect to Sui RPC nodes and Walrus aggregators.
 
@@ -140,5 +140,5 @@ After installing the CLI, you need to configure it to connect to Walrus networks
 - Wallet and RPC settings
 - Advanced configuration options
 
-For more detailed installation instructions and alternative installation methods, see the [Setup guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/setup.md#installation). Once configured, proceed to [Upload Workflow](./03-upload-workflow.md) to learn how to store data on Walrus.
+For more detailed installation instructions and alternative installation methods, see the [Setup guide](https://docs.wal.app/docs/usage/setup#installation). Once configured, proceed to [Upload Workflow](./03-upload-workflow.md) to learn how to store data on Walrus.
 

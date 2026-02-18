@@ -23,7 +23,7 @@ The Walrus CLI looks for configuration files in the following locations (in orde
 
 The CLI accepts both `.yaml` and `.yml` file extensions.
 
-For more details on configuration file structure and advanced options, see the [Setup guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/setup.md#configuration).
+For more details on configuration file structure and advanced options, see the [Setup guide](https://docs.wal.app/docs/usage/setup#configuration).
 
 ## Quick Start: Download Default Configuration
 
@@ -85,7 +85,7 @@ staking_object: 0x10b9d30c28448939ce6c4d6c6e0ffce4a7f8a4ada8248bdad09ef8b70e4a39
 
 These object IDs are specific to each Walrus deployment (Mainnet vs Testnet) and don't
 change over time. For more information about system and staking objects, see the
-[developer guide](https://github.com/MystenLabs/walrus/blob/main/docs/book/dev-guide/sui-struct.md#system-and-staking-information).
+[developer guide](https://docs.wal.app/docs/dev-guide/sui-struct#system-and-staking-information).
 
 ### Optional Contract Configuration Fields
 
@@ -159,7 +159,7 @@ walrus store file.txt --epochs 10 --context testnet
 If you don't specify `--context`, the `default_context` from your configuration is used.
 
 For network-specific parameters and differences between Mainnet and Testnet, see
-[Available networks](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/networks.md).
+[Available networks](https://docs.wal.app/docs/usage/networks).
 
 ## Wallet Configuration
 
@@ -332,7 +332,7 @@ walrus json '{"command":{"info":{}}}'
 echo {"command":{"info":{}}} | walrus json
 ```
 
-In JSON mode, all options use camelCase instead of kebab-case. See the [JSON API documentation](https://github.com/MystenLabs/walrus/blob/main/docs/book/usage/json-api.md) for details.
+In JSON mode, all options use camelCase instead of kebab-case. See the [JSON API documentation](https://docs.wal.app/docs/usage/json-api) for details.
 
 ## Advanced Configuration Options
 
