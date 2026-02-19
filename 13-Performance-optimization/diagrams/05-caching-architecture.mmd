@@ -1,0 +1,27 @@
+flowchart TD
+    subgraph Edge["Edge Layer"]
+        CDN[CDN<br/>max-age=31536000]
+    end
+    
+    subgraph App["Application Layer"]
+        LB[Load Balancer]
+        Redis[(Redis Cache<br/>Hot Blobs < 1MB)]
+        App1[App Server 1]
+        App2[App Server 2]
+    end
+    
+    subgraph Walrus["Walrus Layer"]
+        Nginx[Nginx Cache<br/>In Front of Aggregator]
+        Agg[Walrus Aggregator]
+        Nodes[Storage Nodes]
+    end
+    
+    CDN --> LB
+    LB --> App1
+    LB --> App2
+    App1 --> Redis
+    App2 --> Redis
+    App1 --> Nginx
+    App2 --> Nginx
+    Nginx --> Agg
+    Agg --> Nodes

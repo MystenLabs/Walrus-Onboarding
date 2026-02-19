@@ -6,6 +6,11 @@ The upload relay is a server-side service that simplifies the upload process by 
 
 The upload relay acts as an intermediary between your application and the storage nodes:
 
+![Relay Architecture](../images/03-relay-architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client as Client Application
@@ -28,6 +33,8 @@ sequenceDiagram
         Relay-->>Client: aggregated certificate
     end
 ```
+
+</details>
 
 Instead of your application making many requests to different storage nodes, you make a single request to the relay, which handles the rest.
 

@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant QuiltIndex as Quilt Index (Header)
+    participant StorageNodes as Storage Nodes
+    participant PatchData as Patch Data
+
+    Note over Client: 1. User requests "document.pdf"
+    Client->>QuiltIndex: 2. Read first columns (Header)
+    QuiltIndex-->>Client: Return QuiltIndex
+    
+    Note over Client: 3. Parse Index -> Find "document.pdf" location
+    Note over Client: 4. Calculate required sliver range
+
+    Client->>StorageNodes: 5. Request ONLY specific slivers
+    StorageNodes-->>Client: Return requested slivers
+    
+    Note over Client: 6. Decode RedStuff symbols
+    Client->>PatchData: Reconstruct "document.pdf"

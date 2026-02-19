@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant SN1 as Storage Node (Detector)
+    participant SNs as Other Storage Nodes
+    participant Chain as Sui Blockchain
+    
+    SN1->>SN1: Fail to reconstruct sliver
+    SN1->>SN1: Generate InconsistencyProof
+    SN1->>SNs: Send proof for signatures
+    SNs-->>SN1: Return signatures
+    SN1->>SN1: Aggregate into certificate
+    SN1->>Chain: Submit InconsistencyCertificate
+    Chain->>Chain: Verify & emit InvalidBlobID event
+    Note over Chain: Slashing mechanism (future)

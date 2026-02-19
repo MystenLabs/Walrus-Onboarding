@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant User
+    participant Walrus
+    participant Resource as Storage Resource
+
+    User->>Walrus: 1. Buy Resource (10 Epochs)
+    Walrus-->>Resource: Create Resource (10 Epochs)
+    User->>Walrus: 2. Store Blob A (uses Resource)
+    Note over Walrus: ... 5 Epochs pass ...
+    User->>Walrus: 3. Delete Blob A
+    Walrus-->>Resource: Release Resource (5 Epochs left)
+    User->>Walrus: 4. Store Blob B
+    Note right of User: Reuses the remaining<br/>5 Epochs (only pays write cost)

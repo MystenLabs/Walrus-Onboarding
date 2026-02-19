@@ -1,0 +1,4 @@
+flowchart LR
+    Browser --> CDN["CDN Edge<br/>(Cloudflare/Fastly)"]
+    CDN -->|Miss| Origin[Your Server]
+    Origin --> Agg[Walrus Aggregator]

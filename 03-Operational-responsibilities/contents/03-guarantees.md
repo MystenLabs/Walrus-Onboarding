@@ -304,6 +304,11 @@ openssl enc -d -aes-256-cbc -in retrieved.bin -out decrypted.txt
 
 Understanding where trust boundaries exist:
 
+![Trust Boundaries](../images/03-trust-boundaries.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph TB
     subgraph trusted["🔒 TRUSTED (Cryptographically Guaranteed)"]
@@ -337,6 +342,8 @@ graph TB
     style untrusted fill:#fff3cd,stroke:#ffc107,stroke-width:3px,color:#000
     style client fill:#cce5ff,stroke:#007bff,stroke-width:3px,color:#000
 ```
+
+</details>
 
 ---
 

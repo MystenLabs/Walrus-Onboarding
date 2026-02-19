@@ -1,0 +1,7 @@
+{
+  "theme": "default",
+  "securityLevel": "loose",
+  "flowchart": { "useMaxWidth": true, "htmlLabels": true, "curve": "basis" },
+  "sequence": { "useMaxWidth": true, "mirrorActors": false, "wrap": true },
+  "c4": { "diagramMarginX": 50, "diagramMarginY": 10 }
+}

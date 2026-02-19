@@ -44,6 +44,11 @@ curl -s "$METRICS_URL" | grep '^http_server_request_duration_seconds_count' | gr
 | **Sliver Distribution** | Slivers sent successfully vs. failed | Failed slivers increase retry time |
 
 **Performance Correlation:**
+![2. Encoding / Decoding Performance](../images/06-performance-correlation.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     A[Encoding Duration ↑] --> B{Cause?}
@@ -51,6 +56,8 @@ flowchart TD
     B -->|Memory| D[Increase RAM<br/>or reduce blob size]
     B -->|Contention| E[Check other processes<br/>on the host]
 ```
+
+</details>
 
 ### 3. Reliability Metrics
 
@@ -92,6 +99,11 @@ High retry rates drastically increase perceived latency even if eventual success
 ## Debugging Common Issues
 
 ### High Latency, Normal Success Rate
+![High Latency, Normal Success Rate](../images/06-high-latency-debugging.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     A[High Latency] --> B{Retry Rate?}
@@ -100,6 +112,8 @@ flowchart TD
     D -->|High| E[Scale up CPU<br/>Reduce concurrency]
     D -->|Normal| F[Network latency<br/>Check geographic distance]
 ```
+
+</details>
 
 ### Decreasing Throughput Over Time
 1. **Check memory usage** - Memory leak causing GC pressure?

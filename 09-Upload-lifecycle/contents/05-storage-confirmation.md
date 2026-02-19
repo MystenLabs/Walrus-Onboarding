@@ -13,6 +13,11 @@ The client calls the `certify_blob` Move function on Sui.
 
 ### Visualizing Certification
 
+![Visualizing Certification](../images/05-certification-visualized.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -46,6 +51,8 @@ sequenceDiagram
     end
     deactivate Node
 ```
+
+</details>
 
 ## Detailed Certification Process
 

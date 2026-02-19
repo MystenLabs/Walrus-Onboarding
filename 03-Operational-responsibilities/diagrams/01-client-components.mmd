@@ -1,0 +1,26 @@
+C4Component
+    title Client Application - Components You Must Implement
+
+    Person(user, "End User", "Uses your app")
+
+    Container_Boundary(clientApp, "Client Application") {
+        Component(appLogic, "App Logic", "TS/JS", "Business logic for<br/>storing/retrieving")
+        Component(sdk, "Walrus SDK", "@mysten/walrus", "SDK or CLI wrapper")
+        Component(retry, "Retry Handler", "Custom", "Exponential backoff<br/>for failures")
+        Component(verifier, "Blob Verifier", "Custom", "Re-encodes to<br/>verify integrity")
+        Component(errorHandler, "Error Handler", "Custom", "Parses errors,<br/>retryable vs fatal")
+        Component(wallet, "Wallet Manager", "Sui Keypair", "Manages keypairs,<br/>signs transactions")
+        Component(onChainValidator, "On-Chain Check", "Sui RPC", "Queries Sui to<br/>verify registration")
+    }
+
+    Rel(user, appLogic, "Uses")
+    Rel(appLogic, sdk, "Calls API")
+    Rel(sdk, retry, "On failure")
+    Rel(retry, sdk, "Retries")
+    Rel(sdk, verifier, "On success")
+    Rel(verifier, onChainValidator, "Verifies")
+    Rel(sdk, errorHandler, "On error")
+    Rel(wallet, sdk, "Signs")
+    Rel(verifier, appLogic, "Returns result")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")

@@ -10,6 +10,11 @@ When you upload a file to Walrus, it undergoes **Erasure Encoding**. This proces
 2. **Single Thread Bottleneck**: Encoding is CPU-intensive. A single large blob might be encoded by a single thread, underutilizing modern multi-core CPUs.
 3. **Failure Impact**: If a 10GB upload fails at 99%, retrying the whole upload is costly in time and resources.
 
+![Why Chunking Matters](../images/01-single-blob-bottleneck.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Problem["Single Large Blob"]
@@ -21,6 +26,8 @@ flowchart LR
     style D fill:#f8d7da,stroke:#dc3545
 ```
 
+</details>
+
 ## How Parallel Chunking Works
 
 By splitting a large dataset into multiple smaller blobs (chunks), you enable **Parallel Processing**:
@@ -28,6 +35,11 @@ By splitting a large dataset into multiple smaller blobs (chunks), you enable **
 1. **Concurrent Encoding**: Multiple chunks can be encoded simultaneously on different CPU cores.
 2. **Pipeline Efficiency**: While one chunk is being uploaded to the network, the next chunk can be encoded.
 3. **Granular Retries**: If one chunk fails to upload, you only need to retry that specific chunk, not the entire dataset.
+
+![How Parallel Chunking Works](../images/01-parallel-chunking-pipeline.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 flowchart LR
@@ -48,6 +60,8 @@ flowchart LR
     style C3 fill:#fff3cd,stroke:#ffc107
     style C4 fill:#d4edda,stroke:#28a745
 ```
+
+</details>
 
 ## Implementation Strategy
 

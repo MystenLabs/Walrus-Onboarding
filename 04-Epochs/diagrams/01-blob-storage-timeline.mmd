@@ -1,0 +1,16 @@
+timeline
+    title Blob Storage Lifecycle
+    Epoch 10 : **Current Epoch**
+             : User uploads Blob A (Duration: 3 epochs)
+             : Storage Resource created [Start: 10, End: 13]
+             : Capacity reserved for Epochs 10, 11, 12
+    Epoch 11 : Blob A is Active
+             : User reads Blob A
+    Epoch 12 : Blob A is Active
+             : **Action Required**: User decides to extend Blob A
+             : Extension: +2 Epochs
+             : New End Epoch: 15
+    Epoch 13 : Blob A continues (would have expired)
+    Epoch 14 : Blob A is Active
+    Epoch 15 : **Expiry**
+             : Blob A is eligible for garbage collection

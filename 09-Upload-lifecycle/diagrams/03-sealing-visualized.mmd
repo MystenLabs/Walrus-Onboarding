@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant Client as Walrus Client
+    participant Committee as Committee (State)
+    participant Node1 as Storage Node 1
+    participant Node2 as Storage Node 2
+    participant Node3 as Storage Node 3
+
+    Note over Client: 1. Committee Lookup
+    Client->>Committee: Get Shard Assignments
+    Committee-->>Client: Map[ShardIndex -> NodeUrl]
+
+    Note over Client: 2. Task Batching
+    Client->>Client: Group Slivers by Node
+
+    Note over Client, Node3: 3. Parallel Execution (PUT /v1/blobs/.../slivers/...)
+    par Upload to Node 1
+        Client->>Node1: Store Sliver A
+        Node1-->>Client: 200 OK (sliver stored successfully)
+    and Upload to Node 2
+        Client->>Node2: Store Sliver B
+        Node2-->>Client: 200 OK (sliver stored successfully)
+    and Upload to Node 3
+        Client->>Node N: Store Sliver N
+        Node3-->>Client: 200 OK (sliver stored successfully)
+    end

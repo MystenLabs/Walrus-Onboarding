@@ -4,6 +4,11 @@ Walrus storage is purchased for a specific duration (epochs). Once this duration
 
 ## Blob Lifecycle
 
+![Blob Lifecycle](../images/04-blob-lifecycle.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Creation["Creation Phase"]
@@ -30,6 +35,8 @@ flowchart LR
     style G fill:#fff3cd,stroke:#ffc107
     style J fill:#f8d7da,stroke:#dc3545
 ```
+
+</details>
 
 > **Important**: Once storage expires and slivers are deleted by storage nodes, the data **cannot be recovered from Walrus** unless you have the original file to re-upload (or another copy exists). Always extend storage before expiration.
 

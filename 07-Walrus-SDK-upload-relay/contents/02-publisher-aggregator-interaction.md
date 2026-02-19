@@ -59,6 +59,11 @@ When uploading without a relay, the SDK directly communicates with storage nodes
    signatures into a proof-of-availability certificate.
 5. **Certify**: Submit a certification transaction with the confirmations (or aggregated certificate)
 
+![Upload Flow Steps](../images/02-upload-sequence.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client as SDK Client
@@ -94,6 +99,8 @@ sequenceDiagram
     Client->>Sui: executeCertifyBlobTransaction(certificate)
     Sui-->>Client: Blob certified ✅
 ```
+
+</details>
 
 ## Storage Node API
 
@@ -212,6 +219,11 @@ When reading blobs, the SDK:
 > `isQuorum()` for `NotFound`/`LegallyUnavailable` responses—if those errors exceed quorum weight, the
 > client aborts early because the blob is either uncertified or legally blocked.
 
+![Reading from Nodes](../images/02-retrieval-sequence.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client as SDK Client
@@ -247,6 +259,8 @@ sequenceDiagram
 
     Note over Client: Recompute metadata/root hash to verify integrity
 ```
+
+</details>
 
 ```ts
   async getSlivers({ blobId, signal }: GetSliversOptions) {

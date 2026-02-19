@@ -13,6 +13,11 @@ Registration is an on-chain transaction that:
 
 ### Visualizing Registration
 
+![Visualizing Registration](../images/02-registration-visualized.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -36,6 +41,8 @@ sequenceDiagram
     
     Note right of SuiState: Blob State: REGISTERED
 ```
+
+</details>
 
 ## Detailed Submission Process
 

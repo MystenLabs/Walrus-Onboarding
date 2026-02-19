@@ -1,0 +1,22 @@
+C4Component
+    title Aggregator Service - Internal Components
+
+    Container_Boundary(aggregator, "Aggregator Service") {
+        Component(api, "HTTP API", "REST", "Receives blob<br/>read requests")
+        Component(validator, "Request Validator", "Middleware", "Validates blob ID")
+        Component(chain, "Sui Interface", "Sui RPC", "Queries blob<br/>metadata")
+        Component(fetcher, "Sliver Fetcher", "HTTP Client", "Fetches slivers<br/>(≥334 needed)")
+        Component(decoder, "Erasure Decoder", "Reed-Solomon", "Reconstructs blob<br/>from slivers")
+        Component(checker, "Consistency Check", "Crypto", "Verifies integrity")
+        Component(cache, "Cache Manager", "Memory/Redis", "Caches blobs")
+    }
+
+    Rel(api, validator, "Validates")
+    Rel(validator, chain, "Queries")
+    Rel(chain, fetcher, "Gets info")
+    Rel(fetcher, decoder, "Sends slivers")
+    Rel(decoder, checker, "Verifies")
+    Rel(checker, cache, "Caches")
+    Rel(cache, api, "Returns data")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")

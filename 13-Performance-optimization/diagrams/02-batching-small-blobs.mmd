@@ -1,0 +1,16 @@
+flowchart LR
+    subgraph Inefficient["❌ Many Small Blobs"]
+        S1[10KB] --> T1[Tx 1]
+        S2[10KB] --> T2[Tx 2]
+        S3[10KB] --> T3[Tx 3]
+        S4[10KB] --> T4[Tx 4]
+    end
+    
+    subgraph Efficient["✅ Batched/Quilt"]
+        B1[10KB]
+        B2[10KB]
+        B3[10KB]
+        B4[10KB]
+        B1 & B2 & B3 & B4 --> Q[Quilt or Batched Blob]
+        Q --> T[Single Tx]
+    end

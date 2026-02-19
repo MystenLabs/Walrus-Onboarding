@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant Client
+    participant Node as Storage Node
+    participant DB as Node Database
+
+    Note over Client: 1. Requesting Confirmation
+    Client->>Node: GET /v1/blobs/.../confirmation/...
+    
+    activate Node
+    Note over Node: 2. Node-Side Verification
+    Node->>DB: 2.1 Check Registration (Local State)
+    DB-->>Node: Registered: YES
+    
+    Node->>DB: 2.2 Check Storage (Local)
+    DB-->>Node: All Slivers Present: YES
+    
+    Note over Node: 3. Signing
+    Node->>Node: Sign Confirmation (PrivateKey)
+    deactivate Node
+    
+    Node-->>Client: Signed Validity Proof
+    
+    Note over Client: 4. Collection & Aggregation<br/>(Accumulate signatures until quorum reached)

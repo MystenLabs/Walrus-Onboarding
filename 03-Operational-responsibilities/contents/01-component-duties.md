@@ -10,6 +10,11 @@ This section explains what Publishers, Aggregators, and Clients actually do when
 
 The diagram below shows how all components interact in the Walrus system using C4 Context diagram:
 
+![System Architecture Overview](../images/01-system-context.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 C4Context
     title Walrus Storage System - Container Architecture
@@ -40,6 +45,8 @@ C4Context
     UpdateRelStyle(client, blockchain, $lineColor="green", $textColor="green")
     UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
 ```
+
+</details>
 
 **Key Architecture Points:**
 - **Client** (your application): Uses TypeScript SDK or CLI to interact with the system
@@ -247,6 +254,11 @@ Publisher → Client: HTTP 200 + blob ID
 
 The diagram below shows the internal components and data flow within a Publisher using C4 Component architecture:
 
+![Publisher Internal Architecture](../images/01-publisher-components.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 C4Component
     title Publisher Service - Internal Components
@@ -273,6 +285,8 @@ C4Component
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
 
+</details>
+
 **Publisher Components:**
 - **HTTP API Handler**: Receives blob upload requests from clients
 - **Authentication & Validation**: Validates JWT tokens, checks blob size limits
@@ -283,6 +297,11 @@ C4Component
 - **Sui Chain Interface**: Interacts with Sui blockchain (register blobs, post certificates)
 
 ### Publisher Lifecycle Flow
+
+![Publisher Lifecycle Flow](../images/01-publisher-lifecycle.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 sequenceDiagram
@@ -303,6 +322,8 @@ sequenceDiagram
     S-->>P: Certificate confirmed
     P->>C: 8. Return blob ID + metadata
 ```
+
+</details>
 
 ---
 
@@ -446,6 +467,11 @@ Aggregator → Client: HTTP 200 + blob data
 
 The diagram below shows the internal components and data flow within an Aggregator using C4 Component architecture:
 
+![Aggregator Internal Architecture](../images/01-aggregator-components.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 C4Component
     title Aggregator Service - Internal Components
@@ -471,6 +497,8 @@ C4Component
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
 
+</details>
+
 **Aggregator Components:**
 - **HTTP API Handler**: Receives blob read requests from clients
 - **Request Validator**: Validates blob ID format and request parameters
@@ -481,6 +509,11 @@ C4Component
 - **Cache Manager**: Optionally caches reconstructed blobs for faster serving
 
 ### Aggregator Lifecycle Flow
+
+![Aggregator Lifecycle Flow](../images/01-aggregator-lifecycle.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 sequenceDiagram
@@ -501,6 +534,8 @@ sequenceDiagram
     end
     A->>C: 7. Return blob data (HTTP 200)
 ```
+
+</details>
 
 ---
 
@@ -638,6 +673,11 @@ sui client object <blob-object-id>
 
 The diagram below shows what a well-designed client application should implement using C4 Component architecture:
 
+![Client Application Architecture](../images/01-client-components.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 C4Component
     title Client Application - Components You Must Implement
@@ -666,6 +706,8 @@ C4Component
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
+
+</details>
 
 **Client Application Components:**
 - **Application Logic**: Your business logic that needs to store/retrieve blobs

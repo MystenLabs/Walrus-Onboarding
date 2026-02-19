@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant Aggregator
+    participant Sui as Sui Blockchain
+    participant Nodes as Storage Nodes
+
+    Client->>Aggregator: HTTP GET /<blob-id>
+    
+    Aggregator->>Sui: 1. Query Blob Metadata
+    Sui-->>Aggregator: ID, Size, Epoch, Shards
+    
+    Aggregator->>Nodes: 2. Request Slivers (Parallel)
+    Nodes-->>Aggregator: Return Slivers
+    
+    Note over Aggregator: 3. Decode 334 slivers<br/>4. Consistency Check
+    
+    Aggregator-->>Client: Return Original Blob

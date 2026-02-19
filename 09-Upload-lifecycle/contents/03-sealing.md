@@ -12,6 +12,11 @@ The client sends specific slivers to specific storage nodes based on the **Shard
 
 ### Visualizing Sealing
 
+![Visualizing Sealing](../images/03-sealing-visualized.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client as Walrus Client
@@ -39,6 +44,8 @@ sequenceDiagram
         Node3-->>Client: 200 OK (sliver stored successfully)
     end
 ```
+
+</details>
 
 ## Detailed Sealing Process
 

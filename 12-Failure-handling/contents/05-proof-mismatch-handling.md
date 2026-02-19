@@ -6,6 +6,11 @@ Walrus ensures data integrity using cryptographic proofs. A "proof mismatch" or 
 
 The TypeScript SDK verifies blob integrity at the **whole-blob level**, not per-sliver:
 
+![Client Verification Flow](../images/05-client-verification-flow.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client as Client (SDK)
@@ -26,11 +31,18 @@ sequenceDiagram
     end
 ```
 
+</details>
+
 > **Note**: The SDK does NOT verify individual slivers against Merkle proofs. It relies on the content-addressable property: if the decoded blob produces the expected blob ID, the data is correct.
 
 ## Storage Node Inconsistency Detection
 
 When **storage nodes** (not clients) detect encoding inconsistencies during sliver recovery, they can report it on-chain:
+
+![Storage Node Inconsistency Detection](../images/05-node-inconsistency-detection.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 sequenceDiagram
@@ -47,6 +59,8 @@ sequenceDiagram
     Chain->>Chain: Verify & emit InvalidBlobID event
     Note over Chain: Slashing mechanism (future)
 ```
+
+</details>
 
 > **Note**: Clients do NOT submit inconsistency proofs. They simply verify slivers and try other nodes on failure. Storage nodes handle fraud detection and reporting.
 >

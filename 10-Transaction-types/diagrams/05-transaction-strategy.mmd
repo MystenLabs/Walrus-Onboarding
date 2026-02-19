@@ -1,0 +1,14 @@
+flowchart TD
+    Start([New Data to Store]) --> Size{Is file > 10MB?}
+    
+    Size -- Yes --> Standard[Standard Blob]
+    Size -- No --> Volume{Many small files?}
+    
+    Volume -- Yes --> Quilt[Quilt / Batched Blob]
+    Volume -- No --> Funding{Need Public Funding?}
+    
+    Funding -- Yes --> Shared[SharedBlob]
+    Funding -- No --> Lifecycle{Short lifespan?}
+    
+    Lifecycle -- Yes --> Deletable[Deletable Standard Blob]
+    Lifecycle -- No --> Standard

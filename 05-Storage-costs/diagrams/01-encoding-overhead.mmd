@@ -1,0 +1,20 @@
+graph TB
+    subgraph Small_Blob ["Small Blob (< 10MB)"]
+        direction TB
+        S_Meta[Metadata Overhead ~64MB]
+        S_Data[Data ~1MB]
+    end
+    
+    subgraph Large_Blob ["Large Blob (> 10MB)"]
+        direction TB
+        L_EC[Erasure Coding ~5x Data]
+        L_Data[Data]
+        L_Meta[Metadata ~64MB]
+    end
+    
+    style S_Meta fill:#f96,stroke:#333,stroke-width:2px
+    style S_Data fill:#69f,stroke:#333,stroke-width:2px
+    
+    style L_EC fill:#f9f,stroke:#333,stroke-width:2px
+    style L_Data fill:#69f,stroke:#333,stroke-width:2px
+    style L_Meta fill:#f96,stroke:#333,stroke-width:2px

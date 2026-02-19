@@ -6,6 +6,11 @@ Uploading data to Walrus is not a single atomic transaction but a multi-step pro
 
 A standard upload involves three main on-chain interactions and one off-chain phase:
 
+![The Upload Lifecycle](../images/01-upload-lifecycle.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant U as User/Client
@@ -29,6 +34,8 @@ sequenceDiagram
     S-->>U: Emits Event: BlobCertified
     Note over U,S: Data is now guaranteed available
 ```
+
+</details>
 
 1.  **Reserve Space**
 2.  **Register Blob**

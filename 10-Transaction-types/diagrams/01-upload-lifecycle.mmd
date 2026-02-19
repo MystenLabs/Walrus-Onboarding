@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant U as User/Client
+    participant S as Sui (Walrus System)
+    participant N as Storage Nodes
+
+    Note over U,S: 1. Reserve Space
+    U->>S: reserve_space (pay WAL)
+    S-->>U: Returns Storage Object
+
+    Note over U,S: 2. Register Blob
+    U->>S: register_blob (Storage Obj + Blob ID)
+    S-->>N: Emits Event: BlobRegistered
+    
+    Note over U,N: 3. Upload Data 
+    U->>N: PUT /v1/store (Upload Shards)
+    N-->>U: Return BLS Signatures
+
+    Note over U,S: 4. Certify Blob
+    U->>S: certify_blob (Signatures)
+    S-->>U: Emits Event: BlobCertified
+    Note over U,S: Data is now guaranteed available

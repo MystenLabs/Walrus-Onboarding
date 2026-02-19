@@ -124,6 +124,11 @@ Let's trace what happens behind the scenes:
 
 #### Phase 1: Encoding (Publisher/Client)
 
+![Phase 1: Encoding (Publisher/Client)](../images/04-encoding-phase.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     Blob[Original Blob: 'Hello, Walrus!...'] --> Encoding
@@ -151,7 +156,14 @@ flowchart TD
     end
 ```
 
+</details>
+
 #### Phase 2: On-Chain Registration
+
+![Phase 2: On-Chain Registration](../images/04-onchain-registration.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 sequenceDiagram
@@ -164,7 +176,14 @@ sequenceDiagram
     Note over Sui: • Blob Object ID: 0xdef456...<br/>• Blob ID: 0xabc123...<br/>• Size: 38 bytes<br/>• Encoding: RS2<br/>• Status: Registering
 ```
 
+</details>
+
 #### Phase 3: Sliver Distribution
+
+![Phase 3: Sliver Distribution](../images/04-sliver-distribution.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 sequenceDiagram
@@ -183,6 +202,8 @@ sequenceDiagram
     PC->>Sui: Post Certificate
     Note over Sui: • Blob ID: 0xabc123...<br/>• Signatures: [sig1, sig2...]<br/>• Status: Certified<br/><br/>Event Emitted:<br/>• Point of Availability
 ```
+
+</details>
 
 ### Step 4: Verify Upload Success
 
@@ -241,6 +262,11 @@ Now let's see how retrieval works:
 
 #### Retrieval Sequence
 
+![Retrieval Sequence](../images/04-retrieval-sequence.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -260,6 +286,8 @@ sequenceDiagram
 
     Agg-->>Client: "Hello, Walrus! This is my first blob."
 ```
+
+</details>
 
 ## Key Observations
 

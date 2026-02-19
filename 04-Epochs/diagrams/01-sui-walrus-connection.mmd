@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph Sui["🔷 Sui Blockchain"]
+        TX["Transactions"]
+        Objects["Objects (UID)"]
+        Move["Move Contracts"]
+    end
+    
+    subgraph Walrus["🐘 Walrus"]
+        Blob["Blob Object"]
+        Storage["Storage Object"]
+        System["System State"]
+    end
+    
+    TX --> Blob
+    TX --> Storage
+    Objects --> Blob
+    Objects --> Storage
+    Move --> System
+    
+    style Sui fill:#4da2ff,stroke:#1971c2
+    style Walrus fill:#b2f2bb,stroke:#2f9e44

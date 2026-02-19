@@ -1,0 +1,6 @@
+flowchart TD
+    A[High Latency] --> B{Retry Rate?}
+    B -->|High| C[Storage nodes slow/failing<br/>Check node health]
+    B -->|Low| D{CPU Usage?}
+    D -->|High| E[Scale up CPU<br/>Reduce concurrency]
+    D -->|Normal| F[Network latency<br/>Check geographic distance]

@@ -1,0 +1,19 @@
+flowchart LR
+    subgraph Traditional["Traditional Caching"]
+        A1[Request /file.txt] --> B1{Cache?}
+        B1 -->|Hit| C1[Return Cached]
+        B1 -->|Miss| D1[Fetch from Origin]
+        D1 --> E1[Cache + Return]
+        F1[Content Changed!] --> G1["⚠️ Must Invalidate Cache"]
+    end
+    
+    subgraph Walrus["Walrus Caching"]
+        A2[Request /blob/abc123] --> B2{Cache?}
+        B2 -->|Hit| C2[Return Cached]
+        B2 -->|Miss| D2[Fetch from Nodes]
+        D2 --> E2[Cache + Return]
+        F2[Content Changed] --> G2["New BlobId: xyz789<br/>✅ No Invalidation Needed"]
+    end
+    
+    style G1 fill:#fff3cd,stroke:#ffc107
+    style G2 fill:#d4edda,stroke:#28a745

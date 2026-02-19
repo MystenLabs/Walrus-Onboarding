@@ -120,6 +120,11 @@ return retry(
 
 Use exponential backoff when you need to give storage nodes time to recover:
 
+![Exponential backoff](../images/09-exponential-backoff.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     A[Start Upload] --> B{Try Operation}
@@ -133,6 +138,8 @@ flowchart TD
     I --> J[Increment Attempt]
     J --> B
 ```
+
+</details>
 
 ```ts
 const delay = Math.pow(2, attempt) * 1000;

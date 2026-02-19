@@ -1,0 +1,16 @@
+stateDiagram-v2
+    state "Active Blob" as Active
+    state "Near Expiry" as Danger
+    state "Expired (Data Lost)" as Lost
+    state "Extended Blob" as Safe
+
+    [*] --> Active
+    Active --> Danger: Time Passes (Epochs advance)
+    
+    Danger --> Lost: End Epoch Reached
+    Note right of Lost: Cannot recover!
+    
+    Danger --> Safe: Call extend_blob()
+    Note right of Safe: end_epoch increased
+    
+    Safe --> Active

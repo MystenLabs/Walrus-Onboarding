@@ -1,0 +1,8 @@
+sequenceDiagram
+    participant PC as Publisher/Client
+    participant Sui as Sui Blockchain
+
+    Note over PC: Create transaction:<br/>• Register blob object<br/>• Reserve storage space<br/>• Post metadata
+
+    PC->>Sui: Transaction
+    Note over Sui: • Blob Object ID: 0xdef456...<br/>• Blob ID: 0xabc123...<br/>• Size: 38 bytes<br/>• Encoding: RS2<br/>• Status: Registering

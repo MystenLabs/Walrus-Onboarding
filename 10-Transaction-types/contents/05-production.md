@@ -4,6 +4,11 @@ When building production applications on Walrus, choosing the right transaction 
 
 ## Transaction Strategy Matrix
 
+![Transaction Strategy Matrix](../images/05-transaction-strategy.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     Start([New Data to Store]) --> Size{Is file > 10MB?}
@@ -20,6 +25,8 @@ flowchart TD
     Lifecycle -- Yes --> Deletable[Deletable Standard Blob]
     Lifecycle -- No --> Standard
 ```
+
+</details>
 
 | Scenario | Recommended Strategy | Why? |
 | :--- | :--- | :--- |

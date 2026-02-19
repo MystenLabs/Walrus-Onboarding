@@ -1,0 +1,8 @@
+flowchart LR
+    subgraph Problem["Single Large Blob"]
+        A[10GB File] --> B[Single Encode Thread]
+        B --> C[All-or-Nothing Upload]
+        C --> D["❌ 99% Fail = Full Retry"]
+    end
+    
+    style D fill:#f8d7da,stroke:#dc3545

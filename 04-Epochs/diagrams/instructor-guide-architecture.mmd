@@ -1,0 +1,20 @@
+flowchart TB
+    subgraph Sui["🔷 SUI BLOCKCHAIN"]
+        direction LR
+        Blob["📦 Blob Object<br/>(owned)<br/>─────────<br/>• blob_id<br/>• storage<br/>• deletable"]
+        Storage["💾 Storage Object<br/>─────────<br/>• start_epoch<br/>• end_epoch<br/>• storage_size"]
+        System["⚙️ System State<br/>(shared)<br/>─────────<br/>• epoch<br/>• committee"]
+    end
+    
+    subgraph Walrus["🐘 WALRUS STORAGE NODES"]
+        Data["Off-chain: actual file data stored here"]
+    end
+    
+    Sui -->|"Proof of Storage<br/>(blob_id links to data)"| Walrus
+    
+    style Sui fill:#e7f5ff,stroke:#1971c2,color:#0c2d48
+    style Walrus fill:#ebfbee,stroke:#2f9e44,color:#0c3d14
+    style Blob fill:#a5d8ff,stroke:#1971c2,color:#0c2d48
+    style Storage fill:#a5d8ff,stroke:#1971c2,color:#0c2d48
+    style System fill:#ffc9c9,stroke:#f03e3e,color:#5c0011
+    style Data fill:#d3f9d8,stroke:#2f9e44,color:#0c3d14

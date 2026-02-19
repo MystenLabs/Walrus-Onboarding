@@ -6,6 +6,11 @@ In a distributed storage system like Walrus, files are split into chunks, and ch
 
 The SDK automatically handles partial node failures by requesting slivers from multiple nodes and reconstructing the data when enough slivers are available:
 
+![How the SDK Handles Missing Slivers](../images/01-missing-sliver-handling.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Client["Client (SDK)"]
@@ -39,6 +44,8 @@ flowchart LR
     style N4 fill:#f8d7da,stroke:#dc3545
     style B fill:#d4edda,stroke:#28a745
 ```
+
+</details>
 
 > **Key Insight**: You only need $2f+1$ slivers to reconstruct data. Individual node failures don't cause the operation to fail.
 

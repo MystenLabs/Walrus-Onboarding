@@ -2,6 +2,11 @@
 
 Unlike upload and extension, **Retrieval** is primarily an **off-chain** operation. Reading data does not require sending a transaction to the Sui blockchain, making it fast and free of gas costs.
 
+![Retrieval Operations](../images/03-retrieval-flow.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     Start([User Request Blob ID]) --> Mode{Mode?}
@@ -21,6 +26,8 @@ flowchart TD
     Reconstruct --> Verify[Verify Hash matches BlobID]
     Verify --> Done([Return Data])
 ```
+
+</details>
 
 ## Standard Retrieval
 The most common retrieval method involves fetching data directly from Storage Nodes.

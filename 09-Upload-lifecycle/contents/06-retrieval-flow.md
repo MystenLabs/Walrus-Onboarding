@@ -12,6 +12,11 @@ Retrieving a blob involves reversing the upload process: fetching enough slivers
 
 ### Visualizing Retrieval
 
+![Visualizing Retrieval](../images/06-retrieval-visualized.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client as User / Client
@@ -44,6 +49,8 @@ sequenceDiagram
     Client->>Client: RS Decode (Slivers -> File)
     Client->>Client: Hash Check (File vs Blob ID)
 ```
+
+</details>
 
 ## Detailed Retrieval Process
 

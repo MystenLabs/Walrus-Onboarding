@@ -6,6 +6,11 @@ Publishers are responsible for accepting blobs, splitting them into slivers, and
 
 When an error occurs, use this decision tree to determine how to handle it:
 
+![Error Handling Decision Flow](../images/02-error-decision-flow.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     A[Error Caught] --> B{Is it a<br/>RetryableWalrusClientError?}
@@ -32,6 +37,8 @@ flowchart TD
     style G fill:#d4edda,stroke:#28a745
     style I fill:#f8d7da,stroke:#dc3545
 ```
+
+</details>
 
 ## Types of Unavailability
 

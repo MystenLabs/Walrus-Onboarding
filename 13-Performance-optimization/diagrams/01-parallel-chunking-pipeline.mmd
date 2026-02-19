@@ -1,0 +1,17 @@
+flowchart LR
+    subgraph Solution["Chunked Upload"]
+        A[10GB File] --> B1[Chunk 1: 100MB]
+        A --> B2[Chunk 2: 100MB]
+        A --> B3[Chunk 3: 100MB]
+        A --> B4[...]
+        
+        B1 --> C1["✅ Upload"]
+        B2 --> C2["✅ Upload"]
+        B3 --> C3["❌ Fail → Retry only this"]
+        B4 --> C4["✅ Upload"]
+    end
+    
+    style C1 fill:#d4edda,stroke:#28a745
+    style C2 fill:#d4edda,stroke:#28a745
+    style C3 fill:#fff3cd,stroke:#ffc107
+    style C4 fill:#d4edda,stroke:#28a745

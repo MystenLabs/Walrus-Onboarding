@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant PC as Publisher/Client
+    participant SN as Storage Nodes (1..N)
+    participant Sui as Sui Blockchain
+
+    Note over PC: Has: 1000 sliver pairs
+
+    PC->>SN: Distribute slivers (parallel)
+    Note over SN: Each node validates hash & blob ID<br/>Stores assigned sliver
+    SN-->>PC: Return signed certificates
+
+    Note over PC: Collect signatures (need 2/3 quorum)<br/>Aggregate into confirmation certificate
+
+    PC->>Sui: Post Certificate
+    Note over Sui: • Blob ID: 0xabc123...<br/>• Signatures: [sig1, sig2...]<br/>• Status: Certified<br/><br/>Event Emitted:<br/>• Point of Availability

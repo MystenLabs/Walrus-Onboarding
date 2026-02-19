@@ -49,6 +49,11 @@
 
 Draw or display this relationship:
 
+![Visual: Sui ↔ Walrus Architecture](../images/instructor-guide-architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TB
     subgraph Sui["🔷 SUI BLOCKCHAIN"]
@@ -71,6 +76,8 @@ flowchart TB
     style System fill:#ffc9c9,stroke:#f03e3e,color:#5c0011
     style Data fill:#d3f9d8,stroke:#2f9e44,color:#0c3d14
 ```
+
+</details>
 
 ### Discussion Starters
 

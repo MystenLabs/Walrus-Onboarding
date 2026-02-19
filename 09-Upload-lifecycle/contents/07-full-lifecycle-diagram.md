@@ -2,6 +2,11 @@
 
 This diagram visualizes the complete flow of a blob upload transaction in Walrus, from the client's local machine to the final certification on the Sui network.
 
+![7. Full Lifecycle Diagram](../images/07-full-lifecycle.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -39,6 +44,8 @@ sequenceDiagram
         SN->>SN: Peer Recovery (Fetch missing slivers)
     end
 ```
+
+</details>
 
 ## Execution Flow Summary
 

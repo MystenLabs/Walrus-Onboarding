@@ -1,0 +1,21 @@
+flowchart TD
+    subgraph App["Your Application"]
+        A[Multiple Blobs]
+    end
+    
+    subgraph Concurrent["Concurrent Upload Tasks"]
+        B1[Blob 1 Upload]
+        B2[Blob 2 Upload]
+        B3[Blob 3 Upload]
+        B4[Blob N Upload]
+    end
+    
+    A --> B1
+    A --> B2
+    A --> B3
+    A --> B4
+    
+    B1 --> P[Publisher]
+    B2 --> P
+    B3 --> P
+    B4 --> P

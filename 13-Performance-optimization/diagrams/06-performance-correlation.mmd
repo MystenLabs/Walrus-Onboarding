@@ -1,0 +1,5 @@
+flowchart TD
+    A[Encoding Duration ↑] --> B{Cause?}
+    B -->|CPU| C[Scale up CPU<br/>or reduce concurrency]
+    B -->|Memory| D[Increase RAM<br/>or reduce blob size]
+    B -->|Contention| E[Check other processes<br/>on the host]

@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant Publisher
+    participant Sui as Sui Blockchain
+    participant Nodes as Storage Nodes
+
+    Client->>Publisher: HTTP PUT blob data
+    
+    Note over Publisher: 1. Encode blob<br/>(Reed-Solomon + Merkle)
+    
+    Publisher->>Sui: 2. Register Blob
+    Sui-->>Publisher: Blob Object ID
+    
+    Publisher->>Nodes: 3. Distribute Slivers (Parallel)
+    Note over Nodes: 4. Validate & Store
+    Nodes-->>Publisher: Signatures
+    
+    Note over Publisher: 5. Aggregate Signatures
+    
+    Publisher->>Sui: 6. Post Certificate
+    Note right of Sui: Point of Availability<br/>(Blob is retrievable)

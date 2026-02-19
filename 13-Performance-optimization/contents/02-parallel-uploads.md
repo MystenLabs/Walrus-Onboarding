@@ -14,6 +14,11 @@ If you have multiple independent blobs (or chunks of a large file), you can uplo
 - **Benefit**: Saturates available upstream bandwidth.
 - **Limit**: Controlled by your client's concurrency settings (e.g., connection pool size) and the publisher's capacity.
 
+![1. Inter-Blob Parallelism (Multiple Blobs)](../images/02-client-level-parallelism.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     subgraph App["Your Application"]
@@ -38,6 +43,8 @@ flowchart TD
     B4 --> P
 ```
 
+</details>
+
 ### 2. Intra-Blob Parallelism (Slivers to Nodes)
 
 Even for a single blob, Walrus uploads are inherently parallel.
@@ -45,6 +52,11 @@ Even for a single blob, Walrus uploads are inherently parallel.
 - **Mechanism**: A blob is erasure-encoded into slivers distributed across $n$ shards (e.g., 1000 shards on mainnet). Each storage node manages one or more shards.
 - **Benefit**: No single storage node becomes a bottleneck.
 - **SDK Behavior**: The Walrus SDK's `DistributedUploader` manages this complexity. It maintains a set of pending requests to various storage nodes and processes them as `WeightedFutures`.
+
+![2. Intra-Blob Parallelism (Slivers to Nodes)](../images/02-storage-node-distribution.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 flowchart TD
@@ -61,6 +73,8 @@ flowchart TD
     N3 --> Q
     N4 --> Q
 ```
+
+</details>
 
 > **Technical Note:** The number of slivers corresponds to the shard count on the network (e.g., 1000 shards). Each blob produces one sliver pair per shard. Only $2f+1$ confirmations are needed for quorum, where $f = \lfloor(n-1)/3\rfloor$. On a 1000-shard network, this means ~334 primary slivers are sufficient for reconstruction.
 
@@ -114,6 +128,11 @@ Signs of hitting rate limits:
 
 For very small blobs (< 100KB), the overhead of establishing connections and performing Sui transactions dominates. Parallelism helps, but **batching** small data into larger blobs (before uploading) is often more effective for throughput.
 
+![Batching Small Blobs](../images/02-batching-small-blobs.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Inefficient["❌ Many Small Blobs"]
@@ -132,6 +151,8 @@ flowchart LR
         Q --> T[Single Tx]
     end
 ```
+
+</details>
 
 **When to batch:**
 - Many files < 100KB each

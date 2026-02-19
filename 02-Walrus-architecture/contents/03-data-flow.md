@@ -146,6 +146,11 @@ Once the certificate is posted:
 
 ### Complete Upload Flow Diagram
 
+![Complete Upload Flow Diagram](../images/03-complete-upload-flow.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -169,6 +174,8 @@ sequenceDiagram
     Publisher->>Sui: 6. Post Certificate
     Note right of Sui: Point of Availability<br/>(Blob is retrievable)
 ```
+
+</details>
 
 ## Retrieval Flow: How Data is Retrieved
 
@@ -263,6 +270,11 @@ The client receives the original blob data, which they can verify is correct.
 
 ### Complete Retrieval Flow Diagram
 
+![Complete Retrieval Flow Diagram](../images/03-complete-retrieval-flow.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -282,6 +294,8 @@ sequenceDiagram
     
     Aggregator-->>Client: Return Original Blob
 ```
+
+</details>
 
 ## Key Properties of the Data Flow
 

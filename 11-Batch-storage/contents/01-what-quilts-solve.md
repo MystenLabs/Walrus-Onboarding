@@ -153,6 +153,11 @@ If you need deterministic BlobIds derived from content:
 
 Use this flowchart to decide whether to use quilts:
 
+![Decision Framework](../images/01-quilt-decision-framework.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph TD
     A[Do you have many small blobs < 1MB?] -->|No| B[Use regular blobs]
@@ -165,6 +170,8 @@ graph TD
     E -->|Yes| G[Use QUILTS! ✓]
     style G fill:#bbf,stroke:#333,stroke-width:2px
 ```
+
+</details>
 
 ## Real-World Examples
 

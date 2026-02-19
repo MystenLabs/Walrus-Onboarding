@@ -1,0 +1,6 @@
+flowchart LR
+    subgraph Upload["Initial Upload"]
+        A[Blob Data] --> B["reserve_space(epochs=5)"]
+        B --> C[Storage Resource]
+        C --> D["Blob stored for 5 epochs"]
+    end

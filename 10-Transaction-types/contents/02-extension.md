@@ -2,6 +2,11 @@
 
 Data in Walrus is stored for a finite period defined by the `Storage` resource associated with the blob. To keep data available beyond its initial expiration, you must perform an extension transaction.
 
+![Extension Transactions](../images/02-extension-state.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 stateDiagram-v2
     state "Active Blob" as Active
@@ -20,6 +25,8 @@ stateDiagram-v2
     
     Safe --> Active
 ```
+
+</details>
 
 ## Methods of Extension
 

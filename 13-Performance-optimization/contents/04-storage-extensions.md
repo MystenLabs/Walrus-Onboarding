@@ -6,6 +6,11 @@ In Walrus, you pay for storage based on size and **duration** (measured in epoch
 
 When you upload a blob, you specify an `epochs` parameter. This reserves storage space for that duration.
 
+![How Storage Payment Works](../images/04-storage-payment.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Upload["Initial Upload"]
@@ -14,6 +19,8 @@ flowchart LR
         C --> D["Blob stored for 5 epochs"]
     end
 ```
+
+</details>
 
 - **Cost Formula**: $Cost \approx EncodedSize \times Duration \times BaseRate + UploadFee$
 - **Extension**: You can extend the lifetime of a blob later by paying for additional epochs.
@@ -29,6 +36,11 @@ Extending a blob is a transaction on the Sui blockchain. It incurs:
 
 > 📚 **Reference:** See [`extend_blob`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system.move#L183-L189) in the Move contracts. The function requires a `Coin<WAL>` payment that is processed via [`process_storage_payments`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L424-L440).
 
+![The Cost of Extension](../images/04-extension-cost-components.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     subgraph Comparison["Cost Comparison"]
@@ -42,6 +54,8 @@ flowchart TD
     style C fill:#d4edda,stroke:#28a745
     style D fill:#f8d7da,stroke:#dc3545
 ```
+
+</details>
 
 ## Optimization Strategies
 

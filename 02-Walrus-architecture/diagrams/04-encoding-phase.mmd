@@ -1,0 +1,24 @@
+flowchart TD
+    Blob[Original Blob: 'Hello, Walrus!...'] --> Encoding
+    
+    subgraph Encoding [Encoding Process]
+        direction TB
+        Split[1. Split into symbols] --> RS[2. Apply Reed-Solomon]
+        RS --> Pairs[3. Create sliver pairs]
+        Pairs --> Hashes[4. Compute hashes]
+        Hashes --> Merkle[5. Build Merkle tree]
+        Merkle --> BlobID[6. Compute blob ID]
+    end
+
+    Encoding --> Result
+    
+    subgraph Result [Encoded Result]
+        direction TB
+        ResID[Blob ID: 0xabc123...]
+        ResPairs[Sliver pairs: ~1000]
+        ResMeta[Metadata: size, encoding]
+        ResSize[Total size: ~190 bytes]
+        ResID --- ResPairs
+        ResPairs --- ResMeta
+        ResMeta --- ResSize
+    end

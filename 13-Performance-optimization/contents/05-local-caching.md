@@ -12,6 +12,11 @@ Walrus blob IDs are **content-addressed** and **immutable**. This makes caching 
 - A given Blob ID always returns the exact same content
 - **Cache invalidation is unnecessary** - you only evict entries to save space (LRU)
 
+![The Caching Advantage](../images/05-content-addressed-cache.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Traditional["Traditional Caching"]
@@ -34,6 +39,8 @@ flowchart LR
     style G2 fill:#d4edda,stroke:#28a745
 ```
 
+</details>
+
 ## Where to Cache
 
 ### 1. Aggregator Level
@@ -42,12 +49,19 @@ The **Walrus Aggregator** (daemon) is responsible for reconstructing blobs from 
 
 > 📚 **Reference:** See [Operating an aggregator](https://docs.wal.app/operator-guide/aggregator.html) for aggregator setup and the [HTTP API](https://docs.wal.app/usage/web-api.html) for endpoint details (`GET /v1/blobs/{blob_id}`).
 
+![1. Aggregator Level](../images/05-aggregator-caching.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     Client --> Cache["HTTP Cache<br/>(Nginx/Varnish)"]
     Cache -->|Miss| Agg[Walrus Aggregator]
     Agg --> Nodes[Storage Nodes]
 ```
+
+</details>
 
 **Configuration Example (Nginx):**
 
@@ -156,12 +170,19 @@ async function getCachedBlob(blobId: string): Promise<Uint8Array> {
 
 Since Walrus Blob IDs are immutable, they are perfect for CDN caching with aggressive cache headers.
 
+![3. CDN / Edge Caching](../images/05-cdn-edge-caching.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     Browser --> CDN["CDN Edge<br/>(Cloudflare/Fastly)"]
     CDN -->|Miss| Origin[Your Server]
     Origin --> Agg[Walrus Aggregator]
 ```
+
+</details>
 
 **Setting Cache Headers:**
 
@@ -249,6 +270,11 @@ One of the hardest problems in computer science is easy here: **Walrus Blobs are
 
 ## Caching Architecture Example
 
+![Caching Architecture Example](../images/05-caching-architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     subgraph Edge["Edge Layer"]
@@ -278,6 +304,8 @@ flowchart TD
     Nginx --> Agg
     Agg --> Nodes
 ```
+
+</details>
 
 ## Key Takeaways
 

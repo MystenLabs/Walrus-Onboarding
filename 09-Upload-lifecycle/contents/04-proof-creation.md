@@ -8,6 +8,11 @@ The client asks each storage node to confirm that it holds the necessary shards 
 
 ### Visualizing Proof Creation
 
+![Visualizing Proof Creation](../images/04-proof-creation-visualized.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -33,6 +38,8 @@ sequenceDiagram
     
     Note over Client: 4. Collection & Aggregation<br/>(Accumulate signatures until quorum reached)
 ```
+
+</details>
 
 ## Detailed Proof Generation
 

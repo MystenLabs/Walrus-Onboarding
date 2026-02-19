@@ -1,0 +1,19 @@
+graph TD
+    A[Start] --> B{Choose Method}
+    B -->|CLI| C[Prepare Files]
+    C --> D[Run 'walrus store-quilt']
+    D --> E{Success?}
+    E -->|Yes| F[Get Quilt ID]
+    E -->|No| G[Fix Errors]
+    G --> D
+    B -->|SDK| H[Select Files & Assign IDs]
+    H --> I["Add Tags(Optional)" ]
+    I --> J[Encode Quilt]
+    J --> K[Register on Sui]
+    K --> L[Upload to Storage Nodes]
+    L --> M[Certify on Sui]
+    M --> N{Success?}
+    N -->|Yes| F
+    N -->|No| O[Fix Errors]
+    O --> H
+    F --> P[End]

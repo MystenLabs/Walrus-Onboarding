@@ -1,0 +1,10 @@
+graph TD
+    A[Do you have many small blobs < 1MB?] -->|No| B[Use regular blobs]
+    A -->|Yes| C[Can they be logically grouped?]
+    C -->|No| B
+    C -->|Yes| D[Do they have the same lifecycle?]
+    D -->|No| B
+    D -->|Yes| E[Will you retrieve them individually?]
+    E -->|No| F[Use regular blobs<br/>or quilt is still OK]
+    E -->|Yes| G[Use QUILTS! ✓]
+    style G fill:#bbf,stroke:#333,stroke-width:2px

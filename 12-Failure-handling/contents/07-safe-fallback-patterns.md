@@ -68,6 +68,11 @@ When an aggregator or service is consistently failing, continuing to send reques
 
 ### State Diagram
 
+![State Diagram](../images/07-circuit-breaker-state.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 stateDiagram-v2
     [*] --> Closed
@@ -98,6 +103,8 @@ stateDiagram-v2
         Testing: Evaluate result
     }
 ```
+
+</details>
 
 ### States
 - **Closed**: Normal operation, requests flow through.

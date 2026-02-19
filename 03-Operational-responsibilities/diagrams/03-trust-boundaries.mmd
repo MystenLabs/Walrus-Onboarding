@@ -1,0 +1,31 @@
+graph TB
+    subgraph trusted["🔒 TRUSTED (Cryptographically Guaranteed)"]
+        direction TB
+        T1["✓ Sui Blockchain<br/>(consensus, smart contracts)"]
+        T2["✓ Blob IDs<br/>(Merkle root, content-addressed)"]
+        T3["✓ Consistency Checks<br/>(hash verification)"]
+        T4["✓ Erasure Coding<br/>(mathematical guarantees)"]
+        T5["✓ Byzantine Tolerance<br/>(> 2/3 honest assumption)"]
+    end
+
+    subgraph untrusted["⚠️ UNTRUSTED (Must Verify)"]
+        direction TB
+        U1["? Publishers<br/>(encode & distribute correctly?)"]
+        U2["? Aggregators<br/>(reconstruct correctly?)"]
+        U3["? Storage Nodes<br/>(individually untrusted, but<br/>collectively trusted)"]
+        U4["? Network<br/>(reliable delivery?)"]
+    end
+
+    subgraph client["👤 CLIENT RESPONSIBILITY"]
+        direction TB
+        C1["☑ Verify blob IDs"]
+        C2["☑ Implement retry logic"]
+        C3["☑ Encrypt sensitive data"]
+        C4["☑ Manage wallets and gas"]
+        C5["☑ Handle errors gracefully"]
+        C6["☑ Check on-chain state"]
+    end
+
+    style trusted fill:#d4edda,stroke:#28a745,stroke-width:3px,color:#000
+    style untrusted fill:#fff3cd,stroke:#ffc107,stroke-width:3px,color:#000
+    style client fill:#cce5ff,stroke:#007bff,stroke-width:3px,color:#000

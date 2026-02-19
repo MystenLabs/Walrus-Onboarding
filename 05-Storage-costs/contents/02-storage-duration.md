@@ -95,6 +95,11 @@ Storing the same 10MB blob for 20 epochs:
 
 ## Storage Resource Reuse
 
+![Storage Resource Reuse](../images/02-storage-resource-reuse.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -110,6 +115,8 @@ sequenceDiagram
     User->>Walrus: 4. Store Blob B
     Note right of User: Reuses the remaining<br/>5 Epochs (only pays write cost)
 ```
+
+</details>
 
 One important optimization is **reusing storage resources** by deleting deletable blobs before they expire. This is enabled by [`delete_blob`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/system_state_inner.move#L365-L368) which returns the underlying [`Storage`](https://github.com/MystenLabs/walrus/blob/main/contracts/walrus/sources/system/storage_resource.move) resource.
 

@@ -8,12 +8,19 @@ The **Publisher** acts as your gateway to the Walrus network. It handles the com
 
 The simplest way to start is using a public publisher hosted by a third party or the Walrus foundation (on testnet).
 
+![1. Public / Remote Publishers](../images/03-remote-publisher.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     C[Your Client] -->|HTTP PUT| P[Remote Publisher]
     P -->|Sui Tx| S[Sui Network]
     P -->|Slivers| N[Storage Nodes]
 ```
+
+</details>
 
 | Aspect | Details |
 |:-------|:--------|
@@ -45,11 +52,18 @@ walrus publisher \
 
 For maximum performance, your application can use the SDK to write directly to storage nodes, bypassing any HTTP publisher endpoint entirely.
 
+![3. Direct SDK Writes (Client as Publisher)](../images/03-direct-sdk-writes.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     C[Your Application<br/>with SDK] -->|Sui Tx| S[Sui Network]
     C -->|Slivers Direct| N[Storage Nodes]
 ```
+
+</details>
 
 | Aspect | Details |
 |:-------|:--------|
@@ -142,6 +156,11 @@ async function uploadWithFailover(
 
 Select a publisher geographically close to your application server to minimize TCP handshake and transfer time:
 
+![Geographic Selection](../images/03-geographic-selection.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph TD
     subgraph Selection["Publisher Selection"]
@@ -151,6 +170,8 @@ graph TD
         Selector -->|Direct SDK| SDK[Direct Write<br/>No HTTP Hop]
     end
 ```
+
+</details>
 
 ## Comparison Matrix
 

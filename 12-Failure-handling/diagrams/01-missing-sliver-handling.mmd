@@ -1,0 +1,31 @@
+flowchart LR
+    subgraph Client["Client (SDK)"]
+        A[Request Blob]
+        R[Reconstruct Data]
+    end
+    
+    subgraph Nodes["Storage Nodes"]
+        N1[Node 1]
+        N2[Node 2]
+        N3[Node 3]
+        N4[Node 4]
+        N5[Node N]
+    end
+    
+    A -->|Request| N1
+    A -->|Request| N2
+    A -->|Request| N3
+    A -->|Request| N4
+    A -->|Request| N5
+    
+    N1 -->|"✅ Sliver"| R
+    N2 -->|"❌ Unavailable"| R
+    N3 -->|"✅ Sliver"| R
+    N4 -->|"❌ Timeout"| R
+    N5 -->|"✅ Sliver"| R
+    
+    R -->|"2f+1 slivers collected"| B[✅ Success]
+    
+    style N2 fill:#f8d7da,stroke:#dc3545
+    style N4 fill:#f8d7da,stroke:#dc3545
+    style B fill:#d4edda,stroke:#28a745

@@ -1,0 +1,19 @@
+flowchart LR
+    File[Original File] -->|1. Input Validation| Splitter
+    Splitter -- "2. Matrix Expansion (Split into k chunks)" --> Encoder[RS Encoder]
+    
+    subgraph Encoding ["Erasure Encoding (Reed-Solomon)"]
+        direction TB
+        Encoder -->|4. Sliver Generation| Primary["Primary Slivers<br/>(Data)"]
+        Encoder -->|4. Sliver Generation| Secondary["Secondary Slivers<br/>(Parity)"]
+    end
+    
+    subgraph Meta ["Metadata Generation"]
+        Encoder -->|3. Compute Hash| Hasher[Merkle Tree Hasher]
+        Hasher --> Root[Merkle Root]
+        Root --> ID[Blob ID]
+    end
+
+    Primary --> Package[Walrus Blob]
+    Secondary --> Package
+    ID --> Package

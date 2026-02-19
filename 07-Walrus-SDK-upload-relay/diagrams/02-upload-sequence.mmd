@@ -1,0 +1,33 @@
+sequenceDiagram
+    participant Client as SDK Client
+    participant Encoder as WASM Encoder
+    participant Sui as Sui Blockchain
+    participant Node1 as Storage Node 1
+    participant Node2 as Storage Node 2
+    participant NodeN as Storage Node N
+    
+    Note over Client: Step 1: Encode
+    Client->>Encoder: encodeBlob(data)
+    Encoder-->>Client: slivers, metadata, blobId, rootHash
+    
+    Note over Client,Sui: Step 2: Register
+    Client->>Sui: executeRegisterBlobTransaction()
+    Sui-->>Client: blobObjectId
+    
+    Note over Client,NodeN: Step 3: Upload (Parallel)
+    par Upload to all nodes
+        Client->>Node1: writeMetadata + writeSlivers
+        Client->>Node2: writeMetadata + writeSlivers
+        Client->>NodeN: writeMetadata + writeSlivers
+    end
+    
+    Note over Client,NodeN: Step 4: Collect Confirmations (Proof-of-Availability)
+    Node1-->>Client: BLS signature confirmation
+    Node2-->>Client: BLS signature confirmation
+    NodeN-->>Client: BLS signature confirmation
+    
+    Note over Client: Aggregate confirmations into proof-of-availability certificate
+    
+    Note over Client,Sui: Step 5: Certify
+    Client->>Sui: executeCertifyBlobTransaction(certificate)
+    Sui-->>Client: Blob certified ✅

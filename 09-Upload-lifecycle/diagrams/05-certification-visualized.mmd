@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant Client
+    participant Sui as Sui Network
+    participant Node as Storage Nodes
+
+    Note over Client: 1. Transaction Building
+    Client->>Sui: certify_blob(signatures)
+    
+    activate Sui
+    Note over Sui: 2. On-Chain Verification
+    Sui->>Sui: Verify Signatures
+    Sui->>Sui: Check Quorum > 2/3
+    
+    Note over Sui: 3. State Update
+    Sui->>Sui: Update State: CERTIFIED
+    
+    Note over Sui: 4. Event Emission
+    Sui--)Node: Emit Event: BlobCertified
+    deactivate Sui
+    
+    activate Node
+    Note over Node: 5. Network Reaction (Event Loop)
+    Node->>Node: Observe Event
+    
+    alt Missing Slivers?
+        Node->>Node: Mark as Certified
+        Node->>Node: Initiate Peer Sync
+    else Has Slivers?
+        Node->>Node: Mark as Certified
+    end
+    deactivate Node

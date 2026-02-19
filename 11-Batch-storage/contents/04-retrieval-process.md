@@ -6,6 +6,11 @@ This section explains how to retrieve individual blobs (patches) from quilts usi
 
 One of the key advantages of quilts is that you can retrieve individual patches **without downloading the entire quilt**.
 
+![Overview](../images/04-patch-retrieval.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -26,6 +31,8 @@ sequenceDiagram
     Note right of Client: 4. Reconstruct
     Client->>Client: Decode patch & verify
 ```
+
+</details>
 
 Walrus provides multiple ways to query and retrieve patches:
 

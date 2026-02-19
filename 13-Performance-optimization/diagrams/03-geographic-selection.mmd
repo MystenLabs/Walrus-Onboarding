@@ -1,0 +1,7 @@
+graph TD
+    subgraph Selection["Publisher Selection"]
+        Client -->|Strategy| Selector{Selector}
+        Selector -->|Lowest Latency| PubA[Publisher A<br/>US-East]
+        Selector -->|Backup| PubB[Publisher B<br/>EU-West]
+        Selector -->|Direct SDK| SDK[Direct Write<br/>No HTTP Hop]
+    end

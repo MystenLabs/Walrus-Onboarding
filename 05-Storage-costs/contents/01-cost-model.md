@@ -4,6 +4,11 @@ This section explains the fundamental cost structure of storing data on Walrus. 
 
 ## The Four Sources of Cost
 
+![The Four Sources of Cost](../images/01-four-cost-sources.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph TD
     Total[Total Storage Cost] --> WAL_Costs[WAL Costs]
@@ -24,6 +29,8 @@ graph TD
     style WAL_Costs fill:#69f,stroke:#333,stroke-width:2px
     style SUI_Costs fill:#69f,stroke:#333,stroke-width:2px
 ```
+
+</details>
 
 Storing blobs on Walrus involves four distinct sources of cost:
 
@@ -335,6 +342,11 @@ This will show you the exact encoded size without storing the blob.
 
 ### Cost Implications
 
+![Cost Implications](../images/01-encoding-overhead.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph TB
     subgraph Small_Blob ["Small Blob (< 10MB)"]
@@ -357,6 +369,8 @@ graph TB
     style L_Data fill:#69f,stroke:#333,stroke-width:2px
     style L_Meta fill:#f96,stroke:#333,stroke-width:2px
 ```
+
+</details>
 
 - **Small blobs (< 10MB)**: Costs are dominated by the fixed metadata overhead (~61-64MB depending on shard count)
 - **Large blobs (> 10MB)**: Costs are dominated by the erasure-coded blob size (approximately 5x original size for large blobs)

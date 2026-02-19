@@ -1,0 +1,15 @@
+flowchart LR
+    subgraph Sequential["Sequential Upload"]
+        S1[Blob 1] --> S2[Blob 2] --> S3[Blob 3] --> S4[Blob 4] --> S5[Blob 5]
+    end
+    
+    subgraph Parallel["Parallel Upload"]
+        P1[Blob 1]
+        P2[Blob 2]
+        P3[Blob 3]
+        P4[Blob 4]
+        P5[Blob 5]
+    end
+    
+    Sequential --> R1["~15s total"]
+    Parallel --> R2["~4.5s total"]

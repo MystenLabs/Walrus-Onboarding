@@ -1,0 +1,11 @@
+flowchart TD
+    subgraph Comparison["Cost Comparison"]
+        A["1 Year Upfront<br/>1 Tx = 1 Gas Fee"] 
+        B["Monthly Extensions<br/>12 Tx = 12 Gas Fees"]
+    end
+    
+    A --> C["✅ More Efficient"]
+    B --> D["❌ Extra Overhead"]
+    
+    style C fill:#d4edda,stroke:#28a745
+    style D fill:#f8d7da,stroke:#dc3545

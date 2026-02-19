@@ -49,6 +49,11 @@ The script `ts/throughput-tuner.ts` performs:
 3. **Parallel Upload**: Uploads all blobs concurrently
 4. **Report**: Calculates and compares throughput (MB/s)
 
+![The Experiment](../images/07-benchmark-flow.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Sequential["Sequential Upload"]
@@ -66,6 +71,8 @@ flowchart LR
     Sequential --> R1["~15s total"]
     Parallel --> R2["~4.5s total"]
 ```
+
+</details>
 
 ## Run the Script
 

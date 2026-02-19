@@ -196,6 +196,11 @@ impl QuiltColumnRangeReader for QuiltDecoderV1<'_> {
 
 Here's what happens when you retrieve a patch by identifier:
 
+![Data Flow: Reading a Patch](../images/02-patch-retrieval-flow.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -216,6 +221,8 @@ sequenceDiagram
     Note over Client: 6. Decode RedStuff symbols
     Client->>PatchData: Reconstruct "document.pdf"
 ```
+
+</details>
 
 **Code reference**: [`crates/walrus-sdk/src/client/quilt_client.rs:655-679`](https://github.com/MystenLabs/walrus/blob/main/crates/walrus-sdk/src/client/quilt_client.rs#L650-L672) shows the implementation of `get_blobs_from_quilt_by_internal_ids_impl`.
 

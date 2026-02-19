@@ -1,0 +1,15 @@
+graph TD
+    subgraph "Standard Approach"
+        F1[File 1] --> B1[Blob 1] --> T1[Tx 1]
+        F2[File 2] --> B2[Blob 2] --> T2[Tx 2]
+        F3[File 3] --> B3[Blob 3] --> T3[Tx 3]
+        Note1[High Overhead: 3 Txs, 3 Objects]
+    end
+
+    subgraph "Quilt Approach"
+        Q1[File 1] --> Q[Quilt Blob]
+        Q2[File 2] --> Q
+        Q3[File 3] --> Q
+        Q --> TQ[Tx Quilt]
+        Note2[Low Overhead: 1 Tx, 1 Object]
+    end

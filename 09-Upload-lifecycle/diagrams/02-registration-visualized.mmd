@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant WalrusSystem as Walrus System Contract
+    participant SuiState as Sui Global State
+
+    Note over Client: Prepared Metadata & Storage Resource
+    
+    Client->>WalrusSystem: register_blob(metadata, storage_resource)
+    
+    activate WalrusSystem
+    Note right of WalrusSystem: 1. Storage Resource Selection<br/>2. Cost Calculation
+    WalrusSystem->>WalrusSystem: 3.1 Validate Payment/Credits
+    WalrusSystem->>WalrusSystem: 3.2 Calculate Storage Cost
+    WalrusSystem->>SuiState: 3.3 Create Blob Object
+    
+    SuiState-->>WalrusSystem: Blob Object ID
+    deactivate WalrusSystem
+    
+    WalrusSystem-->>Client: 4. Success (Blob Registered)
+    
+    Note right of SuiState: Blob State: REGISTERED

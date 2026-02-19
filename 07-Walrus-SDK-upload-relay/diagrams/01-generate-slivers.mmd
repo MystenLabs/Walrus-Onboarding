@@ -1,0 +1,9 @@
+flowchart TD
+    A[Raw Data Bytes] -->|Input| B[Reed-Solomon Encoder]
+    B -->|Split & Encode| C[Primary Slivers]
+    B -->|Generate| D[Secondary/Parity Slivers]
+    C --> E[Sliver Pairs]
+    D --> E
+    
+    style A fill:#e1f5ff
+    style E fill:#fff4e1

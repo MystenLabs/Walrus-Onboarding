@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client as Client (SDK)
+    participant Nodes as Storage Nodes
+    
+    Client->>Nodes: Request slivers (2f+1 needed)
+    Nodes-->>Client: Return sliver data
+    
+    Client->>Client: Decode slivers into blob
+    Client->>Client: Re-compute blob ID from decoded data
+    Client->>Client: Compare with expected blob ID
+    
+    alt Blob ID matches
+        Client->>Client: ✅ Blob verified
+        Client->>Client: Return data to application
+    else Blob ID mismatch
+        Client->>Client: ❌ Throw InconsistentBlobError
+    end

@@ -1,0 +1,28 @@
+stateDiagram-v2
+    [*] --> Closed
+    
+    Closed --> Closed: Success
+    Closed --> Open: failures >= threshold
+    
+    Open --> HalfOpen: timeout elapsed
+    
+    HalfOpen --> Closed: test succeeds
+    HalfOpen --> Open: test fails
+    
+    state Closed {
+        [*] --> Normal
+        Normal: ✅ Requests pass through
+        Normal: Count failures
+    }
+    
+    state Open {
+        [*] --> Tripped
+        Tripped: ❌ Requests fail immediately
+        Tripped: Wait for reset timeout
+    }
+    
+    state HalfOpen {
+        [*] --> Testing
+        Testing: 🔄 Allow one test request
+        Testing: Evaluate result
+    }

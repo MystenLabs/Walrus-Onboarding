@@ -1,0 +1,23 @@
+C4Component
+    title Publisher Service - Internal Components
+
+    Container_Boundary(publisher, "Publisher Service") {
+        Component(api, "HTTP API", "REST", "Receives blob uploads")
+        Component(auth, "Auth & Validation", "Middleware", "Validates JWT,<br/>checks size limits")
+        Component(encoder, "Erasure Encoder", "Reed-Solomon", "Encodes blobs<br/>into slivers")
+        Component(wallet, "Wallet Manager", "Sui SDK", "Manages SUI/WAL,<br/>signs transactions")
+        Component(distributor, "Sliver Distributor", "HTTP Client", "Sends slivers to<br/>storage nodes")
+        Component(certAgg, "Certificate Agg", "Crypto", "Collects signatures,<br/>checks quorum")
+        Component(chain, "Sui Interface", "Sui RPC", "Registers blobs,<br/>posts certificates")
+    }
+
+    Rel(api, auth, "Validates")
+    Rel(auth, encoder, "Encodes")
+    Rel(encoder, distributor, "Distributes")
+    Rel(encoder, wallet, "Gets blob ID")
+    Rel(wallet, chain, "Signs tx")
+    Rel(distributor, certAgg, "Collects sigs")
+    Rel(certAgg, chain, "Posts cert")
+    Rel(chain, api, "Returns result")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")

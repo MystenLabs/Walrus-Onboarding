@@ -1,0 +1,11 @@
+flowchart TD
+    A[Start Upload] --> B{Try Operation}
+    B -->|Success| C[Return Result ✅]
+    B -->|Error| D{Check Error Type}
+    D -->|Retryable| E{Attempts < Max?}
+    D -->|Permanent| F[Throw Error ❌]
+    E -->|Yes| G[Calculate Delay]
+    E -->|No| H[Throw Last Error ❌]
+    G --> I[Wait: 2^attempt seconds]
+    I --> J[Increment Attempt]
+    J --> B

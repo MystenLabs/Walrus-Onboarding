@@ -1,0 +1,13 @@
+flowchart TD
+    B[Single Blob] --> E[Erasure Encoding]
+    E --> S["Sliver Pairs (one per shard)"]
+    
+    S --> N1[Node 1<br/>Shards 1-10]
+    S --> N2[Node 2<br/>Shards 11-20]
+    S --> N3[Node 3<br/>Shards 21-30]
+    S --> N4[Node N<br/>...]
+    
+    N1 --> Q["Quorum Reached<br/>(2f+1 confirmations)"]
+    N2 --> Q
+    N3 --> Q
+    N4 --> Q

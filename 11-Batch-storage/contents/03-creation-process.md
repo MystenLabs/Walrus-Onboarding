@@ -16,6 +16,11 @@ Creating a quilt involves:
 
 The process is similar to storing regular blobs, but with batching and metadata support.
 
+![Overview](../images/03-creation-process.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph TD
     A[Start] --> B{Choose Method}
@@ -37,6 +42,8 @@ graph TD
     O --> H
     F --> P[End]
 ```
+
+</details>
 
 ## Method 1: CLI with `store-quilt`
 

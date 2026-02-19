@@ -28,6 +28,11 @@ This ensures data availability even in the presence of malicious nodes.
 
 ### Visualizing the Process
 
+![Visualizing the Process](../images/01-chunk-creation-process.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     File[Original File] -->|1. Input Validation| Splitter
@@ -49,6 +54,8 @@ flowchart LR
     Secondary --> Package
     ID --> Package
 ```
+
+</details>
 
 ### Key Concepts
 

@@ -9,6 +9,11 @@ You will also add error handling and verify the upload end-to-end.
 1. Add retry logic for `RetryableWalrusClientError`.
 1. Verify the integrity of the uploaded content by downloading it immediately.
 
+![Objectives](../images/12-hands-on-exercise.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     A[📝 Create Content] --> B[🚀 Upload with Retry]
@@ -27,6 +32,8 @@ flowchart LR
     style H fill:#ffcdd2
     style E fill:#ffcdd2
 ```
+
+</details>
 
 ## Running in Docker (Recommended for Consistent Results)
 

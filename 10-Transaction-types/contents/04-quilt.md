@@ -2,6 +2,11 @@
 
 **Quilt** is a specialized Walrus feature designed to optimize the storage of many small blobs. It batches multiple small files into a single, larger Walrus blob, reducing overhead and costs.
 
+![Quilt Operations](../images/04-quilt-operations.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph TD
     subgraph "Standard Approach"
@@ -19,6 +24,8 @@ graph TD
         Note2[Low Overhead: 1 Tx, 1 Object]
     end
 ```
+
+</details>
 
 ## Quilt Transaction Differences
 

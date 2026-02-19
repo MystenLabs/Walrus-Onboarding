@@ -1,0 +1,4 @@
+flowchart LR
+    Client --> Cache["HTTP Cache<br/>(Nginx/Varnish)"]
+    Cache -->|Miss| Agg[Walrus Aggregator]
+    Agg --> Nodes[Storage Nodes]

@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client as Client Application
+    participant Relay as Upload Relay
+    participant Nodes as Storage Nodes
+
+    rect rgb(255,235,238)
+        Note over Client: Direct upload (no relay)
+        Client->>+Nodes: parallel store requests (metadata + slivers)
+        Note over Client: Manage failures & retries
+        Nodes-->>Client: BLS confirmations
+        Client->>Client: Aggregate confirmations into certificate
+    end
+
+    rect rgb(232,245,233)
+        Note over Client,Relay: Upload with relay
+        Client->>Relay: single upload request (blob + metadata)
+        Relay->>+Nodes: fan-out parallel uploads
+        Nodes-->>Relay: confirmations
+        Relay-->>Client: aggregated certificate
+    end

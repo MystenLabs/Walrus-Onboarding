@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant Client as User / Client
+    participant Network as Walrus Network
+    participant N1 as Storage Node 1
+    participant N2 as Storage Node 2
+    participant N3 as Storage Node 3
+    participant N4 as Storage Node 4
+
+    Note over Client: 1. Metadata Lookup
+    Client->>Network: Get Blob Metadata
+    Network-->>Client: {size, encoding, shard_locations}
+
+    Note over Client: 2. Parallel Fetching
+    par Fetch Sliver A
+        Client->>N1: GET Sliver A
+        N1-->>Client: Sliver A Data
+    and Fetch Sliver B
+        Client->>N2: GET Sliver B
+        N2-->>Client: Sliver B Data
+    and Fetch Sliver C
+        Client->>N3: GET Sliver C
+        N3-->>Client: Sliver C Data
+    and Fetch Sliver D
+        Client->>N4: GET Sliver D
+        N4-->>Client: Sliver D Data
+    end
+
+    Note over Client: 3. Reconstruction & Verification
+    Client->>Client: RS Decode (Slivers -> File)
+    Client->>Client: Hash Check (File vs Blob ID)

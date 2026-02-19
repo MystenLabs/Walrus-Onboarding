@@ -1,0 +1,33 @@
+sequenceDiagram
+    participant Client as SDK Client
+    participant Node1 as Storage Node 1
+    participant Node2 as Storage Node 2
+    participant Node3 as Storage Node 3
+    participant NodeN as Storage Node N
+    participant Decoder as WASM Decoder
+
+    Note over Client: Get blob metadata from any node
+    Client->>Node1: getBlobMetadata(blobId)
+    Node1-->>Client: metadata (encoding type, hashes, length)
+
+    Note over Client: Calculate min slivers (ceil(n/2)+1) <br/> Track NotFound/Blocked weight and abort if quorum says uncertified/blocked
+
+    Note over Client,NodeN: Request slivers in parallel
+    par Fetch slivers
+        Client->>Node1: getSliver(blobId, sliverPairIndex, type)
+        Client->>Node2: getSliver(blobId, sliverPairIndex, type)
+        Client->>Node3: getSliver(blobId, sliverPairIndex, type)
+        Client->>NodeN: getSliver(blobId, sliverPairIndex, type)
+    end
+
+    Node1-->>Client: sliver data
+    Node2--xClient: failure (count toward quorum)
+    Node3-->>Client: sliver data
+    NodeN-->>Client: sliver data
+
+    Note over Client: Enough slivers received (tolerate failures until quorum exceeded)
+
+    Client->>Decoder: decodePrimarySlivers(slivers, metadata)
+    Decoder-->>Client: reconstructed blob data
+
+    Note over Client: Recompute metadata/root hash to verify integrity

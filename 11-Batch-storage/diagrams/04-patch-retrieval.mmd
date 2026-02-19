@@ -1,0 +1,18 @@
+sequenceDiagram
+    autonumber
+    participant Client
+    participant Storage as Storage Nodes
+
+    Note right of Client: 1. Get Quilt Index
+    Client->>Storage: Request first column (Header)
+    Storage-->>Client: Return QuiltIndex
+
+    Note right of Client: 2. Lookup Patch
+    Client->>Client: Parse Index to find patch coordinates
+
+    Note right of Client: 3. Retrieve Patch
+    Client->>Storage: Request specific slivers for patch
+    Storage-->>Client: Return slivers (f+1 needed)
+
+    Note right of Client: 4. Reconstruct
+    Client->>Client: Decode patch & verify

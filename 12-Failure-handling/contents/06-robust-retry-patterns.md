@@ -10,6 +10,11 @@ Simply retrying immediately in a loop is a bad practice ("busy waiting"). It can
 
 ### Algorithm Flowchart
 
+![Algorithm Flowchart](../images/06-exponential-backoff.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     A[Start Operation] --> B[Attempt = 1]
@@ -28,6 +33,8 @@ flowchart TD
     style D fill:#d4edda,stroke:#28a745
     style F fill:#f8d7da,stroke:#dc3545
 ```
+
+</details>
 
 ### Algorithm Steps
 1.  Attempt operation.

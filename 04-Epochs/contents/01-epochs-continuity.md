@@ -15,6 +15,11 @@ Before diving into epochs, let's connect what you've learned about Sui to how Wa
 | **Transactions** | All Walrus operations (store, extend, delete) are Sui transactions |
 | **Sui Epochs** | Walrus epochs are *different* from Sui epochs - Walrus has its own epoch system |
 
+![Recap: Sui ↔ Walrus Connection](../images/01-sui-walrus-connection.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Sui["🔷 Sui Blockchain"]
@@ -38,6 +43,8 @@ flowchart LR
     style Sui fill:#4da2ff,stroke:#1971c2
     style Walrus fill:#b2f2bb,stroke:#2f9e44
 ```
+
+</details>
 
 **Key Insight**: When you store a file on Walrus, you're creating **Sui Objects** on-chain that
 represent your storage reservation and blob metadata. The actual file data lives off-chain on

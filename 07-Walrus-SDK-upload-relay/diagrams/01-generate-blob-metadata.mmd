@@ -1,0 +1,7 @@
+flowchart TD
+    B[Reed-Solomon Encoder] -->|Generate| F[Blob Metadata]
+    F --> G[Blob ID]
+    F --> H[Root Hash]
+    F --> I[Encoding Type & Hashes]
+    
+    style F fill:#e8f5e9

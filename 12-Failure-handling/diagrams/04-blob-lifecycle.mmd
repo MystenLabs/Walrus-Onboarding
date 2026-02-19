@@ -1,0 +1,24 @@
+flowchart LR
+    subgraph Creation["Creation Phase"]
+        A[Upload Blob] --> B[Register on Sui]
+        B --> C[Store Slivers]
+        C --> D[Certify Blob]
+    end
+    
+    subgraph Active["Active Storage"]
+        D --> E[📦 Blob Available]
+        E -->|"Check status"| F{Epochs<br/>remaining?}
+        F -->|"Yes"| E
+        F -->|"Low"| G[⚠️ Extend Storage]
+        G -->|"extendBlob()"| E
+    end
+    
+    subgraph Expiration["Expiration"]
+        F -->|"No epochs left"| H[⏰ Storage Expired]
+        H --> I[Nodes delete data]
+        I --> J[❌ NotCurrentlyRegistered]
+    end
+    
+    style E fill:#d4edda,stroke:#28a745
+    style G fill:#fff3cd,stroke:#ffc107
+    style J fill:#f8d7da,stroke:#dc3545

@@ -1,0 +1,16 @@
+flowchart TD
+    A[Start Operation] --> B[Attempt = 1]
+    B --> C{Execute<br/>Operation}
+    C -->|Success| D[✅ Return Result]
+    C -->|Failure| E{Is Error<br/>Retryable?}
+    E -->|No| F[❌ Throw Error]
+    E -->|Yes| G{Attempt <<br/>Max Attempts?}
+    G -->|No| F
+    G -->|Yes| H["Calculate Delay:<br/>base × 2^attempt"]
+    H --> I["Add Jitter:<br/>+ random(0, base)"]
+    I --> J[Wait for Delay]
+    J --> K[Attempt++]
+    K --> C
+    
+    style D fill:#d4edda,stroke:#28a745
+    style F fill:#f8d7da,stroke:#dc3545

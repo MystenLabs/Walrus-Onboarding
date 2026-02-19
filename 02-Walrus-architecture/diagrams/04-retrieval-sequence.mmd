@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant Agg as Aggregator
+    participant Sui as Sui Blockchain
+    participant SN as Storage Nodes (1..N)
+
+    Client->>Agg: GET /<blob-id>
+    
+    Agg->>Sui: Query Blob Metadata
+    Sui-->>Agg: ID, Size, Epoch, Shard Assignments
+
+    Agg->>SN: Request Slivers (needs 334 primary)
+    SN-->>Agg: Return Slivers
+
+    Note over Agg: Decode 334 slivers<br/>Consistency check (hashes match)<br/>Reconstruct blob
+
+    Agg-->>Client: "Hello, Walrus! This is my first blob."

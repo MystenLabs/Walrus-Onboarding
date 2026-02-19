@@ -1,0 +1,17 @@
+flowchart TD
+    Start([User Request Blob ID]) --> Mode{Mode?}
+    
+    Mode -- "Standard Read" --> Resolve[Resolve Storage Nodes]
+    Mode -- "Certified Read" --> CheckChain[Check Sui for BlobCertified Event]
+    
+    CheckChain -- "Event Found & Valid" --> Resolve
+    CheckChain -- "Not Found / Expired" --> Error([Error: Uncertified])
+    
+    Resolve --> Fetch[Fetch Shards from Nodes]
+    Fetch --> Quorum{Has Quorum?}
+    
+    Quorum -- No --> Retry[Retry / Other Nodes]
+    Quorum -- Yes --> Reconstruct[Reconstruct Data]
+    
+    Reconstruct --> Verify[Verify Hash matches BlobID]
+    Verify --> Done([Return Data])

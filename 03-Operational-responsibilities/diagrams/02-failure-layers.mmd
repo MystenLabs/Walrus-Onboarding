@@ -1,0 +1,19 @@
+graph TB
+    subgraph "Failure Layers"
+        A[Application Layer<br/>Client-side errors, timeouts, invalid requests]
+        T[Transaction Layer<br/>Gas issues, tx failures, nonce conflicts]
+        E[Encoding Layer<br/>Memory errors, encoding failures, hash issues]
+        S[Storage Node Layer<br/>Node offline, data loss, corruption]
+        N[Network Layer<br/>Connectivity failures, timeouts, DNS issues]
+    end
+
+    A --> T
+    T --> E
+    E --> S
+    S --> N
+
+    style A fill:#e1f5ff
+    style T fill:#fff4e1
+    style E fill:#ffe1f5
+    style S fill:#f5e1ff
+    style N fill:#e1ffe1

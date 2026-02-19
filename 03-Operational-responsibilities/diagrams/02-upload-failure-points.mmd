@@ -1,0 +1,28 @@
+flowchart TD
+    Start([Client initiates upload]) --> Network1{Network<br/>reachable?}
+    Network1 -->|No| Fail1[❌ Network failure]
+    Network1 -->|Yes| Encode{Encoding<br/>successful?}
+
+    Encode -->|No| Fail2[❌ Encoding failure<br/>Memory/size issues]
+    Encode -->|Yes| Wallet{Sufficient<br/>gas/WAL?}
+
+    Wallet -->|No| Fail3[❌ Transaction failure<br/>Insufficient funds]
+    Wallet -->|Yes| RegisterTx{Register tx<br/>confirmed?}
+
+    RegisterTx -->|No| Fail4[❌ Transaction timeout/failure]
+    RegisterTx -->|Yes| Distribute{Distribute<br/>slivers}
+
+    Distribute --> Nodes{≥2/3 nodes<br/>respond?}
+    Nodes -->|No| Fail5[❌ Quorum not reached<br/>Too many nodes offline]
+    Nodes -->|Yes| Certificate{Post<br/>certificate?}
+
+    Certificate -->|No| Fail6[❌ Certificate tx failure]
+    Certificate -->|Yes| Success([✓ Upload successful<br/>Blob available])
+
+    style Success fill:#90EE90
+    style Fail1 fill:#FFB6C1
+    style Fail2 fill:#FFB6C1
+    style Fail3 fill:#FFB6C1
+    style Fail4 fill:#FFB6C1
+    style Fail5 fill:#FFB6C1
+    style Fail6 fill:#FFB6C1

@@ -1,0 +1,25 @@
+flowchart LR
+    subgraph Lifecycle["📅 Epoch N Lifecycle"]
+        direction LR
+        Start["🚀 Start<br/>New Committee"]
+        Params["⚙️ Params Frozen<br/>price, capacity"]
+        Active["⚡ Active Period<br/>2 wks / 1 day"]
+        End["📊 End<br/>Rewards Calc"]
+        
+        Start --> Params --> Active --> End
+    end
+    
+    subgraph Ops["🔄 During Active Period"]
+        Store["Store Blobs"]
+        Read["Read Blobs"]
+        Extend["Extend Storage"]
+    end
+    
+    Active -.-> Ops
+    End --> Advance["advance_epoch()"]
+    Advance --> |"Epoch N+1"| Start
+    
+    style Start fill:#b2f2bb,stroke:#2f9e44
+    style Active fill:#a5d8ff,stroke:#1971c2
+    style End fill:#ffc9c9,stroke:#f03e3e
+    style Advance fill:#e5dbff,stroke:#862e9c

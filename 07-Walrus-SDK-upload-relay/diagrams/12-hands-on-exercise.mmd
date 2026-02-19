@@ -1,0 +1,16 @@
+flowchart LR
+    A[📝 Create Content] --> B[🚀 Upload with Retry]
+    B -->|Success| C[📥 Download Blob]
+    B -->|Error & Retryable| D[⏱️ Wait & Retry]
+    D --> B
+    B -->|Error & Permanent| E[❌ Fail]
+    C --> F{🔍 Compare Content}
+    F -->|Match| G[✅ Success]
+    F -->|Mismatch| H[❌ Integrity Fail]
+
+    style A fill:#e1f5ff
+    style B fill:#fff4e1
+    style C fill:#e8f5e9
+    style G fill:#c8e6c9
+    style H fill:#ffcdd2
+    style E fill:#ffcdd2

@@ -8,6 +8,11 @@ When you upload data using the SDK, it goes through an encoding process that cre
 
 #### Step 1: Generate Slivers
 
+![Step 1: Generate Slivers](../images/01-generate-slivers.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TD
     A[Raw Data Bytes] -->|Input| B[Reed-Solomon Encoder]
@@ -20,7 +25,14 @@ flowchart TD
     style E fill:#fff4e1
 ```
 
+</details>
+
 #### Step 2: Generate Blob Metadata
+
+![Step 2: Generate Blob Metadata](../images/01-generate-blob-metadata.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 flowchart TD
@@ -32,7 +44,14 @@ flowchart TD
     style F fill:#e8f5e9
 ```
 
+</details>
+
 #### Step 3: Organize by Storage Nodes
+
+![Step 3: Organize by Storage Nodes](../images/01-organize-by-storage-nodes.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 flowchart TD
@@ -43,6 +62,8 @@ flowchart TD
     
     style J fill:#f3e5f5
 ```
+
+</details>
 
 ### 1. Blob Encoding
 

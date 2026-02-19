@@ -1,0 +1,18 @@
+graph TD
+    Total[Total Storage Cost] --> WAL_Costs[WAL Costs]
+    Total --> SUI_Costs[SUI Costs]
+
+    WAL_Costs --> StorageRes[1. Storage Resource]
+    WAL_Costs --> Upload[2. Upload Cost]
+
+    SUI_Costs --> Tx[3. Transaction Gas]
+    SUI_Costs --> Obj[4. Object Deposit]
+
+    StorageRes -.->|Linear w/ Size and Duration| Var1[Variable Cost]
+    Upload -.->|Linear w/ Size only| Var2[One-time Cost]
+    Tx -.->|Fixed per op| Fixed1[Processing Fee]
+    Obj -.->|Refundable| Fixed2[Storage Fund]
+    
+    style Total fill:#f9f,stroke:#333,stroke-width:2px
+    style WAL_Costs fill:#69f,stroke:#333,stroke-width:2px
+    style SUI_Costs fill:#69f,stroke:#333,stroke-width:2px

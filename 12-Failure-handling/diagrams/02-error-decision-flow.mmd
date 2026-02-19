@@ -1,0 +1,24 @@
+flowchart TD
+    A[Error Caught] --> B{Is it a<br/>RetryableWalrusClientError?}
+    B -->|Yes| C[Reset Client State]
+    C --> D["client.reset()"]
+    D --> E[Retry Operation]
+    E --> F{Success?}
+    F -->|Yes| G[✅ Continue]
+    F -->|No| H{Max retries<br/>reached?}
+    H -->|No| E
+    H -->|Yes| I[❌ Fail with Error]
+    
+    B -->|No| J{Is it a<br/>4xx Client Error?}
+    J -->|Yes| K{Is it 429<br/>Too Many Requests?}
+    K -->|Yes| L[Wait & Retry]
+    L --> E
+    K -->|No| I
+    
+    J -->|No| M{Is it a<br/>5xx Server Error?}
+    M -->|Yes| N[Retry with Backoff]
+    N --> E
+    M -->|No| I
+    
+    style G fill:#d4edda,stroke:#28a745
+    style I fill:#f8d7da,stroke:#dc3545

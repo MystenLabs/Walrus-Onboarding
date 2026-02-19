@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant C as Client
+    participant P as Publisher
+    participant S as Sui Blockchain
+    participant N as Storage Nodes
+
+    C->>P: 1. Upload blob (HTTP PUT)
+    P->>P: 2. Encode blob (erasure coding)
+    P->>P: 3. Manage wallet/gas
+    P->>S: 4. Register blob on-chain
+    S-->>P: Blob object created
+    P->>N: 5. Distribute slivers (parallel)
+    N-->>P: 6. Return signatures
+    P->>P: Check quorum (≥2/3)
+    P->>S: 7. Post certificate
+    S-->>P: Certificate confirmed
+    P->>C: 8. Return blob ID + metadata

@@ -1,0 +1,35 @@
+sequenceDiagram
+    participant Client
+    participant Sui as Sui Network
+    participant SN as Storage Nodes
+
+    Note over Client: 1. Chunk Creation
+    Client->>Client: Encode Blob (Erasure Coding)
+    Client->>Client: Generate Slivers & Metadata
+
+    Note over Client, Sui: 2. Submission (Registration)
+    Client->>Sui: register_blob(BlobMetadata, StorageResource)
+    Sui-->>Client: Blob Object (Registered)
+
+    Note over Client, SN: 3. Sealing (Store Slivers)
+    par Parallel Uploads
+        Client->>SN: PUT /v1/blobs/... (Slivers)
+        SN-->>Client: 200 OK
+    end
+
+    Note over Client, SN: 4. Proof Creation
+    Client->>SN: GET /v1/blobs/.../confirmation/...
+    SN->>SN: Check Storage & Registration
+    SN-->>Client: Signed Confirmation
+
+    Note over Client, Sui: 5. Certification
+    Client->>Sui: certify_blob(Signatures)
+    Sui->>Sui: Verify Signatures & Quorum
+    Sui-->>Client: Success
+    Sui->>SN: Emit BlobCertified Event
+
+    Note over SN: 6. Sync (Event Loop)
+    SN->>SN: Process BlobCertified Event
+    opt Missing Slivers
+        SN->>SN: Peer Recovery (Fetch missing slivers)
+    end

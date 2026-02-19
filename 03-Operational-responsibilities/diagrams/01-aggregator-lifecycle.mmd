@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant C as Client
+    participant A as Aggregator
+    participant S as Sui Blockchain
+    participant N as Storage Nodes
+
+    C->>A: 1. Request blob (HTTP GET /blob-id)
+    A->>S: 2. Query blob metadata
+    S-->>A: Blob status + encoding info
+    A->>N: 3. Fetch slivers (parallel, need 334)
+    N-->>A: Return slivers
+    A->>A: 4. Reconstruct blob (erasure decode)
+    A->>A: 5. Consistency check
+    opt Caching enabled
+        A->>A: 6. Cache reconstructed blob
+    end
+    A->>C: 7. Return blob data (HTTP 200)
