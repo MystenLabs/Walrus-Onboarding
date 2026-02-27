@@ -64,8 +64,8 @@ walrus get-blob-attribute <BLOB_OBJ_ID>
 # Set attributes
 walrus set-blob-attribute <BLOB_OBJ_ID> --attr "Content-Type" "image/png" --attr "Author" "Alice"
 
-# Remove specific attribute keys
-walrus remove-blob-attribute-fields <BLOB_OBJ_ID> --keys "Content-Type,Author"
+# Remove specific attribute keys (space-separated, not comma-separated)
+walrus remove-blob-attribute-fields <BLOB_OBJ_ID> --keys "Content-Type" "Author"
 
 # Remove all attributes
 walrus remove-blob-attribute <BLOB_OBJ_ID>

@@ -34,9 +34,6 @@ walrus store file.txt --epochs 10 --force
 # Use upload relay (handles encoding/fan-out on your behalf)
 walrus store file.txt --epochs 10 --upload-relay https://relay.example.com
 
-# Control concurrency
-walrus store file.txt --epochs 10 --upload-mode conservative  # or balanced / aggressive
-
 # Shared blob (anyone can fund/extend; must be permanent)
 walrus store archive.zip --epochs 30 --share
 ```

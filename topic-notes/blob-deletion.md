@@ -15,19 +15,19 @@
 
 ```bash
 # Delete all owned objects with this blob ID (most common)
-walrus delete --blob-id <BLOB_ID>
+walrus delete --blob-ids <BLOB_ID>
 
 # Delete by computing blob ID from a local file
-walrus delete --file <FILE_PATH>
+walrus delete --files <FILE_PATH>
 
 # Delete a specific Sui blob object (only that one object)
-walrus delete --object-id <OBJECT_ID>
+walrus delete --object-ids <OBJECT_ID>
 
 # Skip confirmation prompt
-walrus delete --blob-id <BLOB_ID> --yes
+walrus delete --blob-ids <BLOB_ID> --yes
 
 # Skip status check after deletion (faster, useful in scripts)
-walrus delete --blob-id <BLOB_ID> --no-status-check
+walrus delete --blob-ids <BLOB_ID> --no-status-check
 ```
 
 ### Burning Blob Objects (reclaim SUI deposit)
@@ -84,7 +84,7 @@ Uploaded → Available ───────────────────
 
 ```bash
 # Quilt deletion — targets the entire quilt, not individual patches
-walrus delete --blob-id <QUILT_BLOB_ID>
+walrus delete --blob-ids <QUILT_BLOB_ID>
 
 # Individual patches cannot be deleted; you must delete the whole quilt
 # QuiltPatchId is not a valid target for walrus delete
