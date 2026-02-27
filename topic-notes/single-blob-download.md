@@ -57,12 +57,12 @@ RUST_LOG=walrus=debug walrus read <BLOB_ID> --out file.txt
 
 ```typescript
 // readBlob() handles shard retrieval, decoding, and integrity checks automatically
-const data = await client.walrus.readBlob({ blobId });
+const data = await client.readBlob({ blobId });
 
 // Download with error classification
 async function downloadWithErrorHandling(blobId: string): Promise<Uint8Array> {
   try {
-    return await client.walrus.readBlob({ blobId });
+    return await client.readBlob({ blobId });
   } catch (error) {
     if (error instanceof BlobNotCertifiedError) {
       throw new Error('Blob not found or not yet certified');

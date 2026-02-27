@@ -29,9 +29,10 @@
 
 ```typescript
 // Compute metadata before upload — derives root hash, blob ID, nonce
-const { rootHash, blobDigest, nonce, blobId } = await client.walrus.computeBlobMetadata({
+const { rootHash, blobDigest, nonce, blobId } = await client.computeBlobMetadata({
   bytes: blob,
 });
+// blobDigest: () => Promise<Uint8Array>  // lazy — call blobDigest() to get hash
 
 console.log('Root hash:', Buffer.from(rootHash).toString('hex'));
 console.log('Blob ID:', blobId);
@@ -42,8 +43,8 @@ console.log('Encoding type:', metadata.encodingType); // RS2 (Reed-Solomon)
 
 ```typescript
 // For direct uploads: aggregate node confirmations into a certificate
-const confirmations = await client.walrus.writeEncodedBlobToNodes({ ... });
-const certificate = await client.walrus.certificateFromConfirmations({
+const confirmations = await client.writeEncodedBlobToNodes({ ... });
+const certificate = await client.certificateFromConfirmations({
   confirmations,
   blobId,
   blobObjectId,
@@ -56,7 +57,7 @@ const certificate = await client.walrus.certificateFromConfirmations({
 
 ```typescript
 // Relay returns a certificate after achieving quorum
-const { certificate, blobId } = await client.walrus.writeBlobToUploadRelay({
+const { certificate, blobId } = await client.writeBlobToUploadRelay({
   blob,
   blobId: metadata.blobId,
   nonce: metadata.nonce,
@@ -65,7 +66,7 @@ const { certificate, blobId } = await client.walrus.writeBlobToUploadRelay({
   blobObjectId: registerResult.blob.id.id,
 });
 
-await client.walrus.executeCertifyBlobTransaction({
+await client.executeCertifyBlobTransaction({
   blobId,
   blobObjectId: registerResult.blob.id.id,
   certificate,
@@ -78,7 +79,7 @@ await client.walrus.executeCertifyBlobTransaction({
 
 ```typescript
 async function verifyBlobIntegrity(blobId: string, expectedData: Uint8Array): Promise<boolean> {
-  const downloadedData = await client.walrus.readBlob({ blobId });
+  const downloadedData = await client.readBlob({ blobId });
 
   if (downloadedData.length !== expectedData.length) {
     throw new Error('Blob size mismatch');
@@ -104,7 +105,7 @@ async function verifyBlobIntegrity(blobId: string, expectedData: Uint8Array): Pr
 
 ```typescript
 try {
-  const data = await client.walrus.readBlob({ blobId });
+  const data = await client.readBlob({ blobId });
 } catch (error) {
   if (error instanceof InconsistentBlobError) {
     // Permanent — blob encoding is incorrect, do not retry

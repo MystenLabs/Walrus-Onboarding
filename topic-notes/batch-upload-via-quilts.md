@@ -61,7 +61,8 @@ Cost: 0.0017 WAL
 
 ```typescript
 // Simple one-step method — handles encode, register, upload, certify
-const result = await client.walrus.writeFiles(files, {
+const result = await client.writeFiles({
+  files,
   epochs: 10,
   deletable: true,
   signer: keypair,
@@ -69,8 +70,8 @@ const result = await client.walrus.writeFiles(files, {
 
 // files is an array of WalrusFile objects:
 const files = [
-  { data: uint8ArrayData1, identifier: 'intro', tags: { chapter: '1' } },
-  { data: uint8ArrayData2, identifier: 'api-ref', tags: { chapter: '2' } },
+  WalrusFile.from({ contents: uint8ArrayData1, identifier: 'intro', tags: { chapter: '1' } }),
+  WalrusFile.from({ contents: uint8ArrayData2, identifier: 'api-ref', tags: { chapter: '2' } }),
 ];
 ```
 

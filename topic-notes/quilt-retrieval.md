@@ -53,7 +53,7 @@ walrus blob-status --blob-id <QUILT_BLOB_ID>
 
 ```typescript
 // Retrieve by identifier(s) using SDK
-const quiltBlob = await client.walrus.getBlob({ blobId: quiltId });
+const quiltBlob = await client.getBlob({ blobId: quiltId });
 const files = await quiltBlob.files({
   identifiers: ['intro', 'api-ref'],
 });
@@ -74,7 +74,7 @@ const files = await quiltBlob.files({
 // Safe retrieval with error handling
 async function safeRetrieve(quiltId: string, identifier: string) {
   try {
-    const quiltBlob = await client.walrus.getBlob({ blobId: quiltId });
+    const quiltBlob = await client.getBlob({ blobId: quiltId });
     const files = await quiltBlob.files({ identifiers: [identifier] });
     return files.length > 0 ? files[0] : null;
   } catch (error) {

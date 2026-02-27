@@ -52,7 +52,7 @@ Stored blob:
 
 ```typescript
 // SDK writeBlob() handles all 4 steps automatically
-const result = await client.walrus.writeBlob({
+const result = await client.writeBlob({
   blob: new Uint8Array(fileBytes),
   deletable: true,   // false = permanent
   epochs: 3,
@@ -64,7 +64,7 @@ const clientWithRelay = new WalrusClient({
   uploadRelay: { host: 'https://relay.testnet.walrus.space' },
   // ...
 });
-const result = await clientWithRelay.walrus.writeBlob({ ... });
+const result = await clientWithRelay.writeBlob({ ... });
 ```
 
 ### 4-Step Flow (low-level)

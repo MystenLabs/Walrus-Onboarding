@@ -87,7 +87,7 @@ export async function retry<T>(
 
 ```typescript
 const result = await retry(
-  () => client.walrus.writeBlob({ blob, deletable: true, epochs: 3, signer: keypair }),
+  () => client.writeBlob({ blob, deletable: true, epochs: 3, signer: keypair }),
   {
     count: 5,
     delay: 1000,
